@@ -2,4 +2,4 @@
 
 @Authors: 
 Georgios Kokolakis gkokol@ics.forth.gr
-Olympia  Popa      csd4239@csd.uoc.gr
+Olimpia  Popa      csd4239@csd.uoc.gr
