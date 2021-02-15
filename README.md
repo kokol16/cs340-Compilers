@@ -1,3 +1,3 @@
 # cs340-Compilers
 
-@Authors:
+@Authors:Kokolakh eisai vlakas
