@@ -379,12 +379,14 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[35] =
+static const flex_int16_t yy_accept[58] =
     {   0,
         0,    0,    5,    4,    3,    2,    2,    2,    2,    2,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    1,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    0
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
+        2,    2,    2,    2,    2,    2,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -398,10 +400,10 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    4,    4,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        1,    1,    1,    1,    3,    1,    4,    5,    6,    7,
+        1,    1,    1,    1,    3,    1,    5,    6,    7,    8,
 
-        8,    9,   10,   11,   12,    4,    4,    4,    4,   13,
-       14,   15,    4,   16,    4,   17,   18,    4,    4,    4,
+        9,   10,    4,   11,   12,    4,   13,   14,    4,   15,
+       16,    4,    4,   17,   18,   19,   20,    4,   21,    4,
         4,    4,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -419,48 +421,61 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[19] =
+static const YY_CHAR yy_meta[22] =
     {   0,
         1,    1,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
+        2
     } ;
 
-static const flex_int16_t yy_base[36] =
+static const flex_int16_t yy_base[59] =
     {   0,
-        0,    0,   45,   46,   46,    0,   36,   30,   24,   32,
-       24,   28,    0,   28,   30,   23,    0,   21,   26,   21,
-       26,   25,   17,   16,   11,   19,   14,   18,   10,    5,
-        9,    5,   12,   46,   17
+        0,    0,   74,   75,   75,    0,   58,   55,   55,   56,
+       17,   59,   52,   11,   50,   57,   48,   53,    0,   55,
+       53,   46,   42,   45,   41,   42,    0,   49,   41,   35,
+       34,   32,   39,   45,   30,   39,   29,   39,   40,   24,
+       34,   28,   28,   28,   30,   19,   22,   18,   25,   17,
+       19,   15,    9,   12,   17,   10,   75,   22
     } ;
 
-static const flex_int16_t yy_def[36] =
+static const flex_int16_t yy_def[59] =
     {   0,
-       34,    1,   34,   34,   34,   35,   35,   35,   35,   35,
-       35,   35,   35,   35,   35,   35,   35,   35,   35,   35,
-       35,   35,   35,   35,   35,   35,   35,   35,   35,   35,
-       35,   35,   35,    0,   34
+       57,    1,   57,   57,   57,   58,   58,   58,   58,   58,
+       58,   58,   58,   58,   58,   58,   58,   58,   58,   58,
+       58,   58,   58,   58,   58,   58,   58,   58,   58,   58,
+       58,   58,   58,   58,   58,   58,   58,   58,   58,   58,
+       58,   58,   58,   58,   58,   58,   58,   58,   58,   58,
+       58,   58,   58,   58,   58,   58,    0,   57
     } ;
 
-static const flex_int16_t yy_nxt[65] =
+static const flex_int16_t yy_nxt[97] =
     {   0,
-        4,    5,    4,    6,    7,    6,    6,    8,    9,    6,
-        6,   10,    6,    6,   11,    6,   12,    6,   13,   17,
-       33,   17,   32,   31,   30,   29,   28,   27,   17,   17,
-       26,   25,   24,   23,   22,   21,   17,   20,   19,   18,
-       17,   16,   15,   14,   34,    3,   34,   34,   34,   34,
-       34,   34,   34,   34,   34,   34,   34,   34,   34,   34,
-       34,   34,   34,   34
+        4,    5,    4,    6,    7,    8,    9,    6,   10,   11,
+        6,   12,    6,   13,   14,   15,   16,    6,   17,    6,
+       18,   24,   29,   19,   27,   27,   30,   56,   55,   27,
+       54,   53,   25,   27,   52,   27,   26,   51,   27,   50,
+       27,   49,   27,   48,   47,   46,   45,   27,   44,   43,
+       42,   41,   40,   27,   27,   39,   38,   27,   37,   36,
+       35,   34,   27,   33,   32,   31,   27,   28,   27,   23,
+       22,   21,   20,   57,    3,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57
+
     } ;
 
-static const flex_int16_t yy_chk[65] =
+static const flex_int16_t yy_chk[97] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,   35,   33,
-       32,   31,   30,   29,   28,   27,   26,   25,   24,   23,
-       22,   21,   20,   19,   18,   16,   15,   14,   12,   11,
-       10,    9,    8,    7,    3,   34,   34,   34,   34,   34,
-       34,   34,   34,   34,   34,   34,   34,   34,   34,   34,
-       34,   34,   34,   34
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,   11,   14,   58,   56,   55,   14,   54,   53,   52,
+       51,   50,   11,   49,   48,   47,   11,   46,   45,   44,
+       43,   42,   41,   40,   39,   38,   37,   36,   35,   34,
+       33,   32,   31,   30,   29,   28,   26,   25,   24,   23,
+       22,   21,   20,   18,   17,   16,   15,   13,   12,   10,
+        9,    8,    7,    3,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57
+
     } ;
 
 /* Table of booleans, true if rule could match eol. */
@@ -483,18 +498,17 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "scanner.l"
-/*lex program to count number of words*/
 #line 3 "scanner.l"
 #include<stdio.h> 
 #include<string.h> 
 #include"scanner.h"
 #define YY_DECL int alpha_yylex (void * yylval)
 #define  alpha_ptr ( (alpha_token_t * )yylval )
-static int counter=0;
-#line 495 "lex.yy.c"
+static unsigned int counter=0;
+#line 509 "lex.yy.c"
 /*keep current line */
 /* Rules Section*/
-#line 498 "lex.yy.c"
+#line 512 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -711,10 +725,10 @@ YY_DECL
 		}
 
 	{
-#line 15 "scanner.l"
+#line 16 "scanner.l"
 
 
-#line 718 "lex.yy.c"
+#line 732 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -741,13 +755,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 35 )
+				if ( yy_current_state >= 58 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 46 );
+		while ( yy_base[yy_current_state] != 75 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -783,9 +797,10 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 17 "scanner.l"
+#line 18 "scanner.l"
 {
-     alpha_ptr->numline=yylineno;
+            /*
+            alpha_ptr->numline=yylineno;
             alpha_ptr->numToken=++counter;
             int length = strlen(yytext)+1;
             alpha_ptr->content=malloc(sizeof(char) * length);
@@ -793,20 +808,18 @@ YY_RULE_SETUP
 
             int length_type= strlen("KEYWORD")+1;
             alpha_ptr->type=malloc(sizeof(char) * length_type);
-            strncpy ( alpha_ptr->type , "KEYWORD" , length_type);
+            strncpy ( alpha_ptr->type , "KEYWORD" , length_type);*/
 
+            alpha_CreateInfo(yylval , "KEYWORD",++counter);
 
-
-            printf("ID :  %s\n",yytext) ;
-
-
+            yylval =alpha_CreateNextNode(yylval);
             
-            alpha_token_t * alpha_node ;
+            /*alpha_token_t * alpha_node ;
             
             alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
            
             alpha_ptr->alpha_yylex=alpha_node;
-            yylval= alpha_ptr->alpha_yylex;
+            yylval= alpha_ptr->alpha_yylex;*/
 }
 	YY_BREAK
 case 2:
@@ -814,7 +827,7 @@ YY_RULE_SETUP
 #line 41 "scanner.l"
 {
             
-           
+           /*
             alpha_ptr->numline=yylineno;
             alpha_ptr->numToken=++counter;
             int length = strlen(yytext)+1;
@@ -823,20 +836,20 @@ YY_RULE_SETUP
 
             int length_type= strlen("IDENT")+1;
             alpha_ptr->type=malloc(sizeof(char) * length_type);
-            strncpy ( alpha_ptr->type , "IDENT" , length_type);
+            strncpy ( alpha_ptr->type , "IDENT" , length_type);*/
 
 
+            alpha_CreateInfo(yylval , "IDENT",++counter);
+            //printf("ID :  %s\n",yytext) ;
+            yylval =alpha_CreateNextNode(yylval);
 
-            printf("ID :  %s\n",yytext) ;
 
-
-            
-            alpha_token_t * alpha_node ;
+            /* alpha_token_t * alpha_node ;
             
             alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
            
             alpha_ptr->alpha_yylex=alpha_node;
-            yylval= alpha_ptr->alpha_yylex;
+            yylval= alpha_ptr->alpha_yylex;*/
 
         } 
 	YY_BREAK
@@ -851,7 +864,7 @@ YY_RULE_SETUP
 #line 72 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 855 "lex.yy.c"
+#line 868 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1148,7 +1161,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 35 )
+			if ( yy_current_state >= 58 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1176,11 +1189,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 35 )
+		if ( yy_current_state >= 58 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 34);
+	yy_is_jam = (yy_current_state == 57);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1891,11 +1904,9 @@ int main(int argc , char * argv[])
     alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
     tmp=alpha_head;
 
-    // The function that starts the analysis 
-
-    alpha_yylex(tmp); 
-    //tmp=NULL;
     
+    alpha_yylex(tmp); 
+    printf("\b\b\b\b");
     while(alpha_head->alpha_yylex != NULL)
     {
         printf("%u: ",alpha_head->numline);
@@ -1903,8 +1914,8 @@ int main(int argc , char * argv[])
         printf("\t\"%s\" ",alpha_head->content);
         printf("\t%s ",alpha_head->type);
 
-        alpha_head=alpha_head->alpha_yylex;
         printf("\n");
+        alpha_head=alpha_head->alpha_yylex;
     }
     return 0; 
 } 

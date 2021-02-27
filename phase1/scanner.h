@@ -7,20 +7,31 @@ typedef struct alpha_token_t {
 
 }alpha_token_t;
 
+#define  alpha_ptr ( (alpha_token_t * )yylval )
 
-alpha_token_t * CreateInfo(char * identifier , unsigned int  counter)
+void  alpha_CreateInfo(void* yylval ,  char * identifier , unsigned int  counter)
 {
-    static alpha_token_t tmp_alpha;
-    tmp_alpha.numline=yylineno;
-    tmp_alpha.numToken=++counter;
+    
+    alpha_ptr->numline=yylineno;
+    alpha_ptr->numToken=counter;
     int length = strlen(yytext)+1;
-    tmp_alpha.content=malloc(sizeof(char) * length);
-    strncpy ( tmp_alpha.content , yytext , length);
+    alpha_ptr->content=malloc(sizeof(char) * length);
+    memcpy ( alpha_ptr->content , yytext , length);
 
     int length_type= strlen(identifier)+1;
-    tmp_alpha.type=malloc(sizeof(char) * length_type);
-    strncpy ( tmp_alpha.type , identifier , length_type);
+    alpha_ptr->type=malloc(sizeof(char) * length_type);
+    memcpy ( alpha_ptr->type , identifier , length_type);
 
-    return &tmp_alpha;
+   
+
+}
+alpha_token_t * alpha_CreateNextNode(void* yylval)
+{
+    static alpha_token_t * alpha_node ;
+            
+    alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
+           
+    alpha_ptr->alpha_yylex=alpha_node;
+    return  alpha_ptr->alpha_yylex;
 
 }
