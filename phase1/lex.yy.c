@@ -503,8 +503,8 @@ char *yytext;
 #include<string.h> 
 #include"scanner.h"
 #define YY_DECL int alpha_yylex (void * yylval)
-#define  alpha_ptr ( (alpha_token_t * )yylval )
 static unsigned int counter=0;
+static short  FirstNode=1;
 #line 509 "lex.yy.c"
 /*keep current line */
 /* Rules Section*/
@@ -799,72 +799,34 @@ case 1:
 YY_RULE_SETUP
 #line 18 "scanner.l"
 {
-            /*
-            alpha_ptr->numline=yylineno;
-            alpha_ptr->numToken=++counter;
-            int length = strlen(yytext)+1;
-            alpha_ptr->content=malloc(sizeof(char) * length);
-            strncpy ( alpha_ptr->content , yytext , length);
-
-            int length_type= strlen("KEYWORD")+1;
-            alpha_ptr->type=malloc(sizeof(char) * length_type);
-            strncpy ( alpha_ptr->type , "KEYWORD" , length_type);*/
-
-            alpha_CreateInfo(yylval , "KEYWORD",++counter);
-
-            yylval =alpha_CreateNextNode(yylval);
-            
-            /*alpha_token_t * alpha_node ;
-            
-            alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-           
-            alpha_ptr->alpha_yylex=alpha_node;
-            yylval= alpha_ptr->alpha_yylex;*/
+            alpha_token_t * tmp;
+            if(FirstNode==1){    FirstNode=0;    tmp=yylval;             }
+            else            {    tmp = alpha_CreateNextNode(yylval);      }
+            alpha_CreateInfo(tmp , "KEYWORD",++counter);       
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 41 "scanner.l"
+#line 24 "scanner.l"
 {
-            
-           /*
-            alpha_ptr->numline=yylineno;
-            alpha_ptr->numToken=++counter;
-            int length = strlen(yytext)+1;
-            alpha_ptr->content=malloc(sizeof(char) * length);
-            strncpy ( alpha_ptr->content , yytext , length);
-
-            int length_type= strlen("IDENT")+1;
-            alpha_ptr->type=malloc(sizeof(char) * length_type);
-            strncpy ( alpha_ptr->type , "IDENT" , length_type);*/
-
-
-            alpha_CreateInfo(yylval , "IDENT",++counter);
-            //printf("ID :  %s\n",yytext) ;
-            yylval =alpha_CreateNextNode(yylval);
-
-
-            /* alpha_token_t * alpha_node ;
-            
-            alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-           
-            alpha_ptr->alpha_yylex=alpha_node;
-            yylval= alpha_ptr->alpha_yylex;*/
-
-        } 
+            alpha_token_t * tmp;
+            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
+            else                {   tmp = alpha_CreateNextNode(yylval); }
+            alpha_CreateInfo(tmp , "IDENT",++counter);    
+} 
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 30 "scanner.l"
 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 32 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 868 "lex.yy.c"
+#line 830 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1881,7 +1843,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 72 "scanner.l"
+#line 32 "scanner.l"
 
   
 int yywrap(void){} 
@@ -1902,20 +1864,22 @@ int main(int argc , char * argv[])
     }
     alpha_token_t * alpha_head, *tmp;
     alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-    tmp=alpha_head;
-
+    alpha_head->alpha_yylex=NULL;
     
-    alpha_yylex(tmp); 
-    printf("\b\b\b\b");
-    while(alpha_head->alpha_yylex != NULL)
+
+    alpha_yylex((void*)alpha_head); 
+    //printf("%u: \n",tmp->numline);
+    tmp=alpha_head;
+    int line_width=10;
+    while(tmp != NULL)
     {
-        printf("%u: ",alpha_head->numline);
-        printf(" #%u",alpha_head->numToken);
-        printf("\t\"%s\" ",alpha_head->content);
-        printf("\t%s ",alpha_head->type);
+        printf("%u: ",tmp->numline);
+        printf(" #%u",tmp->numToken);
+        printf("\t%s" ,tmp->content);
+        printf("\t%*s ",line_width ,tmp->type);
 
         printf("\n");
-        alpha_head=alpha_head->alpha_yylex;
+        tmp=tmp->alpha_yylex;
     }
     return 0; 
 } 
