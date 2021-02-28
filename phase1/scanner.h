@@ -13,9 +13,17 @@ void alpha_CreateInfo(void *yylval, char *identifier, unsigned int counter)
 {
   alpha_ptr->numline = yylineno;
   alpha_ptr->numToken = counter;
-  int length = strlen(yytext) + 1;
-  alpha_ptr->content = malloc(sizeof(char) * length);
-  memcpy(alpha_ptr->content, yytext, length);
+  if (strcmp(identifier,"COMMENT")==0)
+  {
+    alpha_ptr->content = malloc(2*sizeof(char) );
+    memcpy(alpha_ptr->content, "\"\"", 2);
+  }
+  else
+  {
+    int length = strlen(yytext) + 1;
+    alpha_ptr->content = malloc(sizeof(char) * length);
+    memcpy(alpha_ptr->content, yytext, length);
+  }
 
   int length_type = strlen(identifier) + 1;
   alpha_ptr->type = malloc(sizeof(char) * length_type);
@@ -75,3 +83,12 @@ alpha_token_t *alpha_CreateNextNode(void *yylval)
            
             alpha_ptr->alpha_yylex=alpha_node;
             yylval= alpha_ptr->alpha_yylex;*/
+
+/*
+10 omorfos l++alla% 214.4 hafdhfd 
+for 0.3432 ; "fsdsfad\nfsd" 432.//
+6 "fsdfsda" //1213.43;
+//"ok bro" sda
+//"fdsfds"
+"ds\n\tad"
+*/
