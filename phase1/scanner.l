@@ -16,127 +16,128 @@ ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
 REAL [0-9]+[.][0-9]+
 STRING \"[^\n"]*\"  
-ONELINECOMMENTT "//".*              
+ONELINECOMMENTT "//".*         
 /*\"[^"\n]∗\"  */
 /* Rules Section*/
+
 
 %% 
 \n   {
        
 }
 if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil  {
-            alpha_token_t * tmp;
-            if(FirstNode==1){    FirstNode=0;    tmp=yylval;             }
-            else            {    tmp = alpha_CreateNextNode(yylval);      }
-            alpha_CreateInfo(tmp , "KEYWORD",++counter);       
+            alpha_CreateData("KEYWORD",yylval);
+
+
 }
 {STRING}    {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "STRING",++counter);    
+            alpha_CreateData("STRING",yylval);
+
+
 } 
 {REAL}    {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "REALCONST",++counter);    
+            alpha_CreateData("REALCONST",yylval);
+
+
 } 
 {INT}    {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "INTCONST",++counter);    
+            alpha_CreateData("INTCONST",yylval);
+
+
 } 
 {ID}    {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "IDENT",++counter);    
+            alpha_CreateData("IDENT",yylval);
+
 } 
 =   {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "OPERATOR",++counter);
+            alpha_CreateData("OPERATOR",yylval);
+
 }
 ==  {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "OPERATOR",++counter);
+            alpha_CreateData("OPERATOR",yylval);
+
 }
 >=  {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "OPERATOR",++counter);
+            alpha_CreateData("OPERATOR",yylval);
+
 }
 %  {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "OPERATOR",++counter);
+            alpha_CreateData("OPERATOR",yylval);
+
 }
 "++"  {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "OPERATOR",++counter);
+            alpha_CreateData("OPERATOR",yylval);
+
 }
 
 "{" {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "PUNCTUATION",++counter);
+            alpha_CreateData("PUNCTUATION",yylval);
+
 }
 ";" {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "PUNCTUATION",++counter);
+            alpha_CreateData("PUNCTUATION",yylval);
 }
 
 {ONELINECOMMENTT}   {
-            alpha_token_t * tmp;
-            if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-            else                {   tmp = alpha_CreateNextNode(yylval); }
-            alpha_CreateInfo(tmp , "COMMENT",++counter);
+            alpha_CreateData("COMMENT",yylval);
 }
 
-"/*"       {
-    int init_line=yylineno;
-    BEGIN(COMMENT);
+"/*"    {
+    int c;
+    int nested=0;
+    //printf("opened multti line  comment\n");
+    int start_line;
+    int last_line;
+    while((c=input())!=EOF )
+    {
+        if(c=='*')
+        {
+            if((c=input())=='/' )
+            {
+                if(nested==0)
+                {
+                    alpha_CreateData("COMMENT",yylval);
+                    //printf("closed one multi line  comment\n");
+                    break;
+                }
+                else
+                {
+                    alpha_CreateData("NESTED COMMENT",yylval);
+                    //printf("closed one nested comment\n");
+
+                    nested--;
+                }    
+            }
+            else
+            {
+                unput(c);
+            }
+        }
+        else if(c=='/')
+        {
+             if((c=input())=='*' )
+            {
+                nested++;
+                //printf("open one nested comment\n");
+            }
+            else
+            {
+                unput(c);
+            }
+        }
+    }
+
+
+}
+%% 
+void alpha_CreateData(char * operator , void * yylval)
+{
     alpha_token_t * tmp;
     if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-    else                {   tmp = alpha_CreateNextNode(yylval); }
-    alpha_CreateInfo(tmp , "COMMENT",++counter);
-    /*char str[10];
-    tmp->content=malloc(10*sizeof(char) );
-    sprintf(str, "%d", yylineno);
-    strcat(str,"-");
-    memcpy(tmp->content , str , sizeof(str));*/
-    //int last_line=yylineno;
-    //printf("%d-%d\n",init_line,last_line);
-
-    
-
-} 
-<COMMENT>[^*]*
-<COMMENT>"*"+[^*/]*
-<COMMENT>"*"+"/"    {
-    int last_line=yylineno;
-    /*char str[10];
-    sprintf(str, "%d", yylineno);
-    strcat(str,"\"");
-    memcpy(->content , str , sizeof(str));*/
-    printf("last line %d\n",last_line);
-    BEGIN(INITIAL);
+     else                {   tmp = alpha_CreateNextNode(yylval); }
+    alpha_CreateInfo(tmp , operator,++counter);
 }
 
-%% 
-  
 int yywrap(void){} 
 
 int main(int argc , char * argv[]) 

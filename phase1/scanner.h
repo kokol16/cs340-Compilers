@@ -8,12 +8,14 @@ typedef struct alpha_token_t
 
 } alpha_token_t;
 #define alpha_ptr ((alpha_token_t *)yylval)
+void alpha_CreateData(char * operator , void * yylval);
+
 
 void alpha_CreateInfo(void *yylval, char *identifier, unsigned int counter)
 {
   alpha_ptr->numline = yylineno;
   alpha_ptr->numToken = counter;
-  if (strcmp(identifier,"COMMENT")==0)
+  if (strcmp(identifier,"COMMENT")==0 || strcmp(identifier,"NESTED COMMENT")==0 )
   {
     alpha_ptr->content = malloc(2*sizeof(char) );
     memcpy(alpha_ptr->content, "\"\"", 2);
