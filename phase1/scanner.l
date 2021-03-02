@@ -4,13 +4,11 @@
 #include<string.h> 
 #include"scanner.h"
 #define YY_DECL int alpha_yylex (void * yylval)
-static unsigned int counter=0;
-static short  FirstNode=1;
+
 %} 
 /*keep current line */
 %option yylineno
 %option case-insensitive 
-%x COMMENT INCLUDE
 
 ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
@@ -26,69 +24,89 @@ ONELINECOMMENTT "//".*
        
 }
 if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil  {
-            alpha_CreateData("KEYWORD",yylval);
+          alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);
 
+            alpha_PrintData(tmp ,"<-enumerated" );
 
 }
 {STRING}    {
-            alpha_CreateData("STRING",yylval);
+           alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,yytext,yylineno);
 
+            alpha_PrintData(tmp ,"<-char*" );
 
 } 
 {REAL}    {
-            alpha_CreateData("REALCONST",yylval);
+          alpha_token_t * tmp =   alpha_CreateData("REALCONST",yylval,yytext,yylineno);
 
+            alpha_PrintData(tmp ,"<-real" );
 
 } 
 {INT}    {
-            alpha_CreateData("INTCONST",yylval);
-
+          alpha_token_t * tmp =    alpha_CreateData("INTCONST",yylval,yytext,yylineno);
+            alpha_PrintData(tmp ,"<-integer" );
 
 } 
 {ID}    {
-            alpha_CreateData("IDENT",yylval);
+          alpha_token_t * tmp =    alpha_CreateData("IDENT",yylval,yytext,yylineno);
+            alpha_PrintData(tmp ,"<-char*" );
 
 } 
 =   {
-            alpha_CreateData("OPERATOR",yylval);
+          alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASSIGN",yylineno);
+
+            alpha_PrintData(tmp ,"<-enumerated" );
 
 }
 ==  {
-            alpha_CreateData("OPERATOR",yylval);
+           alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"EQUALS",yylineno);
+            alpha_PrintData(tmp ,"<-enumerated" );
+
 
 }
 >=  {
-            alpha_CreateData("OPERATOR",yylval);
+          alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"GREATER_EQUALS",yylineno);
+            alpha_PrintData(tmp ,"<-enumerated" );
 
 }
 %  {
-            alpha_CreateData("OPERATOR",yylval);
+          alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PERCENTAGES",yylineno);
+            alpha_PrintData(tmp ,"<-enumerated" );
 
 }
 "++"  {
-            alpha_CreateData("OPERATOR",yylval);
+           alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"PLUS_PLUS",yylineno);
+            alpha_PrintData(tmp ,"<-enumerated" );
 
 }
 
 "{" {
-            alpha_CreateData("PUNCTUATION",yylval);
+          alpha_token_t * tmp =   alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACE",yylineno);
+            alpha_PrintData(tmp ,"<-enumerated" );
+
 
 }
 ";" {
-            alpha_CreateData("PUNCTUATION",yylval);
+        alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"SEMICOLON",yylineno);
+        alpha_PrintData(tmp ,"<-enumerated" );       
 }
 
 {ONELINECOMMENTT}   {
-            alpha_CreateData("COMMENT",yylval);
+            alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
+            alpha_PrintData(tmp ,"<-enumerated" );
+            
 }
 
 "/*"    {
+    /* line_comment to multi_line_comment?? */
     int c;
     int nested=0;
     //printf("opened multti line  comment\n");
-    int start_line;
-    int last_line;
-    while((c=input())!=EOF )
+   
+    alpha_comments_info_t * head;
+    head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
+    head->next=NULL;
+    head->first_line =yylineno;
+    while((c=input())!=0 )
     {
         if(c=='*')
         {
@@ -96,13 +114,22 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
             {
                 if(nested==0)
                 {
-                    alpha_CreateData("COMMENT",yylval);
+                    
+                    unsigned int first_line= get_first_line(head,nested);
+                    alpha_token_t * tmp = alpha_CreateData("COMMENT",yylval,"BLOCK_COMMENT",first_line);
+                    alpha_PrintData(tmp ,"<-enumerated" );
+
                     //printf("closed one multi line  comment\n");
                     break;
                 }
                 else
                 {
-                    alpha_CreateData("NESTED COMMENT",yylval);
+                    unsigned int first_line= get_first_line(head,nested);
+
+                    alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
+                    alpha_PrintData(tmp ,"<-enumerated" );
+
+
                     //printf("closed one nested comment\n");
 
                     nested--;
@@ -117,6 +144,7 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
         {
              if((c=input())=='*' )
             {
+                push_comments_info(head,yylineno);
                 nested++;
                 //printf("open one nested comment\n");
             }
@@ -126,17 +154,31 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
             }
         }
     }
-
-
 }
 %% 
-void alpha_CreateData(char * operator , void * yylval)
+alpha_token_t * alpha_CreateData(char * identifier , void * yylval,char * additional_info , unsigned int start_line)
 {
     alpha_token_t * tmp;
     if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-     else                {   tmp = alpha_CreateNextNode(yylval); }
-    alpha_CreateInfo(tmp , operator,++counter);
+    else                {   tmp = alpha_CreateNextNode(yylval); }
+    alpha_CreateInfo(tmp , identifier,additional_info ,start_line);
+    return tmp;
+
 }
+void alpha_PrintData(alpha_token_t * node ,char * extra_type )
+{
+        int line_width=10;
+        printf("\b");
+        printf("%u:\t",node->numline);
+        printf("#%*u\t",line_width , node->numToken);
+        printf("%*s\t" ,line_width , node->content);
+        printf("%*s\t",line_width ,node->type);
+        printf("%*s\n" ,line_width ,extra_type);
+
+
+    
+}
+
 
 int yywrap(void){} 
 
@@ -161,7 +203,8 @@ int main(int argc , char * argv[])
 
     alpha_yylex((void*)alpha_head); 
     //printf("%u: \n",tmp->numline);
-    tmp=alpha_head;
+   
+   /* tmp=alpha_head;
     int line_width=10;
     while(tmp != NULL)
     {
@@ -172,6 +215,6 @@ int main(int argc , char * argv[])
 
         printf("\n");
         tmp=tmp->alpha_yylex;
-    }
+    }*/
     return 0; 
 } 
