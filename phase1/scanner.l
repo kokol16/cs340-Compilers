@@ -13,28 +13,26 @@
 ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
 REAL [0-9]+[.][0-9]+
-STRING \"[^\n"]*\"  
+
+/*STRING \"[^\n"]∗\"  */
+STRING \"[^"\n]*\"
+
 ONELINECOMMENTT "//".*         
-/*\"[^"\n]∗\"  */
 /* Rules Section*/
 
-
 %% 
+
+
+
 \n   {
        
 }
 if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil  {
-          alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);
+        alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);
 
-            alpha_PrintData(tmp ,"<-enumerated" );
+        alpha_PrintData(tmp ,"<-enumerated" );
 
 }
-{STRING}    {
-           alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,yytext,yylineno);
-
-            alpha_PrintData(tmp ,"<-char*" );
-
-} 
 {REAL}    {
           alpha_token_t * tmp =   alpha_CreateData("REALCONST",yylval,yytext,yylineno);
 
@@ -48,6 +46,58 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
 } 
 {ID}    {
           alpha_token_t * tmp =    alpha_CreateData("IDENT",yylval,yytext,yylineno);
+            alpha_PrintData(tmp ,"<-char*" );
+
+} 
+{STRING}    {
+            unsigned int index=0,str_index=0;
+            char string[yyleng];
+            while(yytext[index]!='\0')
+            {
+
+                string[str_index]=yytext[index];
+                if(yytext[index]=='\\')
+                {
+                    if(yytext[index+1]=='n')
+                    {
+                        
+                        if(yytext[index-1]!='\\')
+                        {
+                            string[str_index]='\n';
+                            index++;
+                        }
+                        
+                    }
+                    else if(yytext[index+1]=='t')
+                    {
+                        if(yytext[index-1]!='\\')
+                        {
+                            string[str_index]='\t';
+                            index++;
+                        }
+                        
+                    }
+                    else if(yytext[index+1]=='\\')
+                    {
+                        string[str_index]='\\';
+                        index++;
+                    }
+                }
+                if(yytext[index]=='\0')
+                {
+                    break;
+                }
+                index++;
+                str_index++;
+            }
+            string[str_index]='\0';
+            //printf("length : %d\n",yyleng);
+            //printf("char : %c\n",yytext[9]);
+            //printf("length : %d\n",strlen(yytext));
+            printf("%s\n",string);
+            //printf("\n");
+            alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,string,yylineno);
+
             alpha_PrintData(tmp ,"<-char*" );
 
 } 
@@ -173,10 +223,7 @@ void alpha_PrintData(alpha_token_t * node ,char * extra_type )
         printf("#%*u\t",line_width , node->numToken);
         printf("%*s\t" ,line_width , node->content);
         printf("%*s\t",line_width ,node->type);
-        printf("%*s\n" ,line_width ,extra_type);
-
-
-    
+        printf("%*s\n" ,line_width ,extra_type); 
 }
 
 

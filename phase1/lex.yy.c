@@ -381,15 +381,15 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[92] =
     {   0,
-        0,    0,   17,   16,    1,   16,   10,   16,   16,    5,
-       13,    7,   16,    6,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,   12,    0,    3,   11,
-       15,   14,    0,    5,    8,    9,    6,    6,    6,    6,
-        6,    6,    6,    6,    2,    6,    6,    6,    2,    6,
-        6,    6,   14,    4,    2,    6,    6,    6,    6,    2,
-        6,    6,    2,    2,    6,    6,    6,    6,    6,    2,
-        6,    6,    6,    6,    2,    6,    2,    6,    2,    6,
-        2,    6,    2,    6,    6,    2,    6,    6,    2,    2,
+        0,    0,   17,   16,    1,   16,   10,   16,   16,    4,
+       13,    7,   16,    5,    5,    5,    5,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,   12,    0,    6,   11,
+       15,   14,    0,    4,    8,    9,    5,    5,    5,    5,
+        5,    5,    5,    5,    2,    5,    5,    5,    2,    5,
+        5,    5,   14,    3,    2,    5,    5,    5,    5,    2,
+        5,    5,    2,    2,    5,    5,    5,    5,    5,    2,
+        5,    5,    5,    5,    2,    5,    2,    5,    2,    5,
+        2,    5,    2,    5,    5,    2,    5,    5,    2,    2,
         0
 
     } ;
@@ -551,7 +551,7 @@ char *yytext;
 
 #line 553 "lex.yy.c"
 /*keep current line */
-/*\"[^"\n]∗\"  */
+/*STRING \"[^\n"]∗\"  */
 /* Rules Section*/
 #line 557 "lex.yy.c"
 
@@ -770,9 +770,12 @@ YY_DECL
 		}
 
 	{
-#line 22 "scanner.l"
+#line 23 "scanner.l"
 
-#line 776 "lex.yy.c"
+
+
+
+#line 779 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -842,34 +845,24 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 23 "scanner.l"
+#line 27 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 26 "scanner.l"
+#line 30 "scanner.l"
 {
-          alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);
+        alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);
 
-            alpha_PrintData(tmp ,"<-enumerated" );
+        alpha_PrintData(tmp ,"<-enumerated" );
 
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 32 "scanner.l"
-{
-           alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,yytext,yylineno);
-
-            alpha_PrintData(tmp ,"<-char*" );
-
-} 
-	YY_BREAK
-case 4:
-YY_RULE_SETUP
-#line 38 "scanner.l"
+#line 36 "scanner.l"
 {
           alpha_token_t * tmp =   alpha_CreateData("REALCONST",yylval,yytext,yylineno);
 
@@ -877,27 +870,83 @@ YY_RULE_SETUP
 
 } 
 	YY_BREAK
-case 5:
+case 4:
 YY_RULE_SETUP
-#line 44 "scanner.l"
+#line 42 "scanner.l"
 {
           alpha_token_t * tmp =    alpha_CreateData("INTCONST",yylval,yytext,yylineno);
             alpha_PrintData(tmp ,"<-integer" );
 
 } 
 	YY_BREAK
-case 6:
+case 5:
 YY_RULE_SETUP
-#line 49 "scanner.l"
+#line 47 "scanner.l"
 {
           alpha_token_t * tmp =    alpha_CreateData("IDENT",yylval,yytext,yylineno);
             alpha_PrintData(tmp ,"<-char*" );
 
 } 
 	YY_BREAK
+case 6:
+YY_RULE_SETUP
+#line 52 "scanner.l"
+{
+            unsigned int index=0,str_index=0;
+            char string[yyleng];
+            while(yytext[index]!='\0')
+            {
+
+                string[str_index]=yytext[index];
+                if(yytext[index]=='\\')
+                {
+                    if(yytext[index+1]=='n')
+                    {
+                        
+                        if(yytext[index-1]!='\\')
+                        {
+                            string[str_index]='\n';
+                            index++;
+                        }
+                        
+                    }
+                    else if(yytext[index+1]=='t')
+                    {
+                        if(yytext[index-1]!='\\')
+                        {
+                            string[str_index]='\t';
+                            index++;
+                        }
+                        
+                    }
+                    else if(yytext[index+1]=='\\')
+                    {
+                        string[str_index]='\\';
+                        index++;
+                    }
+                }
+                if(yytext[index]=='\0')
+                {
+                    break;
+                }
+                index++;
+                str_index++;
+            }
+            string[str_index]='\0';
+            //printf("length : %d\n",yyleng);
+            //printf("char : %c\n",yytext[9]);
+            //printf("length : %d\n",strlen(yytext));
+            printf("%s\n",string);
+            //printf("\n");
+            alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,string,yylineno);
+
+            alpha_PrintData(tmp ,"<-char*" );
+
+} 
+	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 54 "scanner.l"
+#line 104 "scanner.l"
 {
           alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASSIGN",yylineno);
 
@@ -907,7 +956,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 110 "scanner.l"
 {
            alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"EQUALS",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -917,7 +966,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 116 "scanner.l"
 {
           alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"GREATER_EQUALS",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -926,7 +975,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 121 "scanner.l"
 {
           alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PERCENTAGES",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -935,7 +984,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 126 "scanner.l"
 {
            alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"PLUS_PLUS",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -944,7 +993,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 82 "scanner.l"
+#line 132 "scanner.l"
 {
           alpha_token_t * tmp =   alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACE",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -954,7 +1003,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 88 "scanner.l"
+#line 138 "scanner.l"
 {
         alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"SEMICOLON",yylineno);
         alpha_PrintData(tmp ,"<-enumerated" );       
@@ -962,7 +1011,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 93 "scanner.l"
+#line 143 "scanner.l"
 {
             alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -971,8 +1020,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 99 "scanner.l"
+#line 149 "scanner.l"
 {
+    /* line_comment to multi_line_comment?? */
     int c;
     int nested=0;
     //printf("opened multti line  comment\n");
@@ -1033,10 +1083,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 157 "scanner.l"
+#line 208 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1040 "lex.yy.c"
+#line 1090 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2053,7 +2103,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 157 "scanner.l"
+#line 208 "scanner.l"
 
 alpha_token_t * alpha_CreateData(char * identifier , void * yylval,char * additional_info , unsigned int start_line)
 {
@@ -2072,10 +2122,7 @@ void alpha_PrintData(alpha_token_t * node ,char * extra_type )
         printf("#%*u\t",line_width , node->numToken);
         printf("%*s\t" ,line_width , node->content);
         printf("%*s\t",line_width ,node->type);
-        printf("%*s\n" ,line_width ,extra_type);
-
-
-    
+        printf("%*s\n" ,line_width ,extra_type); 
 }
 
 
