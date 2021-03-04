@@ -934,132 +934,132 @@ YY_RULE_SETUP
 case 16:
 YY_RULE_SETUP
 #line 102 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ASSIGN",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASSIGN",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 104 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 106 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 108 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ASTERISK",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASTERISK",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 110 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DIVISION",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"DIVISION",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 111 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PERCENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PERCENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 113 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 115 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DIFFERENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"DIFFERENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 117 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PLUS_PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PLUS_PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 119 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"MINUS_MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"MINUS_MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 121 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"GREATER",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"GREATER",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 123 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LESS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"LESS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 125 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"GREATER_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"GREATER_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 126 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LESS_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"LESS_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 127 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 128 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"RIGHT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 129 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"LEFT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 130 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"RIGHT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 131 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 132 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"RIGHT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 133 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"SEMICOLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"SEMICOLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 134 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"COMMA",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"COMMA",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 135 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 136 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DOUBLE_COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"DOUBLE_COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 137 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DOT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"DOT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 138 "scanner.l"
-{alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"Diaeresis",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"Diaeresis",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP

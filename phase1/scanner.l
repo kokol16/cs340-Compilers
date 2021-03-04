@@ -99,43 +99,43 @@ FALSE   {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"FALSE",yyli
 NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
 
-{ASSIGN}            {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ASSIGN",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{ASSIGN}            {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASSIGN",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
     
-{PLUS}              {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{PLUS}              {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
     
-{MINUS}             {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{MINUS}             {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
     
-{ASTERISK}          {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ASTERISK",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{ASTERISK}          {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASTERISK",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
     
-{DIVISION}          {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DIVISION",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{PERCENT}          {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PERCENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{DIVISION}          {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"DIVISION",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{PERCENT}          {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PERCENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
     
-{EQUALS}        {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{EQUALS}        {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
     
-{DIFFERENT}        {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DIFFERENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{DIFFERENT}        {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"DIFFERENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-{PLUS_PLUS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PLUS_PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{PLUS_PLUS}    {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PLUS_PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-{MINUS_MINUS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"MINUS_MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{MINUS_MINUS}    {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"MINUS_MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-{GREATER}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"GREATER",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{GREATER}    {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"GREATER",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-{LESS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LESS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LESS}    {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"LESS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-{GREATER_EQUALS}     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"GREATER_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{LESS_EQUALS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LESS_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{LEFT_BRACE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{RIGHT_BRACE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{LEFT_SQUARE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{RIGHT_SQUARE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{LEFT_BRACKETS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{RIGHT_BRACKETS}     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{SEMICOLON}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"SEMICOLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{COMMA}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"COMMA",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{COLON}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{DOUBLE_COLON}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DOUBLE_COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{DOT}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DOT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
-{Diaeresis}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"Diaeresis",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{GREATER_EQUALS}     {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"GREATER_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LESS_EQUALS}    {alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"LESS_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LEFT_BRACE}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{RIGHT_BRACE}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"RIGHT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LEFT_SQUARE}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"LEFT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{RIGHT_SQUARE}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"RIGHT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LEFT_BRACKETS}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{RIGHT_BRACKETS}     {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"RIGHT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{SEMICOLON}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"SEMICOLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{COMMA}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"COMMA",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{COLON}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{DOUBLE_COLON}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"DOUBLE_COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{DOT}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"DOT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{Diaeresis}    {alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"Diaeresis",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
 
 {REAL}    {
