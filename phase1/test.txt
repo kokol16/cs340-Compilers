@@ -1,1 +1,6 @@
-"la\\lala"
+= + - * / % == != ++ --
+> < >= <=
+if else while for function return break continue
+and not or local true false nil
+
+{ } [ ] ( ) ; , : :: . ..

@@ -55,14 +55,16 @@ void print_comments_info(alpha_comments_info_t *head)
 
 void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, unsigned int start_line)
 {
+  short isComment = 0;
   alpha_ptr->numline = start_line;
   alpha_ptr->numToken = ++counter;
   if (strcmp(identifier, "COMMENT") == 0 || strcmp(identifier, "NESTED COMMENT") == 0)
   {
+    isComment = 1;
     if (yylineno == start_line)
     {
-      alpha_ptr->content = malloc(3 * sizeof(char));
-      memcpy(alpha_ptr->content, "\"\"", 3);
+      alpha_ptr->content = malloc(1 * sizeof(char));
+      memcpy(alpha_ptr->content, "", 1);
     }
     else
     {
@@ -70,29 +72,38 @@ void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, uns
       int end_line_length = snprintf(NULL, 0, "%u", yylineno);
       // +4 for "  "  ,+1 for '\0'
       alpha_ptr->content = malloc(start_line_length + end_line_length + 4 + 1);
-      //printf("end line length : %d , body : %u\n",end_line_length,yylineno);
-      snprintf(alpha_ptr->content, start_line_length+1, "%u", start_line);
+      snprintf(alpha_ptr->content, start_line_length + 1, "%u", start_line);
       memcpy(alpha_ptr->content + start_line_length, " - ", 4);
-      snprintf(alpha_ptr->content+start_line_length+3, end_line_length+1, "%d", yylineno);
-
+      snprintf(alpha_ptr->content + start_line_length + 3, end_line_length + 1, "%d", yylineno);
     }
+  }
+  if (strcmp(identifier, "STRING") == 0 || strcmp(identifier, "IDENT") == 0)
+  {
+
+    int length = strlen(additional_info) + 1;
+    alpha_ptr->content = malloc(sizeof(char) * length);
+    memcpy(alpha_ptr->content, additional_info, length);
+
+    int identifier_length = strlen(identifier) + 1;
+    alpha_ptr->type = malloc(sizeof(char) * identifier_length);
+    memcpy(alpha_ptr->type, identifier, identifier_length);
   }
   else
   {
-    int length = strlen(yytext) + 1;
-    alpha_ptr->content = malloc(sizeof(char) * length);
-    memcpy(alpha_ptr->content, yytext, length);
+    if (isComment != 1)
+    {
+      int length = strlen(yytext) + 1;
+      alpha_ptr->content = malloc(sizeof(char) * length);
+      memcpy(alpha_ptr->content, yytext, length);
+    }
+
+    int identifier_length = strlen(identifier) + 1;
+    int additional_info_length = strlen(additional_info) + 1;
+    alpha_ptr->type = malloc(sizeof(char) * identifier_length + additional_info_length + DOUBLE_SPACE);
+    memcpy(alpha_ptr->type, identifier, identifier_length);
+    strncat(alpha_ptr->type, "  ", DOUBLE_SPACE);
+    strncat(alpha_ptr->type, additional_info, additional_info_length);
   }
-
-  int identifier_length = strlen(identifier) + 1;
-  int additional_info_length = strlen(additional_info) + 1;
-  alpha_ptr->type = malloc(sizeof(char) * identifier_length + additional_info_length + DOUBLE_SPACE);
-  memcpy(alpha_ptr->type, identifier, identifier_length);
-  strncat(alpha_ptr->type, "  ", DOUBLE_SPACE);
-  strncat(alpha_ptr->type, additional_info, additional_info_length);
-
-  //memcpy(alpha_ptr->type + identifier_length, " ", DOUBLE_SPACE);
-  //memcpy(alpha_ptr->type + identifier_length + DOUBLE_SPACE, additional_info, additional_info_length);
 }
 alpha_token_t *alpha_CreateNextNode(void *yylval)
 {

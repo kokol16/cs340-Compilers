@@ -1,5 +1,6 @@
 
 %{ 
+#define MY_EOF 0    
 #include<stdio.h> 
 #include<string.h> 
 #include"scanner.h"
@@ -8,31 +9,135 @@
 %} 
 /*keep current line */
 %option yylineno
-%option case-insensitive 
+%option case-insensitive  
 
 ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
 REAL [0-9]+[.][0-9]+
+IF              if
+ELSE            else
+WHILE           while
+FOR             for 
+FUNCTION        function 
+RETURN          return
+BREAK           break 
+CONTINUE        continue
+AND             and     
+NOT             not 
+OR              or 
+LOCAL           local 
+TRUE            true 
+FALSE           false 
+NIL             nil
 
+PLUS            "+"
+ASSIGN          "=" 
+MINUS           "-"
+ASTERISK        "*"
+DIVISION        "/"
+PERCENT         "%"
+EQUALS          "=="
+DIFFERENT       "!="
+PLUS_PLUS       "++"
+MINUS_MINUS     "--"
+GREATER         ">"
+LESS            "<"
+GREATER_EQUALS  ">=" 
+LESS_EQUALS     "<="
+LEFT_BRACE      "{" 
+RIGHT_BRACE     "}" 
+LEFT_SQUARE     "[" 
+RIGHT_SQUARE    "]" 
+LEFT_BRACKETS   "("
+RIGHT_BRACKETS  ")" 
+SEMICOLON       ";" 
+COMMA           ","
+COLON           ":"
+DOUBLE_COLON    "::"
+DOT             "." 
+Diaeresis       ".."
 /*STRING \"[^\n"]∗\"  */
-STRING \"[^"\n]*\"
+
+STRING \"(.|\n)*\"
+
+WRONGSTRING \"(.|\n)* 
+
 
 ONELINECOMMENTT "//".*         
 /* Rules Section*/
 
 %% 
 
+IF      {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+ELSE    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ELSE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+WHILE   {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"WHILE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+FOR     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"FOR",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+FUNCTION {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"FUNCTION",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+RETURN  {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RETURN",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+BREAK   {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"BREAK",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+CONTINUE {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"CONTINUE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+AND     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"AND",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+NOT     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NOT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+OR      {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"OR",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+LOCAL   {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LOCAL",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+TRUE    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"TRUE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+FALSE   {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"FALSE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
 
-\n   {
-       
-}
-if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil  {
-        alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);
+{ASSIGN}            {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ASSIGN",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+    
+{PLUS}              {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+    
+{MINUS}             {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+    
+{ASTERISK}          {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ASTERISK",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+    
+{DIVISION}          {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DIVISION",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{PERCENT}          {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PERCENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+    
+{EQUALS}        {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+    
+{DIFFERENT}        {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DIFFERENT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-        alpha_PrintData(tmp ,"<-enumerated" );
+{PLUS_PLUS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"PLUS_PLUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
-}
+{MINUS_MINUS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"MINUS_MINUS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+{GREATER}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"GREATER",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+{LESS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LESS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+{GREATER_EQUALS}     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"GREATER_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LESS_EQUALS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LESS_EQUALS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LEFT_BRACE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{RIGHT_BRACE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_BRACE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LEFT_SQUARE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{RIGHT_SQUARE}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_SQUARE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{LEFT_BRACKETS}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"LEFT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{RIGHT_BRACKETS}     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"RIGHT_BRACKETS",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{SEMICOLON}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"SEMICOLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{COMMA}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"COMMA",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{COLON}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{DOUBLE_COLON}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DOUBLE_COLON",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{DOT}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"DOT",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+{Diaeresis}    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"Diaeresis",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+
+
 {REAL}    {
           alpha_token_t * tmp =   alpha_CreateData("REALCONST",yylval,yytext,yylineno);
 
@@ -45,16 +150,116 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
 
 } 
 {ID}    {
-          alpha_token_t * tmp =    alpha_CreateData("IDENT",yylval,yytext,yylineno);
+            alpha_token_t * tmp =    alpha_CreateData("IDENT",yylval,yytext,yylineno);
             alpha_PrintData(tmp ,"<-char*" );
 
 } 
-{STRING}    {
-            unsigned int index=0,str_index=0;
+
+\"    {
+            /* optimization if(c==n || c==t ...) */
+            int start_line=yylineno;
+            int c;
+            unsigned int max_size=30;
+            short is_closed=0;
+            char * str=malloc(max_size*sizeof(char));
+            int index=0;
+            while((c=input())!=0 )
+            {
+                if(c=='\"'&&index==0){ is_closed=1; break;}
+                if(c=='\"' && index-1>=0 &&  str[index-1]!='\\')
+                {
+                    is_closed=1;
+                    break;
+                }
+                else if(c=='\\')
+                {
+                    c=input();
+                    if(c=='n')
+                    {
+                        
+                        if(  ((index-1)>0 ) && ( str[index-1]=='\\' ) )
+                        {
+
+                            str[index++]='n';
+                        }
+                        else
+                        {
+
+                            str[index++]='\n';
+
+                        }
+
+                    }
+                    else if(c=='t')
+                    {
+                        if(index-1>=0 && str[index-1]=='\\')
+                        {
+                            str[index++]='t';
+                        }
+                        else
+                        {
+                            str[index++]='\t';
+
+                        }
+                    }
+                    else if(c=='\"')
+                    {
+                        if(index-1>=0 &&  str[index-1]=='\\')
+                        {
+                            printf("error\n");
+                        }
+                        else
+                        {
+                            str[index++]='\"';
+                        }
+                        
+                       
+                    }
+                    else
+                    {
+                        if(c!='\\') /*  \\ is not a warning */
+                        printf("warning escaped character\n");
+                        str[index++]='\\';
+                        unput(c);
+
+                    }
+                }
+                else
+                {
+
+                    str[index++]=c;
+                }
+
+                if(index==max_size)
+                {
+                    max_size*=2;
+                    str = realloc(str, max_size* sizeof(char));
+                   
+                }
+            }
+            if(is_closed==0){
+                
+                printf("error string didn't close\n");
+            }
+            else
+            {
+                if(index==0)
+                {
+                    printf("warning zero lengtth string\n");
+                }
+                str[++index]='\0';
+                alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,str,start_line);
+                alpha_PrintData(tmp ,"<-char*" );
+
+            }
+            
+
+            /*
+            unsigned int index=1,str_index=0;
             char string[yyleng];
             while(yytext[index]!='\0')
             {
-
+                
                 string[str_index]=yytext[index];
                 if(yytext[index]=='\\')
                 {
@@ -90,55 +295,16 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
                 index++;
                 str_index++;
             }
-            string[str_index]='\0';
-            //printf("length : %d\n",yyleng);
-            //printf("char : %c\n",yytext[9]);
-            //printf("length : %d\n",strlen(yytext));
-            printf("%s\n",string);
-            //printf("\n");
-            alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,string,yylineno);
-
+            string[str_index-1]='\0';
+            alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,yytext,yylineno);
             alpha_PrintData(tmp ,"<-char*" );
+            */
 
 } 
-=   {
-          alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"ASSIGN",yylineno);
-
-            alpha_PrintData(tmp ,"<-enumerated" );
-
-}
-==  {
-           alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"EQUALS",yylineno);
-            alpha_PrintData(tmp ,"<-enumerated" );
 
 
-}
->=  {
-          alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"GREATER_EQUALS",yylineno);
-            alpha_PrintData(tmp ,"<-enumerated" );
-
-}
-%  {
-          alpha_token_t * tmp =    alpha_CreateData("OPERATOR",yylval,"PERCENTAGES",yylineno);
-            alpha_PrintData(tmp ,"<-enumerated" );
-
-}
-"++"  {
-           alpha_token_t * tmp =   alpha_CreateData("OPERATOR",yylval,"PLUS_PLUS",yylineno);
-            alpha_PrintData(tmp ,"<-enumerated" );
-
-}
-
-"{" {
-          alpha_token_t * tmp =   alpha_CreateData("PUNCTUATION",yylval,"LEFT_BRACE",yylineno);
-            alpha_PrintData(tmp ,"<-enumerated" );
 
 
-}
-";" {
-        alpha_token_t * tmp =    alpha_CreateData("PUNCTUATION",yylval,"SEMICOLON",yylineno);
-        alpha_PrintData(tmp ,"<-enumerated" );       
-}
 
 {ONELINECOMMENTT}   {
             alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
@@ -156,7 +322,7 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
     head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
     head->next=NULL;
     head->first_line =yylineno;
-    while((c=input())!=0 )
+    while((c=input())!=MY_EOF )
     {
         if(c=='*')
         {
@@ -204,6 +370,26 @@ if|else|while|for|function|return|break|continue|and|not|or|local|true|false|nil
             }
         }
     }
+    if(c==MY_EOF)
+    {
+        printf("error comment didn't close\n");
+    }
+}
+" "  {
+
+}
+\t  {
+
+}
+
+\r  {
+    
+}
+\n   {
+       
+}
+.   {
+    printf("error kanonas\n");
 }
 %% 
 alpha_token_t * alpha_CreateData(char * identifier , void * yylval,char * additional_info , unsigned int start_line)
@@ -220,10 +406,14 @@ void alpha_PrintData(alpha_token_t * node ,char * extra_type )
         int line_width=10;
         printf("\b");
         printf("%u:\t",node->numline);
-        printf("#%*u\t",line_width , node->numToken);
-        printf("%*s\t" ,line_width , node->content);
-        printf("%*s\t",line_width ,node->type);
-        printf("%*s\n" ,line_width ,extra_type); 
+        printf("#%u\t", node->numToken);
+        printf("\"%s\"\t"  , node->content);
+        printf("%s\t" ,node->type);
+        if(strcmp(node->type,"STRING")==0 || strcmp(node->type,"IDENT")==0)
+        {
+            printf("\"%s\"\t",node->content);
+        }
+        printf("%s\n"  ,extra_type); 
 }
 
 
