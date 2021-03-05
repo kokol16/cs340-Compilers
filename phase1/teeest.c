@@ -14,7 +14,7 @@ for 0.3432 ; "fsdsfad\nfsd" 432.//
 int main()
 {
     
-    printf("\");
+    printf(""");
 
 }
 

@@ -164,12 +164,10 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             int index=0;
             while((c=input())!=MY_EOF )
             {
-
-                /*if(c=='\"'&&index==1){ is_closed=1; break;}*/
-                if(c=='\"' && index-1>=0 &&  str[index-1]!='\\')
+                if(c=='\"' )
                 {
-                    is_closed=1;
-                    break;
+                    if(index==0){break;}/* empty string*/
+                    if( index-1>=0 &&  str[index-1]!='\\')break;
                 }
                 else if(c=='\\')
                 {
