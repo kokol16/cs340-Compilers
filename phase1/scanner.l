@@ -162,9 +162,10 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             short is_closed=0;
             char * str=malloc(max_size*sizeof(char));
             int index=0;
-            while((c=input())!=0 )
+            while((c=input())!=MY_EOF )
             {
-                if(c=='\"'&&index==0){ is_closed=1; break;}
+
+                /*if(c=='\"'&&index==1){ is_closed=1; break;}*/
                 if(c=='\"' && index-1>=0 &&  str[index-1]!='\\')
                 {
                     is_closed=1;
@@ -219,9 +220,12 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     else
                     {
                         if(c!='\\') /*  \\ is not a warning */
-                        print_Yellow();
-                        fprintf(stderr,"warning invalid escape character %c\n",c);
-                        reset_Yellow();
+                        {
+                            print_Yellow();
+                            fprintf(stderr,"warning invalid escape character %c\n",c);
+                            reset_Yellow();
+                        }
+                        
                         str[index++]='\\';
                         unput(c);
 
@@ -240,9 +244,10 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                    
                 }
             }
-            if(is_closed==0){
-                
+            if(c==MY_EOF){
+                print_Red();
                 fprintf(stderr , "String that started on line %d didn't close\n",start_line);
+                reset_Red();
             }
             else
             {
@@ -394,13 +399,16 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         {
             if(tmp->is_closed==0)
             {
+                print_Red();
+                
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+                reset_Red();
+
 
             }
            tmp=tmp->next;
         
         }
-        reset_Red();
     }
 }
 " "  {
