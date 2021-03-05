@@ -1260,6 +1260,7 @@ YY_RULE_SETUP
     /* line_comment to multi_line_comment?? */
     int c;
     int nested=0;
+    unsigned int opened_comments=1;
     //printf("opened multti line  comment\n");
    
     alpha_comments_info_t * head;
@@ -1272,8 +1273,14 @@ YY_RULE_SETUP
         {
             if((c=input())=='/' )
             {
+                /* mark that the current comment closed */
+                alpha_comments_info_t * curr_node = get_node(head,nested);
+                if(curr_node!=NULL)
+                curr_node->is_closed=1;
+
                 if(nested==0)
                 {
+                    
                     
                     unsigned int first_line= get_first_line(head,nested);
                     alpha_token_t * tmp = alpha_CreateData("COMMENT",yylval,"BLOCK_COMMENT",first_line);
@@ -1293,7 +1300,9 @@ YY_RULE_SETUP
                     //printf("closed one nested comment\n");
 
                     nested--;
-                }    
+                }  
+
+                opened_comments--;  
             }
             else
             {
@@ -1304,6 +1313,7 @@ YY_RULE_SETUP
         {
              if((c=input())=='*' )
             {
+                opened_comments++;
                 push_comments_info(head,yylineno);
                 nested++;
                 //printf("open one nested comment\n");
@@ -1318,28 +1328,38 @@ YY_RULE_SETUP
     {
         //printf("error comment didn't close\n");
         print_Red();
-        fprintf(stderr , "error comment in line %d didn't close\n" ,yylineno);
+        alpha_comments_info_t * tmp=head;
+        while(tmp!=NULL)
+        {
+            if(tmp->is_closed==0)
+            {
+                fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+
+            }
+           tmp=tmp->next;
+        
+        }
         reset_Red();
     }
 }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 386 "scanner.l"
+#line 406 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 389 "scanner.l"
+#line 409 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 393 "scanner.l"
+#line 413 "scanner.l"
 {
     
 }
@@ -1347,14 +1367,14 @@ YY_RULE_SETUP
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 396 "scanner.l"
+#line 416 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 399 "scanner.l"
+#line 419 "scanner.l"
 {
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
@@ -1364,10 +1384,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 405 "scanner.l"
+#line 425 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1371 "lex.yy.c"
+#line 1391 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2384,7 +2404,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 405 "scanner.l"
+#line 425 "scanner.l"
 
 
 

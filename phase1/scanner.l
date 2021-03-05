@@ -321,6 +321,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     /* line_comment to multi_line_comment?? */
     int c;
     int nested=0;
+    unsigned int opened_comments=1;
     //printf("opened multti line  comment\n");
    
     alpha_comments_info_t * head;
@@ -333,8 +334,14 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         {
             if((c=input())=='/' )
             {
+                /* mark that the current comment closed */
+                alpha_comments_info_t * curr_node = get_node(head,nested);
+                if(curr_node!=NULL)
+                curr_node->is_closed=1;
+
                 if(nested==0)
                 {
+                    
                     
                     unsigned int first_line= get_first_line(head,nested);
                     alpha_token_t * tmp = alpha_CreateData("COMMENT",yylval,"BLOCK_COMMENT",first_line);
@@ -354,7 +361,9 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     //printf("closed one nested comment\n");
 
                     nested--;
-                }    
+                }  
+
+                opened_comments--;  
             }
             else
             {
@@ -365,6 +374,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         {
              if((c=input())=='*' )
             {
+                opened_comments++;
                 push_comments_info(head,yylineno);
                 nested++;
                 //printf("open one nested comment\n");
@@ -379,7 +389,17 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     {
         //printf("error comment didn't close\n");
         print_Red();
-        fprintf(stderr , "error comment in line %d didn't close\n" ,yylineno);
+        alpha_comments_info_t * tmp=head;
+        while(tmp!=NULL)
+        {
+            if(tmp->is_closed==0)
+            {
+                fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+
+            }
+           tmp=tmp->next;
+        
+        }
         reset_Red();
     }
 }

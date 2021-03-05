@@ -6,4 +6,5 @@ and not or local true false nil
 { } [ ] ( ) ; , : :: . ..
 "lalal"
 2
-ok
+
+/* */

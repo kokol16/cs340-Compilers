@@ -42,4 +42,4 @@
 6:	#42	".."	PUNCTUATION  Diaeresis	<-enumerated
 7:	#43	"lalal"	STRING	"lalal"	<-char*
 8:	#44	"2"	INTCONST  2	<-integer
-9:	#45	"ok"	IDENT	"ok"	<-char*
+10:	#45	""	COMMENT  BLOCK_COMMENT	<-enumerated

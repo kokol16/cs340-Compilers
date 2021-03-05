@@ -21,6 +21,7 @@ typedef struct alpha_comments_info_t
 {
   unsigned int first_line;
   unsigned int last_line;
+  short is_closed;
   struct alpha_comments_info_t *next;
 } alpha_comments_info_t;
 
@@ -96,6 +97,16 @@ void push_comments_info(alpha_comments_info_t *head, unsigned int first_line)
     head = head->next;
   }
   head->next = node;
+}
+alpha_comments_info_t * get_node(alpha_comments_info_t *  head,unsigned int  nested)
+{
+  unsigned int counter=0;
+  while(head!=NULL && counter<nested )
+  {
+    head = head->next;
+    counter++;
+  }
+  return head;
 }
 unsigned int get_first_line(alpha_comments_info_t *head, unsigned int index)
 {
@@ -184,50 +195,3 @@ alpha_token_t *alpha_CreateNextNode(void *yylval)
   tmp->alpha_yylex = alpha_node;
   return tmp->alpha_yylex;
 }
-
-/*
-            alpha_ptr->numline=yylineno;
-            alpha_ptr->numToken=++counter;
-            int length = strlen(yytext)+1;
-            alpha_ptr->content=malloc(sizeof(char) * length);
-            strncpy ( alpha_ptr->content , yytext , length);
-
-            int length_type= strlen("KEYWORD")+1;
-            alpha_ptr->type=malloc(sizeof(char) * length_type);
-            strncpy ( alpha_ptr->type , "KEYWORD" , length_type);*/
-
-/*alpha_token_t * alpha_node ;
-            
-            alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-           
-            alpha_ptr->alpha_yylex=alpha_node;
-            yylval= alpha_ptr->alpha_yylex;*/
-
-/*
-            alpha_ptr->numline=yylineno;
-            alpha_ptr->numToken=++counter;
-            int length = strlen(yytext)+1;
-            alpha_ptr->content=malloc(sizeof(char) * length);
-            strncpy ( alpha_ptr->content , yytext , length);
-
-            int length_type= strlen("IDENT")+1;
-            alpha_ptr->type=malloc(sizeof(char) * length_type);
-            strncpy ( alpha_ptr->type , "IDENT" , length_type);*/
-
-//printf("ID :  %s\n",yytext) ;
-
-/* alpha_token_t * alpha_node ;
-            
-            alpha_node=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-           
-            alpha_ptr->alpha_yylex=alpha_node;
-            yylval= alpha_ptr->alpha_yylex;*/
-
-/*
-10 omorfos l++alla% 214.4 hafdhfd 
-for 0.3432 ; "fsdsfad\nfsd" 432.//
-6 "fsdfsda" //1213.43;
-//"ok bro" sda
-//"fdsfds"
-"ds\n\tad"
-*/
