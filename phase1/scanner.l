@@ -5,7 +5,6 @@
 #include<string.h> 
 #include"scanner.h"
 #define YY_DECL int alpha_yylex (void * yylval)
-
 %} 
 /*keep current line */
 %option yylineno
@@ -206,7 +205,9 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     {
                         if(index-1>=0 &&  str[index-1]=='\\')
                         {
-                            printf("error\n");
+                            print_Red();
+                            fprintf(stderr , "error string with only one \\ in line %d\n",yylineno);
+                            reset_Red();
                         }
                         else
                         {
@@ -218,7 +219,9 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     else
                     {
                         if(c!='\\') /*  \\ is not a warning */
-                        printf("warning escaped character\n");
+                        print_Yellow();
+                        fprintf(stderr,"warning invalid escape character %c\n",c);
+                        reset_Yellow();
                         str[index++]='\\';
                         unput(c);
 
@@ -239,13 +242,15 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             }
             if(is_closed==0){
                 
-                printf("error string didn't close\n");
+                fprintf(stderr , "String that started on line %d didn't close\n",start_line);
             }
             else
             {
                 if(index==0)
                 {
-                    printf("warning zero lengtth string\n");
+                    print_Yellow();
+                    fprintf(stderr,"warning zero length in line %d string\n",yylineno);
+                    reset_Yellow();
                 }
                 str[++index]='\0';
                 alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,str,start_line);
@@ -372,7 +377,10 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     }
     if(c==MY_EOF)
     {
-        printf("error comment didn't close\n");
+        //printf("error comment didn't close\n");
+        print_Red();
+        fprintf(stderr , "error comment in line %d didn't close\n" ,yylineno);
+        reset_Red();
     }
 }
 " "  {
@@ -389,45 +397,42 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
        
 }
 .   {
-    printf("error kanonas\n");
+        print_Red();
+        fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
+        reset_Red();
+        
 }
 %% 
-alpha_token_t * alpha_CreateData(char * identifier , void * yylval,char * additional_info , unsigned int start_line)
-{
-    alpha_token_t * tmp;
-    if(FirstNode==1)    {  FirstNode=0;     tmp=yylval;         }
-    else                {   tmp = alpha_CreateNextNode(yylval); }
-    alpha_CreateInfo(tmp , identifier,additional_info ,start_line);
-    return tmp;
 
-}
-void alpha_PrintData(alpha_token_t * node ,char * extra_type )
-{
-        int line_width=10;
-        printf("\b");
-        printf("%u:\t",node->numline);
-        printf("#%u\t", node->numToken);
-        printf("\"%s\"\t"  , node->content);
-        printf("%s\t" ,node->type);
-        if(strcmp(node->type,"STRING")==0 || strcmp(node->type,"IDENT")==0)
-        {
-            printf("\"%s\"\t",node->content);
-        }
-        printf("%s\n"  ,extra_type); 
-}
+
 
 
 int yywrap(void){} 
 
 int main(int argc , char * argv[]) 
 {    
-    if(argc>1)
+    if(argc==2)
     {
         if(!( yyin=fopen(argv[1],"r") )  )
         {
             fprintf(stderr,"error can't read file\n");
             return -1;
         }   
+        
+    }
+    else if (argc>2)
+    {
+        if(!( yyin=fopen(argv[1],"r") )  )
+        {
+            fprintf(stderr,"error can't read file\n");
+            return -1;
+        } 
+        output_file=fopen(argv[2],"w");
+        if(output_file==NULL)
+        {
+            fprintf(stderr,"error can't open write file\n");
+            return -1;
+        }
     }
     else
     {
@@ -439,19 +444,7 @@ int main(int argc , char * argv[])
     
 
     alpha_yylex((void*)alpha_head); 
-    //printf("%u: \n",tmp->numline);
-   
-   /* tmp=alpha_head;
-    int line_width=10;
-    while(tmp != NULL)
-    {
-        printf("%u: ",tmp->numline);
-        printf(" #%u",tmp->numToken);
-        printf("\t%s" ,tmp->content);
-        printf("\t%*s ",line_width ,tmp->type);
+    
 
-        printf("\n");
-        tmp=tmp->alpha_yylex;
-    }*/
     return 0; 
 } 

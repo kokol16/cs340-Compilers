@@ -1,0 +1,3 @@
+fix error throw on /** /**
+documentation
+Oganize functions

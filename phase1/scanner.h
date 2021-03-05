@@ -1,6 +1,12 @@
 #include <stdlib.h>
+
+#define DOUBLE_SPACE 3
+#define alpha_ptr ((alpha_token_t *)yylval)
+
 static unsigned int counter = 0;
 static short FirstNode = 1;
+FILE *output_file = NULL;
+
 typedef struct alpha_token_t
 {
   unsigned int numline;
@@ -18,10 +24,67 @@ typedef struct alpha_comments_info_t
   struct alpha_comments_info_t *next;
 } alpha_comments_info_t;
 
-#define DOUBLE_SPACE 3
-#define alpha_ptr ((alpha_token_t *)yylval)
 alpha_token_t *alpha_CreateData(char *identifier, void *yylval, char *additional_info, unsigned int start_line);
+void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, unsigned int start_line);
+alpha_token_t *alpha_CreateNextNode(void *yylval);
 void alpha_PrintData(alpha_token_t *node, char *extra_type);
+
+void print_Red()
+{
+  fprintf(stderr, "\033[0;31m");
+}
+
+void reset_Red()
+{
+  fprintf(stderr, "\033[0;31m");
+}
+void print_Yellow()
+{
+  fprintf(stderr, "\033[1;33m");
+}
+
+void reset_Yellow()
+{
+  fprintf(stderr, "\033[0m");
+}
+alpha_token_t *alpha_CreateData(char *identifier, void *yylval, char *additional_info, unsigned int start_line)
+{
+  alpha_token_t *tmp;
+  if (FirstNode == 1)
+  {
+    FirstNode = 0;
+    tmp = yylval;
+  }
+  else
+  {
+    tmp = alpha_CreateNextNode(yylval);
+  }
+  alpha_CreateInfo(tmp, identifier, additional_info, start_line);
+  return tmp;
+}
+void alpha_PrintData(alpha_token_t *node, char *extra_type)
+{
+  int line_width = 10;
+  FILE *out;
+  if (output_file != NULL)
+  {
+    out = output_file;
+  }
+  else
+  {
+    out = stdout;
+  }
+  //printf("\b");
+  fprintf(out, "%u:\t", node->numline);
+  fprintf(out, "#%u\t", node->numToken);
+  fprintf(out, "\"%s\"\t", node->content);
+  fprintf(out, "%s\t", node->type);
+  if (strcmp(node->type, "STRING") == 0 || strcmp(node->type, "IDENT") == 0)
+  {
+    fprintf(out, "\"%s\"\t", node->content);
+  }
+  fprintf(out, "%s\n", extra_type);
+}
 
 void push_comments_info(alpha_comments_info_t *head, unsigned int first_line)
 {
