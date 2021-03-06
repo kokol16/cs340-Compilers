@@ -1099,8 +1099,11 @@ YY_RULE_SETUP
             short is_closed=0;
             char * str=malloc(max_size*sizeof(char));
             int index=0;
+            int x;
             while((c=input())!=MY_EOF )
             {
+                printf("c is : %c\n",c);
+
                 if(c=='\"' )
                 {
                     if(index==0){break;}/* empty string*/
@@ -1108,11 +1111,12 @@ YY_RULE_SETUP
                 }
                 else if(c=='\\')
                 {
+
                     c=input();
                     if(c=='n')
                     {
                         
-                        if(  ((index-1)>0 ) && ( str[index-1]=='\\' ) )
+                        if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) )
                         {
 
                             str[index++]='n';
@@ -1159,10 +1163,12 @@ YY_RULE_SETUP
                             print_Yellow();
                             fprintf(stderr,"warning invalid escape character %c\n",c);
                             reset_Yellow();
+                            unput(c);
+
                         }
+
                         
                         str[index++]='\\';
-                        unput(c);
 
                     }
                 }
@@ -1249,7 +1255,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 317 "scanner.l"
+#line 323 "scanner.l"
 {
             alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -1258,7 +1264,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 323 "scanner.l"
+#line 329 "scanner.l"
 {
     /* line_comment to multi_line_comment?? */
     int c;
@@ -1351,21 +1357,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 412 "scanner.l"
+#line 418 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 415 "scanner.l"
+#line 421 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 419 "scanner.l"
+#line 425 "scanner.l"
 {
     
 }
@@ -1373,14 +1379,14 @@ YY_RULE_SETUP
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 422 "scanner.l"
+#line 428 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 425 "scanner.l"
+#line 431 "scanner.l"
 {
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
@@ -1390,10 +1396,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 431 "scanner.l"
+#line 437 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1397 "lex.yy.c"
+#line 1403 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2410,7 +2416,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 431 "scanner.l"
+#line 437 "scanner.l"
 
 
 

@@ -162,20 +162,26 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             short is_closed=0;
             char * str=malloc(max_size*sizeof(char));
             int index=0;
+            int x;
             while((c=input())!=MY_EOF )
             {
+                printf("c is : %c\n",c);
+
                 if(c=='\"' )
                 {
+                    if((x=input())==MY_EOF)break; /* support "\\" like stings*/
+                    else unput(x);  
                     if(index==0){break;}/* empty string*/
                     if( index-1>=0 &&  str[index-1]!='\\')break;
                 }
                 else if(c=='\\')
                 {
+
                     c=input();
                     if(c=='n')
                     {
                         
-                        if(  ((index-1)>0 ) && ( str[index-1]=='\\' ) )
+                        if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) )
                         {
 
                             str[index++]='n';
@@ -222,10 +228,12 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                             print_Yellow();
                             fprintf(stderr,"warning invalid escape character %c\n",c);
                             reset_Yellow();
+                            unput(c);
+
                         }
+
                         
                         str[index++]='\\';
-                        unput(c);
 
                     }
                 }

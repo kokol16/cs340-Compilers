@@ -29,6 +29,8 @@ alpha_token_t *alpha_CreateData(char *identifier, void *yylval, char *additional
 void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, unsigned int start_line);
 alpha_token_t *alpha_CreateNextNode(void *yylval);
 void alpha_PrintData(alpha_token_t *node, char *extra_type);
+void print_Red();
+void reset_Red();
 
 void print_Red()
 {
