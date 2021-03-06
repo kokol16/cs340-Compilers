@@ -19,7 +19,7 @@ typedef struct alpha_token_t
 
 typedef struct alpha_comments_info_t
 {
-  unsigned int first_line;
+  int first_line;
   unsigned int last_line;
   short is_closed;
   struct alpha_comments_info_t *next;
@@ -28,6 +28,7 @@ typedef struct alpha_comments_info_t
 alpha_token_t *alpha_CreateData(char *identifier, void *yylval, char *additional_info, unsigned int start_line);
 void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, unsigned int start_line);
 alpha_token_t *alpha_CreateNextNode(void *yylval);
+void alpha_free_tokens_list(alpha_token_t *head);
 void alpha_PrintData(alpha_token_t *node, char *extra_type);
 void print_Red();
 void reset_Red();
@@ -36,7 +37,6 @@ void print_Red()
 {
   fprintf(stderr, "\033[0;31m");
 }
-
 void reset_Red()
 {
   fprintf(stderr, "\033[0;31m");
@@ -88,22 +88,49 @@ void alpha_PrintData(alpha_token_t *node, char *extra_type)
   }
   fprintf(out, "%s\n", extra_type);
 }
+void alpha_free_tokens_list(alpha_token_t *head)
+{
+  alpha_token_t *prev = head;
+  while (head != NULL)
+  {
+    prev = head;
+    head = head->alpha_yylex;
+    free(prev->content);
+    free(prev->type);
 
-void push_comments_info(alpha_comments_info_t *head, unsigned int first_line)
+    free(prev);
+  }
+}
+void alpha_free_comments_list(alpha_comments_info_t *head)
+{
+  alpha_comments_info_t *prev = head;
+  while (head != NULL)
+  {
+    prev = head;
+    head = head->next;
+    free(prev);
+  }
+}
+
+void push_comments_info(alpha_comments_info_t *head, int first_line,int counter)
 {
   alpha_comments_info_t *node = (alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
   node->first_line = first_line;
+  node->is_closed=0;
   node->next = NULL;
-  while (head->next != NULL)
+  int i=0;
+  while (head->next != NULL && i<counter )
   {
     head = head->next;
+    i++;
   }
+  if(head->next!=NULL) free(head->next);
   head->next = node;
 }
-alpha_comments_info_t * get_node(alpha_comments_info_t *  head,unsigned int  nested)
+alpha_comments_info_t *get_node(alpha_comments_info_t *head, unsigned int nested)
 {
-  unsigned int counter=0;
-  while(head!=NULL && counter<nested )
+  unsigned int counter = 0;
+  while (head != NULL && counter < nested)
   {
     head = head->next;
     counter++;
@@ -124,7 +151,7 @@ void print_comments_info(alpha_comments_info_t *head)
 {
   while (head != NULL)
   {
-    printf("from %u to %u \n", head->first_line, head->last_line);
+    fprintf(output_file, "from %u to %u \n", head->first_line, head->last_line);
     head = head->next;
   }
 }

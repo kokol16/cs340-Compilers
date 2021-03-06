@@ -1106,6 +1106,8 @@ YY_RULE_SETUP
 
                 if(c=='\"' )
                 {
+                    if((x=input())==MY_EOF)break; /* support "\\" like stings*/
+                    else unput(x);  
                     if(index==0){break;}/* empty string*/
                     if( index-1>=0 &&  str[index-1]!='\\')break;
                 }
@@ -1204,58 +1206,14 @@ YY_RULE_SETUP
 
             }
             
-
-            /*
-            unsigned int index=1,str_index=0;
-            char string[yyleng];
-            while(yytext[index]!='\0')
-            {
-                
-                string[str_index]=yytext[index];
-                if(yytext[index]=='\\')
-                {
-                    if(yytext[index+1]=='n')
-                    {
-                        
-                        if(yytext[index-1]!='\\')
-                        {
-                            string[str_index]='\n';
-                            index++;
-                        }
-                        
-                    }
-                    else if(yytext[index+1]=='t')
-                    {
-                        if(yytext[index-1]!='\\')
-                        {
-                            string[str_index]='\t';
-                            index++;
-                        }
-                        
-                    }
-                    else if(yytext[index+1]=='\\')
-                    {
-                        string[str_index]='\\';
-                        index++;
-                    }
-                }
-                if(yytext[index]=='\0')
-                {
-                    break;
-                }
-                index++;
-                str_index++;
-            }
-            string[str_index-1]='\0';
-            alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,yytext,yylineno);
-            alpha_PrintData(tmp ,"<-char*" );
-            */
+            free(str);
+           
 
 } 
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 323 "scanner.l"
+#line 281 "scanner.l"
 {
             alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -1264,7 +1222,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 329 "scanner.l"
+#line 287 "scanner.l"
 {
     /* line_comment to multi_line_comment?? */
     int c;
@@ -1276,6 +1234,8 @@ YY_RULE_SETUP
     head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
     head->next=NULL;
     head->first_line =yylineno;
+    head->is_closed=0;
+    unsigned int counter=0;
     while((c=input())!=MY_EOF )
     {
         if(c=='*')
@@ -1283,34 +1243,16 @@ YY_RULE_SETUP
             if((c=input())=='/' )
             {
                 /* mark that the current comment closed */
-                alpha_comments_info_t * curr_node = get_node(head,nested);
+
+                alpha_comments_info_t * curr_node = get_node(head,counter);
                 if(curr_node!=NULL)
                 curr_node->is_closed=1;
-
-                if(nested==0)
-                {
-                    
-                    
-                    unsigned int first_line= get_first_line(head,nested);
-                    alpha_token_t * tmp = alpha_CreateData("COMMENT",yylval,"BLOCK_COMMENT",first_line);
-                    alpha_PrintData(tmp ,"<-enumerated" );
-
-                    //printf("closed one multi line  comment\n");
-                    break;
-                }
-                else
-                {
-                    unsigned int first_line= get_first_line(head,nested);
-
-                    alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
-                    alpha_PrintData(tmp ,"<-enumerated" );
-
-
-                    //printf("closed one nested comment\n");
-
-                    nested--;
-                }  
-
+                unsigned int first_line= get_first_line(head,counter);
+                alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
+                alpha_PrintData(tmp ,"<-enumerated" );
+                if(counter==0)break;
+               
+                counter--;
                 opened_comments--;  
             }
             else
@@ -1320,12 +1262,12 @@ YY_RULE_SETUP
         }
         else if(c=='/')
         {
-             if((c=input())=='*' )
+            if((c=input())=='*' )
             {
                 opened_comments++;
-                push_comments_info(head,yylineno);
-                nested++;
-                //printf("open one nested comment\n");
+                //fprintf(output_file, "line inserted %d\n",yylineno);
+                push_comments_info(head,yylineno,counter);
+                counter++;
             }
             else
             {
@@ -1335,7 +1277,6 @@ YY_RULE_SETUP
     }
     if(c==MY_EOF)
     {
-        //printf("error comment didn't close\n");
         print_Red();
         alpha_comments_info_t * tmp=head;
         while(tmp!=NULL)
@@ -1345,6 +1286,7 @@ YY_RULE_SETUP
                 print_Red();
                 
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+                
                 reset_Red();
 
 
@@ -1353,25 +1295,27 @@ YY_RULE_SETUP
         
         }
     }
+    alpha_free_comments_list(head);
+    //free(head);
 }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 418 "scanner.l"
+#line 362 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 421 "scanner.l"
+#line 365 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 425 "scanner.l"
+#line 369 "scanner.l"
 {
     
 }
@@ -1379,14 +1323,14 @@ YY_RULE_SETUP
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 428 "scanner.l"
+#line 372 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 431 "scanner.l"
+#line 375 "scanner.l"
 {
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
@@ -1396,10 +1340,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 437 "scanner.l"
+#line 381 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1403 "lex.yy.c"
+#line 1347 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2416,7 +2360,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 437 "scanner.l"
+#line 381 "scanner.l"
 
 
 
@@ -2453,13 +2397,18 @@ int main(int argc , char * argv[])
     {
         yyin=stdin;
     }
-    alpha_token_t * alpha_head, *tmp;
+    alpha_token_t * alpha_head;
     alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
     alpha_head->alpha_yylex=NULL;
     
 
     alpha_yylex((void*)alpha_head); 
-    
+    alpha_free_tokens_list(alpha_head);
+    //free(alpha_head);
+    if(output_file!=NULL)
+    fclose(output_file);
+    fclose(yyin);
+
 
     return 0; 
 } 

@@ -269,52 +269,8 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 
             }
             
-
-            /*
-            unsigned int index=1,str_index=0;
-            char string[yyleng];
-            while(yytext[index]!='\0')
-            {
-                
-                string[str_index]=yytext[index];
-                if(yytext[index]=='\\')
-                {
-                    if(yytext[index+1]=='n')
-                    {
-                        
-                        if(yytext[index-1]!='\\')
-                        {
-                            string[str_index]='\n';
-                            index++;
-                        }
-                        
-                    }
-                    else if(yytext[index+1]=='t')
-                    {
-                        if(yytext[index-1]!='\\')
-                        {
-                            string[str_index]='\t';
-                            index++;
-                        }
-                        
-                    }
-                    else if(yytext[index+1]=='\\')
-                    {
-                        string[str_index]='\\';
-                        index++;
-                    }
-                }
-                if(yytext[index]=='\0')
-                {
-                    break;
-                }
-                index++;
-                str_index++;
-            }
-            string[str_index-1]='\0';
-            alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,yytext,yylineno);
-            alpha_PrintData(tmp ,"<-char*" );
-            */
+            free(str);
+           
 
 } 
 
@@ -339,6 +295,8 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
     head->next=NULL;
     head->first_line =yylineno;
+    head->is_closed=0;
+    unsigned int counter=0;
     while((c=input())!=MY_EOF )
     {
         if(c=='*')
@@ -346,34 +304,16 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             if((c=input())=='/' )
             {
                 /* mark that the current comment closed */
-                alpha_comments_info_t * curr_node = get_node(head,nested);
+
+                alpha_comments_info_t * curr_node = get_node(head,counter);
                 if(curr_node!=NULL)
                 curr_node->is_closed=1;
-
-                if(nested==0)
-                {
-                    
-                    
-                    unsigned int first_line= get_first_line(head,nested);
-                    alpha_token_t * tmp = alpha_CreateData("COMMENT",yylval,"BLOCK_COMMENT",first_line);
-                    alpha_PrintData(tmp ,"<-enumerated" );
-
-                    //printf("closed one multi line  comment\n");
-                    break;
-                }
-                else
-                {
-                    unsigned int first_line= get_first_line(head,nested);
-
-                    alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
-                    alpha_PrintData(tmp ,"<-enumerated" );
-
-
-                    //printf("closed one nested comment\n");
-
-                    nested--;
-                }  
-
+                unsigned int first_line= get_first_line(head,counter);
+                alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
+                alpha_PrintData(tmp ,"<-enumerated" );
+                if(counter==0)break;
+               
+                counter--;
                 opened_comments--;  
             }
             else
@@ -383,12 +323,12 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         }
         else if(c=='/')
         {
-             if((c=input())=='*' )
+            if((c=input())=='*' )
             {
                 opened_comments++;
-                push_comments_info(head,yylineno);
-                nested++;
-                //printf("open one nested comment\n");
+                //fprintf(output_file, "line inserted %d\n",yylineno);
+                push_comments_info(head,yylineno,counter);
+                counter++;
             }
             else
             {
@@ -398,7 +338,6 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     }
     if(c==MY_EOF)
     {
-        //printf("error comment didn't close\n");
         print_Red();
         alpha_comments_info_t * tmp=head;
         while(tmp!=NULL)
@@ -408,6 +347,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                 print_Red();
                 
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+                
                 reset_Red();
 
 
@@ -416,6 +356,8 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         
         }
     }
+    alpha_free_comments_list(head);
+    //free(head);
 }
 " "  {
 
@@ -472,13 +414,18 @@ int main(int argc , char * argv[])
     {
         yyin=stdin;
     }
-    alpha_token_t * alpha_head, *tmp;
+    alpha_token_t * alpha_head;
     alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
     alpha_head->alpha_yylex=NULL;
     
 
     alpha_yylex((void*)alpha_head); 
-    
+    alpha_free_tokens_list(alpha_head);
+    //free(alpha_head);
+    if(output_file!=NULL)
+    fclose(output_file);
+    fclose(yyin);
+
 
     return 0; 
 } 
