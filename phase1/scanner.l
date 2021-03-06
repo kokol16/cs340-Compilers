@@ -309,7 +309,17 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                 if(curr_node!=NULL)
                 curr_node->is_closed=1;
                 unsigned int first_line= get_first_line(head,counter);
-                alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
+                alpha_token_t * tmp;
+                if(counter==0)
+                {
+                    tmp = alpha_CreateData("COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
+                else
+                {
+                    tmp = alpha_CreateData("NESTED COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
                 alpha_PrintData(tmp ,"<-enumerated" );
                 if(counter==0)break;
                
@@ -340,21 +350,23 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     {
         print_Red();
         alpha_comments_info_t * tmp=head;
+                print_Red();
+
         while(tmp!=NULL)
         {
             if(tmp->is_closed==0)
             {
-                print_Red();
                 
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
                 
-                reset_Red();
 
 
             }
            tmp=tmp->next;
         
         }
+        reset_Red();
+
     }
     alpha_free_comments_list(head);
     //free(head);

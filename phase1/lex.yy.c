@@ -1248,7 +1248,17 @@ YY_RULE_SETUP
                 if(curr_node!=NULL)
                 curr_node->is_closed=1;
                 unsigned int first_line= get_first_line(head,counter);
-                alpha_token_t * tmp = alpha_CreateData("NESTED COMMENT",yylval,"BLOCK_COMMENT",first_line);
+                alpha_token_t * tmp;
+                if(counter==0)
+                {
+                    tmp = alpha_CreateData("COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
+                else
+                {
+                    tmp = alpha_CreateData("NESTED COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
                 alpha_PrintData(tmp ,"<-enumerated" );
                 if(counter==0)break;
                
@@ -1279,21 +1289,23 @@ YY_RULE_SETUP
     {
         print_Red();
         alpha_comments_info_t * tmp=head;
+                print_Red();
+
         while(tmp!=NULL)
         {
             if(tmp->is_closed==0)
             {
-                print_Red();
                 
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
                 
-                reset_Red();
 
 
             }
            tmp=tmp->next;
         
         }
+        reset_Red();
+
     }
     alpha_free_comments_list(head);
     //free(head);
@@ -1301,21 +1313,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 362 "scanner.l"
+#line 374 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 365 "scanner.l"
+#line 377 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 369 "scanner.l"
+#line 381 "scanner.l"
 {
     
 }
@@ -1323,14 +1335,14 @@ YY_RULE_SETUP
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 372 "scanner.l"
+#line 384 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 375 "scanner.l"
+#line 387 "scanner.l"
 {
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
@@ -1340,10 +1352,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 381 "scanner.l"
+#line 393 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1347 "lex.yy.c"
+#line 1359 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2360,7 +2372,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 381 "scanner.l"
+#line 393 "scanner.l"
 
 
 

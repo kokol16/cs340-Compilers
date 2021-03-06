@@ -1,3 +1,5 @@
 documentation
 Oganize functions
-free
+ttheres one leak :(
+/* */ check this 
+print multiline comment and the line on signle line multiline comment
