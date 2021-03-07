@@ -1,5 +1,6 @@
-run: lex.yy.c
-	gcc lex.yy.c
+run:  scanner.l lib.c
+	lex scanner.l
+	gcc lex.yy.c lib.c
 
-lex.yy.c : scanner.l
-	lex scanner.l	
+
+

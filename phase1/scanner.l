@@ -1,14 +1,18 @@
 
 %{ 
-#define MY_EOF 0    
-#include<stdio.h> 
-#include<string.h> 
-#include"scanner.h"
+
+#define MY_EOF 0   
 #define YY_DECL int alpha_yylex (void * yylval)
+#include"lib.h"
+FILE *output_file;
+
+
 %} 
+
 /*keep current line */
 %option yylineno
 %option case-insensitive  
+
 
 ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
@@ -165,7 +169,6 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             int x;
             while((c=input())!=MY_EOF )
             {
-                printf("c is : %c\n",c);
 
                 if(c=='\"' )
                 {
@@ -393,6 +396,74 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 %% 
 
 
+alpha_token_t *alpha_CreateData(char *identifier, void *yylval, char *additional_info, unsigned int start_line)
+{
+  alpha_token_t *tmp;
+  if (FirstNode == 1)
+  {
+    FirstNode = 0;
+    tmp = yylval;
+  }
+  else
+  {
+    tmp = alpha_CreateNextNode(yylval);
+  }
+  alpha_CreateInfo(tmp, identifier, additional_info, start_line);
+  return tmp;
+}
+
+void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, unsigned int start_line)
+{
+  short isComment = 0;
+  ((alpha_token_t *)yylval)->numline = start_line;
+  ((alpha_token_t *)yylval)->numToken = ++counter;
+  if (strcmp(identifier, "COMMENT") == 0 || strcmp(identifier, "NESTED COMMENT") == 0)
+  {
+    isComment = 1;
+    if (yylineno == start_line)
+    {
+      ((alpha_token_t *)yylval)->content = malloc(1 * sizeof(char));
+      memcpy(((alpha_token_t *)yylval)->content, "", 1);
+    }
+    else
+    {
+      int start_line_length = snprintf(NULL, 0, "%u", start_line);
+      int end_line_length = snprintf(NULL, 0, "%u", yylineno);
+      // +4 for "  "  ,+1 for '\0'
+      ((alpha_token_t *)yylval)->content = malloc(start_line_length + end_line_length + 4 + 1);
+      snprintf(((alpha_token_t *)yylval)->content, start_line_length + 1, "%u", start_line);
+      memcpy(((alpha_token_t *)yylval)->content + start_line_length, " - ", 4);
+      snprintf(((alpha_token_t *)yylval)->content + start_line_length + 3, end_line_length + 1, "%d", yylineno);
+    }
+  }
+  if (strcmp(identifier, "STRING") == 0 || strcmp(identifier, "IDENT") == 0)
+  {
+
+    int length = strlen(additional_info) + 1;
+    ((alpha_token_t *)yylval)->content = malloc(sizeof(char) * length);
+    memcpy(((alpha_token_t *)yylval)->content, additional_info, length);
+
+    int identifier_length = strlen(identifier) + 1;
+    ((alpha_token_t *)yylval)->type = malloc(sizeof(char) * identifier_length);
+    memcpy(((alpha_token_t *)yylval)->type, identifier, identifier_length);
+  }
+  else
+  {
+    if (isComment != 1)
+    {
+      int length = strlen(yytext) + 1;
+      ((alpha_token_t *)yylval)->content = malloc(sizeof(char) * length);
+      memcpy(((alpha_token_t *)yylval)->content, yytext, length);
+    }
+
+    int identifier_length = strlen(identifier) + 1;
+    int additional_info_length = strlen(additional_info) + 1;
+    ((alpha_token_t *)yylval)->type = malloc(sizeof(char) * identifier_length + additional_info_length + DOUBLE_SPACE);
+    memcpy(((alpha_token_t *)yylval)->type, identifier, identifier_length);
+    strncat(((alpha_token_t *)yylval)->type, "  ", DOUBLE_SPACE);
+    strncat(((alpha_token_t *)yylval)->type, additional_info, additional_info_length);
+  }
+}
 
 
 int yywrap(void){} 
