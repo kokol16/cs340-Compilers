@@ -1,4 +1,2 @@
-documentation
-Oganize functions
 ttheres one leak :(
 print multiline comment and the line on signle line multiline comment

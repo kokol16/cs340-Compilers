@@ -2,25 +2,45 @@
 
 #define alpha_ptr ((alpha_token_t *)yylval)
 
-
+/**
+ * @brief This method changes output color to red
+ * 
+ */
 void print_Red()
 {
   fprintf(stderr, "\033[0;31m");
 }
+/**
+ * @brief This method reset output color from red to normal
+ * 
+ */
 void reset_Red()
 {
   fprintf(stderr, "\033[0;31m");
 }
+/**
+ * @brief This method changes output color to yellow
+ * 
+ */
 void print_Yellow()
 {
   fprintf(stderr, "\033[1;33m");
 }
 
+/**
+ * @brief This method reset output color from yellow to normal
+ * 
+ */
 void reset_Yellow()
 {
   fprintf(stderr, "\033[0m");
 }
-
+/**
+ * @brief This method prints the information for the current token
+ * 
+ * @param node The token that we will print
+ * @param extra_type 
+ */
 void alpha_PrintData(alpha_token_t *node, char *extra_type)
 {
   int line_width = 10;
@@ -57,6 +77,12 @@ void alpha_free_tokens_list(alpha_token_t *head)
     free(prev);
   }
 }
+/**
+ * @brief This method free the memory alocated for the list 
+ * that keeps information about comments
+ * 
+ * @param head 
+ */
 void alpha_free_comments_list(alpha_comments_info_t *head)
 {
   alpha_comments_info_t *prev = head;
@@ -67,6 +93,12 @@ void alpha_free_comments_list(alpha_comments_info_t *head)
     free(prev);
   }
 }
+/**
+ * @brief This method creates a new token
+ * 
+ * @param yylval The head of the list of tokens
+ * @return alpha_token_t* returns the token that has been created
+ */
 alpha_token_t *alpha_CreateNextNode(void *yylval)
 {
   alpha_token_t *alpha_node, *tmp;
@@ -83,6 +115,13 @@ alpha_token_t *alpha_CreateNextNode(void *yylval)
   tmp->alpha_yylex = alpha_node;
   return tmp->alpha_yylex;
 }
+/**
+ * @brief This method creates the informaion for the current comment
+ * 
+ * @param head The head of the comments list
+ * @param first_line The line that the comment started
+ * @param counter The position of the comment in the list
+ */
 void push_comments_info(alpha_comments_info_t *head, int first_line, int counter)
 {
   alpha_comments_info_t *node = (alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
@@ -99,6 +138,13 @@ void push_comments_info(alpha_comments_info_t *head, int first_line, int counter
     free(head->next);
   head->next = node;
 }
+/**
+ * @brief This method return the comment at a certain position
+ * 
+ * @param head The head of the comment's list
+ * @param nested The position of the node we want
+ * @return alpha_comments_info_t* returns the node at position nested or NULL
+ */
 alpha_comments_info_t *get_node(alpha_comments_info_t *head, unsigned int nested)
 {
   unsigned int counter = 0;
@@ -109,6 +155,13 @@ alpha_comments_info_t *get_node(alpha_comments_info_t *head, unsigned int nested
   }
   return head;
 }
+/**
+ * @brief This method finds the line that the comment at a certain position started
+ * 
+ * @param head The head of the comment's list
+ * @param index the posititon of the comment in the list
+ * @return unsigned int return the line that the comment stared or 0
+ */
 unsigned int get_first_line(alpha_comments_info_t *head, unsigned int index)
 {
   unsigned int i = 0;
@@ -119,6 +172,11 @@ unsigned int get_first_line(alpha_comments_info_t *head, unsigned int index)
   }
   return head->first_line;
 }
+/**
+ * @brief This method prints information about the comments
+ * 
+ * @param head The head of the comment's list
+ */
 void print_comments_info(alpha_comments_info_t *head)
 {
   while (head != NULL)

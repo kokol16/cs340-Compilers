@@ -175,7 +175,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     if((x=input())==MY_EOF)break; /* support "\\" like stings*/
                     else unput(x);  
                     if(index==0){break;}/* empty string*/
-                    if( index-1>=0 &&  str[index-1]!='\\')break;
+                    if( index-1>=0 &&  str[index-1]!='\\')break; /* break if u see " without \ before*/
                 }
                 else if(c=='\\')
                 {
@@ -184,7 +184,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     if(c=='n')
                     {
                         
-                        if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) )
+                        if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) ) /* cases like \\n */
                         {
 
                             str[index++]='n';
@@ -199,7 +199,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     }
                     else if(c=='t')
                     {
-                        if(index-1>=0 && str[index-1]=='\\')
+                        if(index-1>=0 && str[index-1]=='\\') /* cases like \\t */
                         {
                             str[index++]='t';
                         }
@@ -211,7 +211,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     }
                     else if(c=='\"')
                     {
-                        if(index-1>=0 &&  str[index-1]=='\\')
+                        if(index-1>=0 &&  str[index-1]=='\\') /* cases like \\" */
                         {
                             print_Red();
                             fprintf(stderr , "error string with only one \\ in line %d\n",yylineno);
@@ -228,6 +228,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     {
                         if(c!='\\') /*  \\ is not a warning */
                         {
+                            /* unsupported \x characters only warning */
                             print_Yellow();
                             fprintf(stderr,"warning invalid escape character %c\n",c);
                             reset_Yellow();
@@ -246,21 +247,21 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     str[index++]=c;
                 }
 
-                if(index==max_size)
+                if(index==max_size)/* check if we need to expand string size*/
                 {
                     max_size*=2;
                     str = realloc(str, max_size* sizeof(char));
                    
                 }
             }
-            if(c==MY_EOF){
+            if(c==MY_EOF){ /* String never closed case*/
                 print_Red();
                 fprintf(stderr , "String that started on line %d didn't close\n",start_line);
                 reset_Red();
             }
             else
             {
-                if(index==0)
+                if(index==0) /* "" is warning as a zero length string */
                 {
                     print_Yellow();
                     fprintf(stderr,"warning zero length in line %d string\n",yylineno);
@@ -291,9 +292,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
     /* line_comment to multi_line_comment?? */
     int c;
     int nested=0;
-    unsigned int opened_comments=1;
-    //printf("opened multti line  comment\n");
-   
+    unsigned int opened_comments=1;/*probably don't need this */   
     alpha_comments_info_t * head;
     head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
     head->next=NULL;
@@ -307,10 +306,10 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             if((c=input())=='/' )
             {
                 /* mark that the current comment closed */
-
                 alpha_comments_info_t * curr_node = get_node(head,counter);
                 if(curr_node!=NULL)
                 curr_node->is_closed=1;
+
                 unsigned int first_line= get_first_line(head,counter);
                 alpha_token_t * tmp;
                 if(counter==0)
@@ -339,7 +338,6 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             if((c=input())=='*' )
             {
                 opened_comments++;
-                //fprintf(output_file, "line inserted %d\n",yylineno);
                 push_comments_info(head,yylineno,counter);
                 counter++;
             }
@@ -349,20 +347,16 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             }
         }
     }
-    if(c==MY_EOF)
+    if(c==MY_EOF) /* comment never closed */
     {
-        print_Red();
         alpha_comments_info_t * tmp=head;
-                print_Red();
-
+        print_Red();
         while(tmp!=NULL)
         {
-            if(tmp->is_closed==0)
+            if(tmp->is_closed==0)/* print all the unclosed comments */
             {
                 
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
-                
-
 
             }
            tmp=tmp->next;
@@ -372,7 +366,6 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 
     }
     alpha_free_comments_list(head);
-    //free(head);
 }
 " "  {
 
@@ -395,7 +388,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 }
 %% 
 
-
+/* This method is a wrapper function for creating a token */
 alpha_token_t *alpha_CreateData(char *identifier, void *yylval, char *additional_info, unsigned int start_line)
 {
   alpha_token_t *tmp;
@@ -427,10 +420,13 @@ void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, uns
     }
     else
     {
+      /* find the length of the 2 line numbers*/  
       int start_line_length = snprintf(NULL, 0, "%u", start_line);
       int end_line_length = snprintf(NULL, 0, "%u", yylineno);
+
       // +4 for "  "  ,+1 for '\0'
       ((alpha_token_t *)yylval)->content = malloc(start_line_length + end_line_length + 4 + 1);
+      /* create the "x-y" comments lines */
       snprintf(((alpha_token_t *)yylval)->content, start_line_length + 1, "%u", start_line);
       memcpy(((alpha_token_t *)yylval)->content + start_line_length, " - ", 4);
       snprintf(((alpha_token_t *)yylval)->content + start_line_length + 3, end_line_length + 1, "%d", yylineno);
