@@ -1102,12 +1102,12 @@ YY_RULE_SETUP
             char * str=malloc(max_size*sizeof(char));
             int index=0;
             int x;
-            while((c=input())!=MY_EOF )
+            while((c=input())>MY_EOF )
             {
 
                 if(c=='\"' )
                 {
-                    if((x=input())==MY_EOF)break; /* support "\\" like stings*/
+                    if((x=input())<=MY_EOF)break; /* support "\\" like stings*/
                     else unput(x);  
                     if(index==0){break;}/* empty string*/
                     if( index-1>=0 &&  str[index-1]!='\\')break; /* break if u see " without \ before*/
@@ -1189,7 +1189,7 @@ YY_RULE_SETUP
                    
                 }
             }
-            if(c==MY_EOF){ /* String never closed case*/
+            if(c<=MY_EOF){ /* String never closed case*/
                 print_Red();
                 fprintf(stderr , "String that started on line %d didn't close\n",start_line);
                 reset_Red();
@@ -1236,7 +1236,7 @@ YY_RULE_SETUP
     head->first_line =yylineno;
     head->is_closed=0;
     unsigned int counter=0;
-    while((c=input())!=MY_EOF )
+    while((c=input())>MY_EOF )
     {
         if(c=='*')
         {
@@ -1284,7 +1284,7 @@ YY_RULE_SETUP
             }
         }
     }
-    if(c==MY_EOF) /* comment never closed */
+    if(c<=MY_EOF) /* comment never closed */
     {
         alpha_comments_info_t * tmp=head;
         print_Red();
