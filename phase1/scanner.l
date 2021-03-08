@@ -167,14 +167,28 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             char * str=malloc(max_size*sizeof(char));
             int index=0;
             int x;
+            short double_slash=0;
             while((c=input())>MY_EOF )
             {
 
                 if(c=='\"' )
                 {
-                    if((x=input())<=MY_EOF)break; /* support "\\" like stings*/
-                    else unput(x);  
+                    
+                    
                     if(index==0){break;}/* empty string*/
+                    if(double_slash)
+                    {
+                        break;
+                    }            
+
+                    
+                    
+                    if((x=input())<=MY_EOF)
+                    {
+                        break; /* support "\\" like stings*/
+                    }
+                    else unput(x);  
+                    
                     if( index-1>=0 &&  str[index-1]!='\\')break; /* break if u see " without \ before*/
                 }
                 else if(c=='\\')
@@ -183,6 +197,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     c=input();
                     if(c=='n')
                     {
+                        double_slash=0;
                         
                         if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) ) /* cases like \\n */
                         {
@@ -199,6 +214,8 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     }
                     else if(c=='t')
                     {
+                        double_slash=0;
+
                         if(index-1>=0 && str[index-1]=='\\') /* cases like \\t */
                         {
                             str[index++]='t';
@@ -211,21 +228,20 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     }
                     else if(c=='\"')
                     {
-                        if(index-1>=0 &&  str[index-1]=='\\') /* cases like \\" */
+                        if(double_slash)
                         {
-                            print_Red();
-                            fprintf(stderr , "error string with only one \\ in line %d\n",yylineno);
-                            reset_Red();
+                            str[index++]='\"';
                         }
                         else
                         {
-                            str[index++]='\"';
+
                         }
                         
                        
                     }
                     else
                     {
+                        
                         if(c!='\\') /*  \\ is not a warning */
                         {
                             /* unsupported \x characters only warning */
@@ -235,8 +251,11 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                             unput(c);
 
                         }
+                        else
+                        {
+                            double_slash=1;
+                        }
 
-                        
                         str[index++]='\\';
 
                     }
@@ -267,7 +286,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     fprintf(stderr,"warning zero length in line %d string\n",yylineno);
                     reset_Yellow();
                 }
-                str[++index]='\0';
+                str[index]='\0';
                 alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,str,start_line);
                 alpha_PrintData(tmp ,"<-char*" );
 
@@ -384,6 +403,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
         reset_Red();
+
         
 }
 %% 

@@ -1102,14 +1102,28 @@ YY_RULE_SETUP
             char * str=malloc(max_size*sizeof(char));
             int index=0;
             int x;
+            short double_slash=0;
             while((c=input())>MY_EOF )
             {
 
                 if(c=='\"' )
                 {
-                    if((x=input())<=MY_EOF)break; /* support "\\" like stings*/
-                    else unput(x);  
+                    
+                    
                     if(index==0){break;}/* empty string*/
+                    if(double_slash)
+                    {
+                        break;
+                    }            
+
+                    
+                    
+                    if((x=input())<=MY_EOF)
+                    {
+                        break; /* support "\\" like stings*/
+                    }
+                    else unput(x);  
+                    
                     if( index-1>=0 &&  str[index-1]!='\\')break; /* break if u see " without \ before*/
                 }
                 else if(c=='\\')
@@ -1118,6 +1132,7 @@ YY_RULE_SETUP
                     c=input();
                     if(c=='n')
                     {
+                        double_slash=0;
                         
                         if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) ) /* cases like \\n */
                         {
@@ -1134,6 +1149,8 @@ YY_RULE_SETUP
                     }
                     else if(c=='t')
                     {
+                        double_slash=0;
+
                         if(index-1>=0 && str[index-1]=='\\') /* cases like \\t */
                         {
                             str[index++]='t';
@@ -1146,21 +1163,21 @@ YY_RULE_SETUP
                     }
                     else if(c=='\"')
                     {
-                        if(index-1>=0 &&  str[index-1]=='\\') /* cases like \\" */
+                        if(double_slash)
                         {
-                            print_Red();
-                            fprintf(stderr , "error string with only one \\ in line %d\n",yylineno);
-                            reset_Red();
+                            str[index++]='\"';
                         }
                         else
                         {
-                            str[index++]='\"';
+
                         }
                         
                        
                     }
                     else
                     {
+                        
+
                         if(c!='\\') /*  \\ is not a warning */
                         {
                             /* unsupported \x characters only warning */
@@ -1170,8 +1187,11 @@ YY_RULE_SETUP
                             unput(c);
 
                         }
+                        else
+                        {
+                            double_slash=1;
+                        }
 
-                        
                         str[index++]='\\';
 
                     }
@@ -1202,7 +1222,7 @@ YY_RULE_SETUP
                     fprintf(stderr,"warning zero length in line %d string\n",yylineno);
                     reset_Yellow();
                 }
-                str[++index]='\0';
+                str[index]='\0';
                 alpha_token_t * tmp =   alpha_CreateData("STRING",yylval,str,start_line);
                 alpha_PrintData(tmp ,"<-char*" );
 
@@ -1215,7 +1235,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 285 "scanner.l"
+#line 305 "scanner.l"
 {
             alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -1224,7 +1244,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 291 "scanner.l"
+#line 311 "scanner.l"
 {
     /* line_comment to multi_line_comment?? */
     int c;
@@ -1307,21 +1327,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 370 "scanner.l"
+#line 390 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 373 "scanner.l"
+#line 393 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 377 "scanner.l"
+#line 397 "scanner.l"
 {
     
 }
@@ -1329,27 +1349,28 @@ YY_RULE_SETUP
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 380 "scanner.l"
+#line 400 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 383 "scanner.l"
+#line 403 "scanner.l"
 {
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
         reset_Red();
+
         
 }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 389 "scanner.l"
+#line 410 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1353 "lex.yy.c"
+#line 1374 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2366,7 +2387,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 389 "scanner.l"
+#line 410 "scanner.l"
 
 
 /* This method is a wrapper function for creating a token */
