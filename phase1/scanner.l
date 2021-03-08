@@ -167,7 +167,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
             char * str=malloc(max_size*sizeof(char));
             int index=0;
             int x;
-            short double_slash=0;
+            int  slash_counter=0;
             while((c=input())>MY_EOF )
             {
 
@@ -176,67 +176,51 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                     
                     
                     if(index==0){break;}/* empty string*/
-                    if(double_slash)
+                    if((slash_counter % 2) == 0)
                     {
                         break;
-                    }            
-
-                    
-                    
-                    if((x=input())<=MY_EOF)
-                    {
-                        break; /* support "\\" like stings*/
                     }
-                    else unput(x);  
                     
-                    if( index-1>=0 &&  str[index-1]!='\\')break; /* break if u see " without \ before*/
+
                 }
                 else if(c=='\\')
                 {
-
+                    slash_counter++;
                     c=input();
                     if(c=='n')
                     {
-                        double_slash=0;
                         
-                        if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) ) /* cases like \\n */
-                        {
-
-                            str[index++]='n';
-                        }
-                        else
+                        if((slash_counter % 2) != 0)
                         {
 
                             str[index++]='\n';
 
                         }
 
+                       
+                        slash_counter=0;
+
                     }
                     else if(c=='t')
                     {
-                        double_slash=0;
 
-                        if(index-1>=0 && str[index-1]=='\\') /* cases like \\t */
-                        {
-                            str[index++]='t';
-                        }
-                        else
+                        if((slash_counter % 2) != 0)/* cases like \\t */
                         {
                             str[index++]='\t';
 
                         }
+                        slash_counter=0;
+
                     }
                     else if(c=='\"')
                     {
-                        if(double_slash)
+                        if((slash_counter % 2) != 0)
                         {
                             str[index++]='\"';
                         }
-                        else
-                        {
-
-                        }
+                       
                         
+                        slash_counter=0;
                        
                     }
                     else
@@ -253,7 +237,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                         }
                         else
                         {
-                            double_slash=1;
+                            slash_counter++;
                         }
 
                         str[index++]='\\';
@@ -264,6 +248,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                 {
 
                     str[index++]=c;
+                    slash_counter=0;
                 }
 
                 if(index==max_size)/* check if we need to expand string size*/
@@ -433,7 +418,7 @@ void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, uns
   if (strcmp(identifier, "COMMENT") == 0 || strcmp(identifier, "NESTED COMMENT") == 0)
   {
     isComment = 1;
-    if (yylineno == start_line)
+    if (yylineno == start_line && strcmp(additional_info, "MULTILINE_COMMENT")!=0  )
     {
       ((alpha_token_t *)yylval)->content = malloc(1 * sizeof(char));
       memcpy(((alpha_token_t *)yylval)->content, "", 1);

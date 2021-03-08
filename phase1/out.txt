@@ -1,1 +1,6 @@
-2:	#1	"\\"	STRING	"\\"	<-char*
+1:	#1	"lalla"	STRING	"lalla"	<-char*
+1:	#2	"ok"	IDENT	"ok"	<-char*
+4:	#3	"4 - 7"	NESTED COMMENT  MULTILINE_COMMENT	<-enumerated
+8:	#4	"8 - 8"	NESTED COMMENT  MULTILINE_COMMENT	<-enumerated
+10:	#5	"10 - 11"	NESTED COMMENT  MULTILINE_COMMENT	<-enumerated
+1:	#6	"1 - 14"	COMMENT  MULTILINE_COMMENT	<-enumerated

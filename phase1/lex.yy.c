@@ -1102,7 +1102,7 @@ YY_RULE_SETUP
             char * str=malloc(max_size*sizeof(char));
             int index=0;
             int x;
-            short double_slash=0;
+            int  slash_counter=0;
             while((c=input())>MY_EOF )
             {
 
@@ -1111,73 +1111,56 @@ YY_RULE_SETUP
                     
                     
                     if(index==0){break;}/* empty string*/
-                    if(double_slash)
+                    if((slash_counter % 2) == 0)
                     {
                         break;
-                    }            
-
-                    
-                    
-                    if((x=input())<=MY_EOF)
-                    {
-                        break; /* support "\\" like stings*/
                     }
-                    else unput(x);  
                     
-                    if( index-1>=0 &&  str[index-1]!='\\')break; /* break if u see " without \ before*/
+
                 }
                 else if(c=='\\')
                 {
-
+                    slash_counter++;
                     c=input();
                     if(c=='n')
                     {
-                        double_slash=0;
                         
-                        if(  ((index-1)>=0 ) && ( str[index-1]=='\\' ) ) /* cases like \\n */
-                        {
-
-                            str[index++]='n';
-                        }
-                        else
+                        if((slash_counter % 2) != 0)
                         {
 
                             str[index++]='\n';
 
                         }
 
+                       
+                        slash_counter=0;
+
                     }
                     else if(c=='t')
                     {
-                        double_slash=0;
 
-                        if(index-1>=0 && str[index-1]=='\\') /* cases like \\t */
-                        {
-                            str[index++]='t';
-                        }
-                        else
+                        if((slash_counter % 2) != 0)/* cases like \\t */
                         {
                             str[index++]='\t';
 
                         }
+                        slash_counter=0;
+
                     }
                     else if(c=='\"')
                     {
-                        if(double_slash)
+                        if((slash_counter % 2) != 0)
                         {
                             str[index++]='\"';
                         }
-                        else
-                        {
-
-                        }
+                       
                         
+                        slash_counter=0;
                        
                     }
                     else
                     {
                         
-
                         if(c!='\\') /*  \\ is not a warning */
                         {
                             /* unsupported \x characters only warning */
@@ -1189,7 +1172,7 @@ YY_RULE_SETUP
                         }
                         else
                         {
-                            double_slash=1;
+                            slash_counter++;
                         }
 
                         str[index++]='\\';
@@ -1200,6 +1183,7 @@ YY_RULE_SETUP
                 {
 
                     str[index++]=c;
+                    slash_counter=0;
                 }
 
                 if(index==max_size)/* check if we need to expand string size*/
@@ -1235,7 +1219,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 305 "scanner.l"
+#line 289 "scanner.l"
 {
             alpha_token_t * tmp =alpha_CreateData("COMMENT",yylval,"LINE_COMMENT",yylineno);
             alpha_PrintData(tmp ,"<-enumerated" );
@@ -1244,7 +1228,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 311 "scanner.l"
+#line 295 "scanner.l"
 {
     /* line_comment to multi_line_comment?? */
     int c;
@@ -1327,21 +1311,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 390 "scanner.l"
+#line 374 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 393 "scanner.l"
+#line 377 "scanner.l"
 {
 
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 397 "scanner.l"
+#line 381 "scanner.l"
 {
     
 }
@@ -1349,14 +1333,14 @@ YY_RULE_SETUP
 case 51:
 /* rule 51 can match eol */
 YY_RULE_SETUP
-#line 400 "scanner.l"
+#line 384 "scanner.l"
 {
        
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 403 "scanner.l"
+#line 387 "scanner.l"
 {
         print_Red();
         fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
@@ -1367,10 +1351,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 410 "scanner.l"
+#line 394 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1374 "lex.yy.c"
+#line 1358 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2387,7 +2371,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 410 "scanner.l"
+#line 394 "scanner.l"
 
 
 /* This method is a wrapper function for creating a token */
@@ -2415,7 +2399,7 @@ void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, uns
   if (strcmp(identifier, "COMMENT") == 0 || strcmp(identifier, "NESTED COMMENT") == 0)
   {
     isComment = 1;
-    if (yylineno == start_line)
+    if (yylineno == start_line && strcmp(additional_info, "MULTILINE_COMMENT")!=0  )
     {
       ((alpha_token_t *)yylval)->content = malloc(1 * sizeof(char));
       memcpy(((alpha_token_t *)yylval)->content, "", 1);
