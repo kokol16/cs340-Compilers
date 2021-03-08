@@ -341,6 +341,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
         {
             if((c=input())=='*' )
             {
+                
                 opened_comments++;
                 push_comments_info(head,yylineno,counter);
                 counter++;
@@ -363,7 +364,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
 
             }
-           tmp=tmp->next;
+            tmp=tmp->next;
         
         }
         reset_Red();
@@ -505,7 +506,6 @@ int main(int argc , char * argv[])
 
     alpha_yylex((void*)alpha_head); 
     alpha_free_tokens_list(alpha_head);
-    //free(alpha_head);
     if(output_file!=NULL)
     fclose(output_file);
     fclose(yyin);
