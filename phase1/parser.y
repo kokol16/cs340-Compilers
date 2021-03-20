@@ -9,53 +9,127 @@
 
 extern FILE * yyin;
 FILE *output_file;
-#define YY_DECL int yylex( YYSTYPE  yylval)
+int yylex(void);
 
-extern YY_DECL;
-
+int yyerror( char * msg );
 
 %}
 %union{
 	int num;
-	
+	char * str;
 }
-%type <num> DIGIT expr stmt program number 
-%lex-param {void * yylval}
 %start program
-%token DIGIT
+%token <num> NUMBER 
+%token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCAL TRUE FALSE NIL STRING  ID
 %left '|'
 %left '&'
 %left '+' '-'
-%left '*' '/' '%'
-
+%left '*' '/' '%'  
 %%                 
 program: stmt;
-stmt:    expr;
-expr:   expr op expr
-         {
-           $$ = $1 + $3;
-         } ;
-         |
-         number
-         ;
+stmt:   expr;   
+        | ifstmt 
+        | whilestmt 
+        | forstmt 
+        | returnstmt
+        | BREAK ;
+        | CONTINUE;
+        | block
+        | funcdef
+        | ;
 
-op: '+'; 
+expr:   assignexpr
+        |expr op expr
+        | term;
+
+op:     '+'
+        | '-' 
+        | '*' 
+        | '/' 
+        | '%' 
+        | '>' 
+        | ">=" 
+        | '<' 
+        | "<=" 
+        | "==" 
+        | "!=" 
+        | AND 
+        | OR;
+        
+
+term:   '(' expr ')'
+        | '-' expr
+        | NOT expr
+        | "++"lvalue
+        | lvalue"++"
+        | "--"lvalue
+        | lvalue"--"
+        | primary ;
+
+assignexpr: lvalue '=' expr ;
+
+primary:  lvalue
+          | call
+          | objectdef
+          | '(' funcdef ')' 
+          | const ;
+
+lvalue:   ID
+          | LOCAL ID
+          | "::" ID
+          | member ;
+
+member:    lvalue '.' ID
+            | lvalue '[' expr ']'
+            | call '.' ID
+            | call '[' expr ']' ;
+
+call:      call '(' elist ')'
+            | lvalue callsuffix
+            | '(' funcdef')' '(' elist ')';
+
+callsuffix: normcall
+            | methodcall ;
+
+normcall: '(' elist ')';
+
+methodcall:    ".." ID '(' elist ')'; /* equivalent to lvalue.ID'('lvalue, elist')';*/
+
+elist: '[' expr '['',' expr']'  ']';
+
+objectdef: '[' '['elist | indexed']' ']';
+
+indexed: '['indexedelem '[' ',' indexedelem']'  ']';
+
+indexedelem: '{' expr : expr '}';
+
+block: '{' '['stmt']' '}';
+
+funcdef: FUNCTION '['ID']' '('idlist')' block;
+
+const: NUMBER | STRING | NIL | TRUE | FALSE;
+
+idlist:    '['ID '[' ',' ID']'  ']';
+
+ifstmt: IF '(' expr ')' stmt '[' ELSE stmt ']'  { printf("if statement\n"); };
+
+whilestmt: WHILE '(' expr ')' stmt;
+
+forstmt:  FOR '(' elist';'  expr';'  elist')' stmt;
+
+returnstmt: RETURN '['expr']';
 
 
-number:  DIGIT
-    
-         ;
+
 %%
 
-int yyerror(void * yylval )
+int yyerror( char * msg )
 {
 
 }
 int main(int argc , char * argv[])
 {
-    extern FILE *yyin;
-
-  if(argc==2)
+    if(argc==2)
     {
         if(!( yyin=fopen(argv[1],"r") )  )
         {
@@ -82,17 +156,13 @@ int main(int argc , char * argv[])
     {
         yyin=stdin;
     }
-    alpha_token_t * alpha_head;
-    alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-    alpha_head->alpha_yylex=NULL;
+  
     
-
-    
-    
-    yyparse();
+    //yylex();
+    //yyin=stdin;
+    yyparse() ;
 
 
-    alpha_free_tokens_list(alpha_head);
     //if(output_file!=NULL)
     //fclose(output_file);
 //    fclose(yyin);
