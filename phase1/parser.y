@@ -4,47 +4,6 @@
 
 #include <stdio.h>
 
-<<<<<<< HEAD
-int yyerror(YYSTYPE   yylval , char * lala);
-extern int yyparse(void * yylval);
-
-extern FILE * yyin;
-FILE *output_file;
-#define YY_DECL int yylex( YYSTYPE  yylval)
-
-extern YY_DECL;
-
-
-%}
-%param {void * yylval}
-%start program
-%token DIGIT
-%left '|'
-%left '&'
-%left '+' '-'
-%left '*' '/' '%'
-
-%%                 
-program: stmt;
-stmt:    expr;
-expr:   expr op expr
-         {
-           $$ = $1 + $3;
-         } ;
-         |
-         number
-         ;
-
-op : '+'; 
-
-
-number:  DIGIT
-    
-         ;
-%%
-
-int yyerror(void * yylval , char * lala)
-=======
 
 
 
@@ -165,19 +124,12 @@ returnstmt: RETURN '['expr']';
 %%
 
 int yyerror( char * msg )
->>>>>>> trelh
 {
 
 }
 int main(int argc , char * argv[])
 {
-<<<<<<< HEAD
-    extern FILE *yyin;
-
-  if(argc==2)
-=======
     if(argc==2)
->>>>>>> trelh
     {
         if(!( yyin=fopen(argv[1],"r") )  )
         {
@@ -204,19 +156,6 @@ int main(int argc , char * argv[])
     {
         yyin=stdin;
     }
-<<<<<<< HEAD
-    alpha_token_t * alpha_head;
-    alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-    alpha_head->alpha_yylex=NULL;
-    
-
-    
-    
-    yyparse(alpha_head);
-
-
-    alpha_free_tokens_list(alpha_head);
-=======
   
     
     //yylex();
@@ -224,7 +163,6 @@ int main(int argc , char * argv[])
     yyparse() ;
 
 
->>>>>>> trelh
     //if(output_file!=NULL)
     //fclose(output_file);
 //    fclose(yyin);

@@ -45,17 +45,6 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-<<<<<<< HEAD
-    DIGIT = 258
-  };
-#endif
-/* Tokens.  */
-#define DIGIT 258
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-=======
     NUMBER = 258,
     IF = 259,
     ELSE = 260,
@@ -110,7 +99,6 @@ union YYSTYPE
 };
 
 typedef union YYSTYPE YYSTYPE;
->>>>>>> trelh
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -118,10 +106,6 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE yylval;
 
-<<<<<<< HEAD
-int yyparse (void * yylval);
-=======
 int yyparse (void);
->>>>>>> trelh
 
 #endif /* !YY_YY_Y_TAB_H_INCLUDED  */
