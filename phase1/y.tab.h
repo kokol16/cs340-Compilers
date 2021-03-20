@@ -45,6 +45,7 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
+<<<<<<< HEAD
     DIGIT = 258
   };
 #endif
@@ -54,6 +55,62 @@ extern int yydebug;
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
+=======
+    NUMBER = 258,
+    IF = 259,
+    ELSE = 260,
+    WHILE = 261,
+    FOR = 262,
+    FUNCTION = 263,
+    RETURN = 264,
+    BREAK = 265,
+    CONTINUE = 266,
+    AND = 267,
+    NOT = 268,
+    OR = 269,
+    LOCAL = 270,
+    TRUE = 271,
+    FALSE = 272,
+    NIL = 273,
+    STRING = 274,
+    ID = 275
+  };
+#endif
+/* Tokens.  */
+#define NUMBER 258
+#define IF 259
+#define ELSE 260
+#define WHILE 261
+#define FOR 262
+#define FUNCTION 263
+#define RETURN 264
+#define BREAK 265
+#define CONTINUE 266
+#define AND 267
+#define NOT 268
+#define OR 269
+#define LOCAL 270
+#define TRUE 271
+#define FALSE 272
+#define NIL 273
+#define STRING 274
+#define ID 275
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+
+union YYSTYPE
+{
+#line 17 "parser.y" /* yacc.c:1909  */
+
+	int num;
+	char * str;
+
+#line 99 "y.tab.h" /* yacc.c:1909  */
+};
+
+typedef union YYSTYPE YYSTYPE;
+>>>>>>> trelh
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -61,6 +118,10 @@ typedef int YYSTYPE;
 
 extern YYSTYPE yylval;
 
+<<<<<<< HEAD
 int yyparse (void * yylval);
+=======
+int yyparse (void);
+>>>>>>> trelh
 
 #endif /* !YY_YY_Y_TAB_H_INCLUDED  */

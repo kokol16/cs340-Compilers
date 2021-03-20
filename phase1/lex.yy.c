@@ -341,6 +341,12 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
+<<<<<<< HEAD
+=======
+
+#define yywrap() (/*CONSTCOND*/1)
+#define YY_SKIP_YYWRAP
+>>>>>>> trelh
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -370,8 +376,13 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
+<<<<<<< HEAD
 #define YY_NUM_RULES 54
 #define YY_END_OF_BUFFER 55
+=======
+#define YY_NUM_RULES 10
+#define YY_END_OF_BUFFER 11
+>>>>>>> trelh
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -379,6 +390,7 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
+<<<<<<< HEAD
 static const flex_int16_t yy_accept[111] =
     {   0,
         0,    0,   55,   53,   49,   52,   50,   51,   48,   53,
@@ -393,10 +405,20 @@ static const flex_int16_t yy_accept[111] =
        44,   44,   44,   13,   44,    7,   44,   14,   44,   12,
 
        44,    3,   44,   44,    6,   44,   44,    8,    5,    0
+=======
+static const flex_int16_t yy_accept[42] =
+    {   0,
+        0,    0,   11,   10,    5,    6,    2,    1,   10,   10,
+       10,   10,   10,    1,    4,    0,    0,    0,    3,    0,
+        0,    0,    9,    0,    0,    0,    0,    0,    0,    0,
+        0,    0,    0,    0,    0,    0,    0,    8,    0,    7,
+        0
+>>>>>>> trelh
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
+<<<<<<< HEAD
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         4,    1,    5,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -411,6 +433,22 @@ static const YY_CHAR yy_ec[256] =
        49,   50,   30,   51,   52,   30,   53,   54,   30,   55,
        56,   30,   30,   57,   58,   59,   60,   30,   61,   30,
        30,   30,   62,    1,   63,    1,    1,    1,    1,    1,
+=======
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
+        3,    1,    4,    1,    1,    1,    1,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,    5,    1,    1,    1,
+        6,    1,    1,    1,    7,    1,    1,    1,    8,    9,
+       10,   11,   12,    1,    1,   13,    1,    1,    1,    1,
+       14,   15,   16,   17,   18,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,   19,    1,    1,    1,    1,    1,
+
+        1,   20,    1,    1,   21,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+>>>>>>> trelh
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -427,6 +465,7 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
+<<<<<<< HEAD
 static const YY_CHAR yy_meta[64] =
     {   0,
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
@@ -542,6 +581,61 @@ static const flex_int32_t yy_rule_can_match_eol[55] =
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,     };
+=======
+static const YY_CHAR yy_meta[22] =
+    {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1
+    } ;
+
+static const flex_int16_t yy_base[42] =
+    {   0,
+        0,    0,   50,   51,   51,   51,   51,   44,   42,   34,
+       38,   33,   24,   38,   51,   26,   32,   30,   51,   31,
+       21,   26,   51,   17,   18,   18,   14,   18,   15,   12,
+       15,   21,    9,   11,   18,   16,    8,   51,   14,   51,
+       51
+    } ;
+
+static const flex_int16_t yy_def[42] =
+    {   0,
+       41,    1,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+        0
+    } ;
+
+static const flex_int16_t yy_nxt[73] =
+    {   0,
+        4,    5,    6,    7,    8,    9,    4,   10,    4,    4,
+        4,    4,   11,    4,   12,    4,    4,    4,    4,    4,
+       13,   40,   39,   38,   37,   36,   35,   34,   33,   32,
+       31,   30,   29,   28,   27,   26,   25,   24,   23,   22,
+       21,   20,   14,   19,   18,   17,   16,   15,   14,   41,
+        3,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41
+    } ;
+
+static const flex_int16_t yy_chk[73] =
+    {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,   39,   37,   36,   35,   34,   33,   32,   31,   30,
+       29,   28,   27,   26,   25,   24,   22,   21,   20,   18,
+       17,   16,   14,   13,   12,   11,   10,    9,    8,    3,
+       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41,   41,   41,   41,   41,   41,   41,   41,   41,
+       41,   41
+    } ;
+
+/* Table of booleans, true if rule could match eol. */
+static const flex_int32_t yy_rule_can_match_eol[11] =
+    {   0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
+>>>>>>> trelh
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -565,11 +659,21 @@ char *yytext;
 #define MY_EOF 0   
 #include"y.tab.h"
 
+<<<<<<< HEAD
 #line 569 "lex.yy.c"
 /*keep current line */
 /*STRING \"[^\n"]∗\"  */
 /* Rules Section*/
 #line 573 "lex.yy.c"
+=======
+
+
+#line 505 "lex.yy.c"
+/*keep current line */
+/*STRING \"[^\n"]∗\"  */
+/* Rules Section*/
+#line 509 "lex.yy.c"
+>>>>>>> trelh
 
 #define INITIAL 0
 
@@ -786,10 +890,16 @@ YY_DECL
 		}
 
 	{
+<<<<<<< HEAD
 #line 71 "scanner.l"
 
 
 #line 793 "lex.yy.c"
+=======
+#line 73 "scanner.l"
+
+#line 728 "lex.yy.c"
+>>>>>>> trelh
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -816,13 +926,21 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
+<<<<<<< HEAD
 				if ( yy_current_state >= 111 )
+=======
+				if ( yy_current_state >= 42 )
+>>>>>>> trelh
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
+<<<<<<< HEAD
 		while ( yy_base[yy_current_state] != 190 );
+=======
+		while ( yy_base[yy_current_state] != 51 );
+>>>>>>> trelh
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -858,6 +976,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
+<<<<<<< HEAD
 #line 73 "scanner.l"
 {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 	YY_BREAK
@@ -1362,6 +1481,80 @@ YY_RULE_SETUP
 ECHO;
 	YY_BREAK
 #line 1365 "lex.yy.c"
+=======
+#line 74 "scanner.l"
+{
+        yylval.num=atoi(yytext);  return NUMBER ;
+}
+	YY_BREAK
+case 2:
+YY_RULE_SETUP
+#line 77 "scanner.l"
+{
+    printf("plus \n");
+    return *yytext ; 
+}
+	YY_BREAK
+case 3:
+YY_RULE_SETUP
+#line 81 "scanner.l"
+{
+    printf("IF \n");
+    return  IF ; 
+}
+	YY_BREAK
+case 4:
+YY_RULE_SETUP
+#line 85 "scanner.l"
+{
+    printf("find : == \n");
+    return *yytext ; 
+}
+	YY_BREAK
+case 5:
+YY_RULE_SETUP
+#line 89 "scanner.l"
+{
+    printf("find : ( \n");
+    return '(' ; 
+}
+	YY_BREAK
+case 6:
+YY_RULE_SETUP
+#line 93 "scanner.l"
+{
+    printf("find : ) \n");
+    return ')' ; 
+}
+	YY_BREAK
+case 7:
+YY_RULE_SETUP
+#line 97 "scanner.l"
+{
+    return *yytext ; 
+}
+	YY_BREAK
+case 8:
+YY_RULE_SETUP
+#line 100 "scanner.l"
+{
+    return *yytext ; 
+}
+	YY_BREAK
+case 9:
+YY_RULE_SETUP
+#line 103 "scanner.l"
+{
+    return *yytext ; 
+}
+	YY_BREAK
+case 10:
+YY_RULE_SETUP
+#line 106 "scanner.l"
+ECHO;
+	YY_BREAK
+#line 868 "lex.yy.c"
+>>>>>>> trelh
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1658,7 +1851,11 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
+<<<<<<< HEAD
 			if ( yy_current_state >= 111 )
+=======
+			if ( yy_current_state >= 42 )
+>>>>>>> trelh
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1686,11 +1883,19 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
+<<<<<<< HEAD
 		if ( yy_current_state >= 111 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 	yy_is_jam = (yy_current_state == 110);
+=======
+		if ( yy_current_state >= 42 )
+			yy_c = yy_meta[yy_c];
+		}
+	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
+	yy_is_jam = (yy_current_state == 41);
+>>>>>>> trelh
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2378,6 +2583,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
+<<<<<<< HEAD
 #line 396 "scanner.l"
 
 
@@ -2500,3 +2706,9 @@ int main(int argc , char * argv[])
 
     return 0; 
 } */
+=======
+#line 106 "scanner.l"
+
+
+
+>>>>>>> trelh

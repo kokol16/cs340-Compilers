@@ -184,4 +184,8 @@ void print_comments_info(alpha_comments_info_t *head)
     fprintf(output_file, "from %u to %u \n", head->first_line, head->last_line);
     head = head->next;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> trelh

@@ -6,22 +6,12 @@
 #define MY_EOF 0   
 #include"y.tab.h"
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> trelh
 %} 
 
 /*keep current line */
 %option yylineno
-<<<<<<< HEAD
 %option case-insensitive  
 
-=======
-%option case-sensitive  
-%option noyywrap
->>>>>>> trelh
 
 ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
@@ -79,9 +69,8 @@ ONELINECOMMENTT "//".*
 /* Rules Section*/
 
 %% 
-<<<<<<< HEAD
 
-IF      {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+IF      {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);alpha_PrintData(tmp ,"<-enumerated" );   }
 
 ELSE    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ELSE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
@@ -159,7 +148,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 } 
 {INT}    {
           alpha_token_t * tmp =    alpha_CreateData("INTCONST",yylval,yytext,yylineno);
-            alpha_PrintData(tmp ,"<-integer" );
+            alpha_PrintData(tmp ,"<-integer" ); return DIGIT;
 
 } 
 {ID}    {
@@ -516,7 +505,7 @@ int main(int argc , char * argv[])
     alpha_head->alpha_yylex=NULL;
     
 
-    alpha_yylex((void*)alpha_head); 
+    yylex((void*)alpha_head); 
     alpha_free_tokens_list(alpha_head);
     if(output_file!=NULL)
     fclose(output_file);
@@ -525,39 +514,3 @@ int main(int argc , char * argv[])
 
     return 0; 
 } */
-=======
-{INT}   {
-        yylval.num=atoi(yytext);  return NUMBER ;
-}
-{PLUS}  {
-    printf("plus \n");
-    return *yytext ; 
-}
-{IF}    {
-    printf("IF \n");
-    return  IF ; 
-}
-{EQUALS}    {
-    printf("find : == \n");
-    return *yytext ; 
-}
-"("     {
-    printf("find : ( \n");
-    return '(' ; 
-}
-")"    {
-    printf("find : ) \n");
-    return ')' ; 
-}
-RIGHT_SQUARE    {
-    return *yytext ; 
-}
-LEFT_SQUARE {
-    return *yytext ; 
-}
-ELSE {
-    return *yytext ; 
-}
-%% 
-
->>>>>>> trelh

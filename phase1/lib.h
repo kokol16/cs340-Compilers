@@ -2,7 +2,10 @@
 #include<stdio.h> 
 #include<string.h> 
 #define DOUBLE_SPACE 3
+<<<<<<< HEAD
 #define YYSTYPE void* 
+=======
+>>>>>>> trelh
 
 
 static unsigned int counter = 0;
@@ -40,6 +43,10 @@ alpha_comments_info_t *get_node(alpha_comments_info_t *head, unsigned int nested
 unsigned int get_first_line(alpha_comments_info_t *head, unsigned int index);
 void print_comments_info(alpha_comments_info_t *head);
 void alpha_free_comments_list(alpha_comments_info_t *head);
+<<<<<<< HEAD
 void push_comments_info(alpha_comments_info_t *head, int first_line,int counter);
 
 
+=======
+void push_comments_info(alpha_comments_info_t *head, int first_line,int counter);
+>>>>>>> trelh
