@@ -20,104 +20,107 @@ int yyerror( char * msg );
 }
 %start program
 %token <num> NUMBER 
-%token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCAL TRUE FALSE NIL STRING  ID
+%token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCAL TRUE FALSE NIL STRING  ID EQUALS PLUS
+%token ASSIGN MINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
+%token SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
 %left '|'
 %left '&'
 %left '+' '-'
 %left '*' '/' '%'  
 %%                 
 program: stmt;
-stmt:   expr;   
+stmt:   expr   {printf("hello\n");}  /*trexei xwris to SEMICOLON*/
         | ifstmt 
         | whilestmt 
         | forstmt 
         | returnstmt
-        | BREAK ;
-        | CONTINUE;
+        | BREAK SEMICOLON
+        | CONTINUE SEMICOLON
         | block
         | funcdef
-        | ;
+        |SEMICOLON
+        ;
 
 expr:   assignexpr
         |expr op expr
         | term;
 
-op:     '+'
-        | '-' 
-        | '*' 
-        | '/' 
-        | '%' 
-        | '>' 
-        | ">=" 
-        | '<' 
-        | "<=" 
-        | "==" 
-        | "!=" 
+op:     PLUS
+        | MINUS 
+        | ASTERISK 
+        | DIVISION
+        | PERCENT 
+        | GREATER 
+        | GREATER_EQUALS 
+        | LESS 
+        | LESS_EQUALS 
+        | EQUALS 
+        | DIFFERENT
         | AND 
         | OR;
         
 
-term:   '(' expr ')'
-        | '-' expr
+term:   LEFT_BRACKETS expr RIGHT_BRACKETS
+        | MINUS expr
         | NOT expr
-        | "++"lvalue
-        | lvalue"++"
-        | "--"lvalue
-        | lvalue"--"
+        | PLUS_PLUS lvalue
+        | lvalue PLUS_PLUS
+        | MINUS_MINUS lvalue
+        | lvalue MINUS_MINUS
         | primary ;
 
-assignexpr: lvalue '=' expr ;
+assignexpr: lvalue ASSIGN expr ;
 
 primary:  lvalue
           | call
           | objectdef
-          | '(' funcdef ')' 
+          | LEFT_BRACKETS funcdef RIGHT_BRACKETS 
           | const ;
 
 lvalue:   ID
           | LOCAL ID
-          | "::" ID
+          | DOUBLE_COLON ID
           | member ;
 
-member:    lvalue '.' ID
-            | lvalue '[' expr ']'
-            | call '.' ID
-            | call '[' expr ']' ;
+member:    lvalue DOT ID
+            | lvalue LEFT_SQUARE expr RIGHT_SQUARE
+            | call DOT ID
+            | call LEFT_SQUARE expr RIGHT_SQUARE ;
 
-call:      call '(' elist ')'
+call:      call LEFT_BRACKETS elist RIGHT_BRACKETS
             | lvalue callsuffix
-            | '(' funcdef')' '(' elist ')';
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS;
 
 callsuffix: normcall
             | methodcall ;
 
-normcall: '(' elist ')';
+normcall: LEFT_BRACKETS elist RIGHT_BRACKETS;
 
-methodcall:    ".." ID '(' elist ')'; /* equivalent to lvalue.ID'('lvalue, elist')';*/
+methodcall:    Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS; /* equivalent to lvalue.ID'('lvalue, elist')';*/
 
-elist: '[' expr '['',' expr']'  ']';
+elist: LEFT_SQUARE expr LEFT_SQUARE COMMA expr RIGHT_SQUARE  RIGHT_SQUARE;
 
-objectdef: '[' '['elist | indexed']' ']';
+objectdef: LEFT_SQUARE LEFT_SQUARE elist | indexed RIGHT_SQUARE RIGHT_SQUARE;
 
-indexed: '['indexedelem '[' ',' indexedelem']'  ']';
+indexed: LEFT_SQUARE indexedelem LEFT_SQUARE COMMA indexedelem RIGHT_SQUARE  RIGHT_SQUARE;
 
-indexedelem: '{' expr : expr '}';
+indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE;
 
-block: '{' '['stmt']' '}';
+block: LEFT_BRACE LEFT_SQUARE stmt RIGHT_SQUARE RIGHT_BRACE;
 
-funcdef: FUNCTION '['ID']' '('idlist')' block;
+funcdef: FUNCTION LEFT_SQUARE ID RIGHT_SQUARE LEFT_BRACKETS idlist RIGHT_BRACKETS block;
 
 const: NUMBER | STRING | NIL | TRUE | FALSE;
 
-idlist:    '['ID '[' ',' ID']'  ']';
+idlist:    LEFT_SQUARE ID LEFT_SQUARE COMMA ID RIGHT_SQUARE  RIGHT_SQUARE;
 
-ifstmt: IF '(' expr ')' stmt '[' ELSE stmt ']'  { printf("if statement\n"); };
+ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt LEFT_SQUARE ELSE stmt RIGHT_SQUARE  { printf("if statement\n"); };
 
-whilestmt: WHILE '(' expr ')' stmt;
+whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS stmt;
 
-forstmt:  FOR '(' elist';'  expr';'  elist')' stmt;
+forstmt:  FOR LEFT_BRACKETS elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt;
 
-returnstmt: RETURN '['expr']';
+returnstmt: RETURN LEFT_SQUARE expr RIGHT_SQUARE {printf("return\n");} ;
 
 
 
