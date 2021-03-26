@@ -71,7 +71,7 @@ ONELINECOMMENTT "//".*
 }
 {PLUS}  {
     printf("plus \n");
-    return *yytext ; 
+    return PLUS ; 
 }
 {IF}    {
     printf("IF \n");
@@ -79,24 +79,90 @@ ONELINECOMMENTT "//".*
 }
 {EQUALS}    {
     printf("find : == \n");
-    return *yytext ; 
+    return EQUALS ; 
 }
-"("     {
+{LEFT_BRACKETS} {
     printf("find : ( \n");
-    return '(' ; 
+    return LEFT_BRACKETS ; 
 }
-")"    {
+{RIGHT_BRACKETS}    {
     printf("find : ) \n");
-    return ')' ; 
+    return RIGHT_BRACKETS ; 
 }
-RIGHT_SQUARE    {
-    return *yytext ; 
+{RIGHT_SQUARE}  {
+    printf("right\n");
+    return RIGHT_SQUARE ; 
 }
-LEFT_SQUARE {
-    return *yytext ; 
+{LEFT_SQUARE}   {
+    printf("left\n");
+    return LEFT_SQUARE ; 
 }
-ELSE {
-    return *yytext ; 
+{ELSE}  { 
+    printf("else\n");              
+    return ELSE ; 
 }
+{ASSIGN}  {
+    return ASSIGN;
+}         
+{MINUS}  {
+    return MINUS;
+}  
+{ASTERISK}  {
+    printf("asteri\n");
+    return ASTERISK;
+}                
+{DIVISION}  {
+    return DIVISION;
+}  
+{PERCENT}  {
+    return PERCENT;
+}                
+{DIFFERENT}  {
+    return DIFFERENT;
+}         
+{PLUS_PLUS}  {
+    return PLUS_PLUS;
+}  
+{MINUS_MINUS}  {
+    return MINUS_MINUS;
+}                
+{GREATER}  {
+    return GREATER;
+}         
+{LESS}  {
+    return LESS;
+}         
+{GREATER_EQUALS}  {
+    return GREATER_EQUALS;
+}         
+{LESS_EQUALS}  {
+    return LESS_EQUALS;
+}         
+{LEFT_BRACE}  {
+    return LEFT_BRACE;
+} 
+{RIGHT_BRACE}  {
+    return LEFT_BRACE;
+}
+{SEMICOLON}  {
+    return SEMICOLON;
+}
+{COMMA}  {
+    return COMMA;
+}
+{COLON}  {
+    return COLON;
+}
+{DOUBLE_COLON}  {
+    return DOUBLE_COLON;
+}
+{DOT}  {
+    return DOT;
+}
+{Diaeresis}  {
+    return Diaeresis;
+}
+                
+
 %% 
 

@@ -108,6 +108,7 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
+<<<<<<< HEAD:phase1/parser.c
     DIGIT = 258
   };
 #endif
@@ -117,6 +118,114 @@ extern int yydebug;
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
+=======
+    NUMBER = 258,
+    IF = 259,
+    ELSE = 260,
+    WHILE = 261,
+    FOR = 262,
+    FUNCTION = 263,
+    RETURN = 264,
+    BREAK = 265,
+    CONTINUE = 266,
+    AND = 267,
+    NOT = 268,
+    OR = 269,
+    LOCAL = 270,
+    TRUE = 271,
+    FALSE = 272,
+    NIL = 273,
+    STRING = 274,
+    ID = 275,
+    EQUALS = 276,
+    PLUS = 277,
+    ASSIGN = 278,
+    MINUS = 279,
+    ASTERISK = 280,
+    DIVISION = 281,
+    PERCENT = 282,
+    DIFFERENT = 283,
+    PLUS_PLUS = 284,
+    MINUS_MINUS = 285,
+    GREATER = 286,
+    LESS = 287,
+    GREATER_EQUALS = 288,
+    LESS_EQUALS = 289,
+    SEMICOLON = 290,
+    COMMA = 291,
+    COLON = 292,
+    DOUBLE_COLON = 293,
+    DOT = 294,
+    Diaeresis = 295,
+    LEFT_BRACE = 296,
+    RIGHT_BRACE = 297,
+    LEFT_SQUARE = 298,
+    RIGHT_SQUARE = 299,
+    LEFT_BRACKETS = 300,
+    RIGHT_BRACKETS = 301
+  };
+#endif
+/* Tokens.  */
+#define NUMBER 258
+#define IF 259
+#define ELSE 260
+#define WHILE 261
+#define FOR 262
+#define FUNCTION 263
+#define RETURN 264
+#define BREAK 265
+#define CONTINUE 266
+#define AND 267
+#define NOT 268
+#define OR 269
+#define LOCAL 270
+#define TRUE 271
+#define FALSE 272
+#define NIL 273
+#define STRING 274
+#define ID 275
+#define EQUALS 276
+#define PLUS 277
+#define ASSIGN 278
+#define MINUS 279
+#define ASTERISK 280
+#define DIVISION 281
+#define PERCENT 282
+#define DIFFERENT 283
+#define PLUS_PLUS 284
+#define MINUS_MINUS 285
+#define GREATER 286
+#define LESS 287
+#define GREATER_EQUALS 288
+#define LESS_EQUALS 289
+#define SEMICOLON 290
+#define COMMA 291
+#define COLON 292
+#define DOUBLE_COLON 293
+#define DOT 294
+#define Diaeresis 295
+#define LEFT_BRACE 296
+#define RIGHT_BRACE 297
+#define LEFT_SQUARE 298
+#define RIGHT_SQUARE 299
+#define LEFT_BRACKETS 300
+#define RIGHT_BRACKETS 301
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+
+union YYSTYPE
+{
+#line 17 "parser.y" /* yacc.c:355  */
+
+	int num;
+	char * str;
+
+#line 220 "y.tab.c" /* yacc.c:355  */
+};
+
+typedef union YYSTYPE YYSTYPE;
+>>>>>>> trelh:phase1/y.tab.c
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -130,7 +239,11 @@ int yyparse (void * yylval);
 
 /* Copy the second part of user declarations.  */
 
+<<<<<<< HEAD:phase1/parser.c
 #line 134 "parser.c" /* yacc.c:358  */
+=======
+#line 237 "y.tab.c" /* yacc.c:358  */
+>>>>>>> trelh:phase1/y.tab.c
 
 #ifdef short
 # undef short
@@ -370,23 +483,42 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
+<<<<<<< HEAD:phase1/parser.c
 #define YYFINAL  6
 /* YYLAST -- Last index in YYTABLE.  */
 #define YYLAST   3
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  11
+=======
+#define YYFINAL  63
+/* YYLAST -- Last index in YYTABLE.  */
+#define YYLAST   432
+
+/* YYNTOKENS -- Number of terminals.  */
+#define YYNTOKENS  54
+>>>>>>> trelh:phase1/y.tab.c
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  6
 /* YYNRULES -- Number of rules.  */
+<<<<<<< HEAD:phase1/parser.c
 #define YYNRULES  7
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  10
+=======
+#define YYNRULES  74
+/* YYNSTATES -- Number of states.  */
+#define YYNSTATES  168
+>>>>>>> trelh:phase1/y.tab.c
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
+<<<<<<< HEAD:phase1/parser.c
 #define YYMAXUTOK   258
+=======
+#define YYMAXUTOK   301
+>>>>>>> trelh:phase1/y.tab.c
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -398,14 +530,26 @@ static const yytype_uint8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+<<<<<<< HEAD:phase1/parser.c
        2,     2,     2,     2,     2,     2,     2,    10,     5,     2,
        2,     2,     8,     6,     2,     7,     2,     9,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+=======
+       2,     2,     2,     2,     2,     2,     2,    53,    48,     2,
+       2,     2,    51,    49,     2,    50,     2,    52,     2,     2,
+>>>>>>> trelh:phase1/y.tab.c
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+<<<<<<< HEAD:phase1/parser.c
+=======
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    47,     2,     2,     2,     2,     2,
+>>>>>>> trelh:phase1/y.tab.c
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     4,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -419,15 +563,35 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+<<<<<<< HEAD:phase1/parser.c
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3
+=======
+       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46
+>>>>>>> trelh:phase1/y.tab.c
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        0,    22,    22,    23,    24,    29,    32,    35
+=======
+       0,    31,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    40,    41,    44,    45,    46,    48,    49,    50,    51,
+      52,    53,    54,    55,    56,    57,    58,    59,    60,    63,
+      64,    65,    66,    67,    68,    69,    70,    72,    74,    75,
+      76,    77,    78,    80,    81,    82,    83,    85,    86,    87,
+      88,    90,    91,    92,    94,    95,    97,    99,   101,   103,
+     103,   105,   107,   109,   111,   113,   113,   113,   113,   113,
+     115,   117,   119,   121,   123
+>>>>>>> trelh:phase1/y.tab.c
 };
 #endif
 
@@ -436,9 +600,25 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
+<<<<<<< HEAD:phase1/parser.c
   "$end", "error", "$undefined", "DIGIT", "'|'", "'&'", "'+'", "'-'",
   "'*'", "'/'", "'%'", "$accept", "program", "stmt", "expr", "op",
   "number", YY_NULLPTR
+=======
+  "$end", "error", "$undefined", "NUMBER", "IF", "ELSE", "WHILE", "FOR",
+  "FUNCTION", "RETURN", "BREAK", "CONTINUE", "AND", "NOT", "OR", "LOCAL",
+  "TRUE", "FALSE", "NIL", "STRING", "ID", "EQUALS", "PLUS", "ASSIGN",
+  "MINUS", "ASTERISK", "DIVISION", "PERCENT", "DIFFERENT", "PLUS_PLUS",
+  "MINUS_MINUS", "GREATER", "LESS", "GREATER_EQUALS", "LESS_EQUALS",
+  "SEMICOLON", "COMMA", "COLON", "DOUBLE_COLON", "DOT", "Diaeresis",
+  "LEFT_BRACE", "RIGHT_BRACE", "LEFT_SQUARE", "RIGHT_SQUARE",
+  "LEFT_BRACKETS", "RIGHT_BRACKETS", "'|'", "'&'", "'+'", "'-'", "'*'",
+  "'/'", "'%'", "$accept", "program", "stmt", "expr", "op", "term",
+  "assignexpr", "primary", "lvalue", "member", "call", "callsuffix",
+  "normcall", "methodcall", "elist", "objectdef", "indexed", "indexedelem",
+  "block", "funcdef", "const", "idlist", "ifstmt", "whilestmt", "forstmt",
+  "returnstmt", YY_NULLPTR
+>>>>>>> trelh:phase1/y.tab.c
 };
 #endif
 
@@ -447,6 +627,7 @@ static const char *const yytname[] =
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_uint16 yytoknum[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        0,   256,   257,   258,   124,    38,    43,    45,    42,    47,
       37
 };
@@ -456,6 +637,21 @@ static const yytype_uint16 yytoknum[] =
 
 #define yypact_value_is_default(Yystate) \
   (!!((Yystate) == (-6)))
+=======
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+     295,   296,   297,   298,   299,   300,   301,   124,    38,    43,
+      45,    42,    47,    37
+};
+# endif
+
+#define YYPACT_NINF -57
+
+#define yypact_value_is_default(Yystate) \
+  (!!((Yystate) == (-57)))
+>>>>>>> trelh:phase1/y.tab.c
 
 #define YYTABLE_NINF -1
 
@@ -466,7 +662,27 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
+<<<<<<< HEAD:phase1/parser.c
       -3,    -6,     1,    -6,    -4,    -6,    -6,    -6,    -3,    -4
+=======
+     112,   -57,   -33,   -29,   -18,   -13,    -7,     4,     6,   143,
+      23,   -57,   -57,   -57,   -57,   -57,   143,     8,     8,   -57,
+      28,    24,   -30,     2,    50,   -57,   381,   -57,   -57,   -57,
+     387,   -57,    39,   -57,    29,   -57,   -57,   -57,   -57,   -57,
+     -57,   -57,   143,   143,    32,    52,   143,   -57,   -57,   381,
+     -57,   381,    73,   -37,    39,   -37,   -57,   112,   143,    32,
+      40,    30,    49,   -57,   -57,   -57,   -57,   -57,   -57,   -57,
+     -57,   -57,   -57,   -57,   -57,   -57,   -57,   143,   143,   -57,
+     -57,    80,    81,   143,    32,   -57,   -57,   -57,    83,   143,
+      32,    60,    65,   168,   143,    70,    62,   191,    61,    64,
+     333,   -57,    74,   -57,    67,   381,   381,   -57,    68,   215,
+      71,   -57,   239,    78,   -57,   112,   112,   287,   143,    89,
+     -57,    67,    84,   143,    94,    32,    32,   -57,   -57,   -57,
+     -57,    95,   -57,   101,   357,    96,   -57,   310,    99,    98,
+     102,   135,   143,    32,   125,   103,   -57,   107,   -57,   -57,
+     112,   263,   106,   111,   123,   -57,   121,   122,   112,   132,
+     -57,   -57,   -57,   -57,   149,   126,   127,   -57
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -474,19 +690,51 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        0,     7,     0,     2,     3,     5,     1,     6,     0,     4
+=======
+       0,    65,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    68,    69,    67,    66,    43,     0,     0,     0,    12,
+       0,     0,     0,     0,     0,     2,     3,    15,    13,    36,
+      38,    46,    39,    40,     0,    10,    11,    42,     4,     5,
+       6,     7,     0,     0,     0,     0,     0,     8,     9,    31,
+      44,    30,     0,    32,     0,    34,    45,     0,     0,     0,
+       0,     0,     0,     1,    27,    28,    25,    16,    17,    18,
+      19,    20,    26,    21,    23,    22,    24,     0,     0,    33,
+      35,     0,     0,     0,     0,    52,    54,    55,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    59,     0,    29,    41,    14,    37,    47,     0,     0,
+       0,    49,     0,     0,    60,     0,     0,     0,     0,     0,
+      74,     0,     0,     0,     0,     0,     0,    48,    56,    50,
+      51,     0,    72,     0,     0,     0,    63,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    62,     0,    53,    57,
+       0,     0,     0,     0,     0,    61,     0,     0,     0,     0,
+      64,    71,    58,    73,     0,     0,     0,    70
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
+<<<<<<< HEAD:phase1/parser.c
       -6,    -6,    -6,    -5,    -6,    -6
+=======
+     -57,   -57,   -56,    -9,   -57,   -57,   -57,   -57,     7,   -57,
+      48,   -57,   -57,   -57,   -55,   -57,   -57,    51,    20,   -14,
+     -57,   -57,   -57,   -57,   -57,   -57
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
+<<<<<<< HEAD:phase1/parser.c
       -1,     2,     3,     4,     8,     5
+=======
+      -1,    24,    25,    26,    77,    27,    28,    29,    30,    31,
+      32,    85,    86,    87,    95,    33,    34,    60,    35,    36,
+      37,   145,    38,    39,    40,    41
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -494,31 +742,167 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        1,     6,     7,     9
+=======
+      49,    99,    81,    82,   101,     1,    83,    51,    84,    62,
+       5,    58,    42,    59,    61,     9,    43,    10,    11,    12,
+      13,    14,    15,    10,    53,    55,    16,    44,    15,   110,
+      45,    17,    18,    92,    93,   113,    46,    97,    98,    47,
+      20,    48,    64,    50,    65,    22,    20,    23,    56,   100,
+      63,    66,    67,    52,    68,    69,    70,    71,    72,   131,
+     132,    73,    74,    75,    76,    54,    54,    57,   105,   106,
+     139,   140,    96,    91,   109,    94,   103,    64,    88,    65,
+     112,     5,    89,   102,    90,   117,    66,    67,   152,    68,
+      69,    70,    71,    72,   156,   104,    73,    74,    75,    76,
+     107,   108,   163,   111,   114,   118,   119,   121,   122,   134,
+     124,   115,   125,   126,   137,     1,     2,   128,     3,     4,
+       5,     6,     7,     8,   130,     9,   136,    10,    11,    12,
+      13,    14,    15,   151,   135,    58,    16,   142,   141,   144,
+     150,    17,    18,   147,   148,   153,     1,    19,   149,   154,
+      20,   155,   158,    21,   159,    22,     9,    23,    10,    11,
+      12,    13,    14,    15,    21,   161,   162,    16,   164,   165,
+     166,   167,    17,    18,   160,   138,     0,     0,     0,     0,
+      64,    20,    65,     0,     0,     0,    22,     0,    23,    66,
+      67,     0,    68,    69,    70,    71,    72,     0,     0,    73,
+      74,    75,    76,    64,     0,    65,     0,     0,     0,     0,
+       0,     0,    66,    67,   116,    68,    69,    70,    71,    72,
+       0,     0,    73,    74,    75,    76,     0,    64,     0,    65,
+       0,     0,     0,     0,     0,   120,    66,    67,     0,    68,
+      69,    70,    71,    72,     0,     0,    73,    74,    75,    76,
+       0,    64,     0,    65,     0,     0,     0,     0,     0,   127,
+      66,    67,     0,    68,    69,    70,    71,    72,     0,     0,
+      73,    74,    75,    76,     0,    64,     0,    65,     0,     0,
+       0,     0,     0,   129,    66,    67,     0,    68,    69,    70,
+      71,    72,     0,     0,    73,    74,    75,    76,     0,    64,
+       0,    65,     0,     0,     0,     0,     0,   157,    66,    67,
+       0,    68,    69,    70,    71,    72,     0,     0,    73,    74,
+      75,    76,    64,     0,    65,     0,     0,     0,     0,     0,
+     133,    66,    67,     0,    68,    69,    70,    71,    72,     0,
+       0,    73,    74,    75,    76,    64,     0,    65,     0,     0,
+       0,     0,   146,     0,    66,    67,     0,    68,    69,    70,
+      71,    72,     0,     0,    73,    74,    75,    76,     0,    64,
+     123,    65,     0,     0,     0,     0,     0,     0,    66,    67,
+       0,    68,    69,    70,    71,    72,     0,     0,    73,    74,
+      75,    76,   143,    64,     0,    65,     0,     0,     0,     0,
+       0,     0,    66,    67,     0,    68,    69,    70,    71,    72,
+      78,     0,    73,    74,    75,    76,    79,    80,     0,     0,
+       0,     0,     0,     0,     0,     0,    81,    82,     0,     0,
+      83,     0,    84
+>>>>>>> trelh:phase1/y.tab.c
 };
 
 static const yytype_uint8 yycheck[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        3,     0,     6,     8
+=======
+       9,    57,    39,    40,    59,     3,    43,    16,    45,    23,
+       8,    41,    45,    43,    23,    13,    45,    15,    16,    17,
+      18,    19,    20,    15,    17,    18,    24,    45,    20,    84,
+      43,    29,    30,    42,    43,    90,    43,    46,    52,    35,
+      38,    35,    12,    20,    14,    43,    38,    45,    20,    58,
+       0,    21,    22,    45,    24,    25,    26,    27,    28,   115,
+     116,    31,    32,    33,    34,    17,    18,    43,    77,    78,
+     125,   126,    20,    44,    83,    43,    46,    12,    39,    14,
+      89,     8,    43,    43,    45,    94,    21,    22,   143,    24,
+      25,    26,    27,    28,   150,    46,    31,    32,    33,    34,
+      20,    20,   158,    20,    44,    35,    44,    46,    44,   118,
+      36,    46,    45,    45,   123,     3,     4,    46,     6,     7,
+       8,     9,    10,    11,    46,    13,    42,    15,    16,    17,
+      18,    19,    20,   142,    45,    41,    24,    36,    43,    43,
+       5,    29,    30,    44,    46,    20,     3,    35,    46,    46,
+      38,    44,    46,    41,    43,    43,    13,    45,    15,    16,
+      17,    18,    19,    20,    41,    44,    44,    24,    36,    20,
+      44,    44,    29,    30,   154,   124,    -1,    -1,    -1,    -1,
+      12,    38,    14,    -1,    -1,    -1,    43,    -1,    45,    21,
+      22,    -1,    24,    25,    26,    27,    28,    -1,    -1,    31,
+      32,    33,    34,    12,    -1,    14,    -1,    -1,    -1,    -1,
+      -1,    -1,    21,    22,    46,    24,    25,    26,    27,    28,
+      -1,    -1,    31,    32,    33,    34,    -1,    12,    -1,    14,
+      -1,    -1,    -1,    -1,    -1,    44,    21,    22,    -1,    24,
+      25,    26,    27,    28,    -1,    -1,    31,    32,    33,    34,
+      -1,    12,    -1,    14,    -1,    -1,    -1,    -1,    -1,    44,
+      21,    22,    -1,    24,    25,    26,    27,    28,    -1,    -1,
+      31,    32,    33,    34,    -1,    12,    -1,    14,    -1,    -1,
+      -1,    -1,    -1,    44,    21,    22,    -1,    24,    25,    26,
+      27,    28,    -1,    -1,    31,    32,    33,    34,    -1,    12,
+      -1,    14,    -1,    -1,    -1,    -1,    -1,    44,    21,    22,
+      -1,    24,    25,    26,    27,    28,    -1,    -1,    31,    32,
+      33,    34,    12,    -1,    14,    -1,    -1,    -1,    -1,    -1,
+      43,    21,    22,    -1,    24,    25,    26,    27,    28,    -1,
+      -1,    31,    32,    33,    34,    12,    -1,    14,    -1,    -1,
+      -1,    -1,    42,    -1,    21,    22,    -1,    24,    25,    26,
+      27,    28,    -1,    -1,    31,    32,    33,    34,    -1,    12,
+      37,    14,    -1,    -1,    -1,    -1,    -1,    -1,    21,    22,
+      -1,    24,    25,    26,    27,    28,    -1,    -1,    31,    32,
+      33,    34,    35,    12,    -1,    14,    -1,    -1,    -1,    -1,
+      -1,    -1,    21,    22,    -1,    24,    25,    26,    27,    28,
+      23,    -1,    31,    32,    33,    34,    29,    30,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    39,    40,    -1,    -1,
+      43,    -1,    45
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        0,     3,    12,    13,    14,    16,     0,     6,    15,    14
+=======
+       0,     3,     4,     6,     7,     8,     9,    10,    11,    13,
+      15,    16,    17,    18,    19,    20,    24,    29,    30,    35,
+      38,    41,    43,    45,    55,    56,    57,    59,    60,    61,
+      62,    63,    64,    69,    70,    72,    73,    74,    76,    77,
+      78,    79,    45,    45,    45,    43,    43,    35,    35,    57,
+      20,    57,    45,    62,    64,    62,    20,    43,    41,    43,
+      71,    57,    73,     0,    12,    14,    21,    22,    24,    25,
+      26,    27,    28,    31,    32,    33,    34,    58,    23,    29,
+      30,    39,    40,    43,    45,    65,    66,    67,    39,    43,
+      45,    44,    57,    57,    43,    68,    20,    57,    73,    56,
+      57,    68,    43,    46,    46,    57,    57,    20,    20,    57,
+      68,    20,    57,    68,    44,    46,    46,    57,    35,    44,
+      44,    46,    44,    37,    36,    45,    45,    44,    46,    44,
+      46,    56,    56,    43,    57,    45,    42,    57,    71,    68,
+      68,    43,    36,    35,    43,    75,    42,    44,    46,    46,
+       5,    57,    68,    20,    46,    44,    56,    44,    46,    43,
+      72,    44,    44,    56,    36,    20,    44,    44
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        0,    11,    12,    13,    14,    14,    15,    16
+=======
+       0,    54,    55,    56,    56,    56,    56,    56,    56,    56,
+      56,    56,    56,    57,    57,    57,    58,    58,    58,    58,
+      58,    58,    58,    58,    58,    58,    58,    58,    58,    59,
+      59,    59,    59,    59,    59,    59,    59,    60,    61,    61,
+      61,    61,    61,    62,    62,    62,    62,    63,    63,    63,
+      63,    64,    64,    64,    65,    65,    66,    67,    68,    69,
+      69,    70,    71,    72,    73,    74,    74,    74,    74,    74,
+      75,    76,    77,    78,    79
+>>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
+<<<<<<< HEAD:phase1/parser.c
        0,     2,     1,     1,     3,     1,     1,     1
+=======
+       0,     2,     1,     1,     1,     1,     1,     1,     2,     2,
+       1,     1,     1,     1,     3,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     3,
+       2,     2,     2,     2,     2,     2,     1,     3,     1,     1,
+       1,     3,     1,     1,     2,     2,     1,     3,     4,     3,
+       4,     4,     2,     6,     1,     1,     3,     5,     7,     3,
+       3,     7,     5,     5,     8,     1,     1,     1,     1,     1,
+       7,     9,     5,     9,     4
+>>>>>>> trelh:phase1/y.tab.c
 };
 
 
@@ -1196,6 +1580,7 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+<<<<<<< HEAD:phase1/parser.c
         case 4:
 #line 25 "parser.y" /* yacc.c:1646  */
     {
@@ -1206,6 +1591,28 @@ yyreduce:
 
 
 #line 1209 "parser.c" /* yacc.c:1646  */
+=======
+        case 3:
+#line 32 "parser.y" /* yacc.c:1646  */
+    {printf("hello\n");}
+#line 1482 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 71:
+#line 117 "parser.y" /* yacc.c:1646  */
+    { printf("if statement\n"); }
+#line 1488 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 74:
+#line 123 "parser.y" /* yacc.c:1646  */
+    {printf("return\n");}
+#line 1494 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 1498 "y.tab.c" /* yacc.c:1646  */
+>>>>>>> trelh:phase1/y.tab.c
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1433,7 +1840,11 @@ yyreturn:
 #endif
   return yyresult;
 }
+<<<<<<< HEAD:phase1/parser.c
 #line 38 "parser.y" /* yacc.c:1906  */
+=======
+#line 127 "parser.y" /* yacc.c:1906  */
+>>>>>>> trelh:phase1/y.tab.c
 
 
 int yyerror(char * lala)
