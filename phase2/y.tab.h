@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_PARSER_H_INCLUDED
-# define YY_YY_PARSER_H_INCLUDED
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -45,17 +45,6 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-<<<<<<< HEAD:phase1/parser.h
-    DIGIT = 258
-  };
-#endif
-/* Tokens.  */
-#define DIGIT 258
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-=======
     NUMBER = 258,
     IF = 259,
     ELSE = 260,
@@ -153,7 +142,7 @@ typedef int YYSTYPE;
 
 union YYSTYPE
 {
-#line 17 "parser.y" /* yacc.c:1909  */
+#line 9 "parser.y" /* yacc.c:1909  */
 
 	int num;
 	char * str;
@@ -162,7 +151,6 @@ union YYSTYPE
 };
 
 typedef union YYSTYPE YYSTYPE;
->>>>>>> trelh:phase1/y.tab.h
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -170,6 +158,6 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE yylval;
 
-int yyparse (void * yylval);
+int yyparse (void);
 
-#endif /* !YY_YY_PARSER_H_INCLUDED  */
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

@@ -64,16 +64,22 @@
 /* Copy the first part of user declarations.  */
 #line 1 "parser.y" /* yacc.c:339  */
 
+
+#include"lib.h"
+
 #include <stdio.h>
-int yyerror(char * lala);
+
+
+
+
 extern FILE * yyin;
 FILE *output_file;
-int yylex (void * yylval)
+int yylex(void);
+
+int yyerror( char * msg );
 
 
-#endif
-
-#line 77 "parser.c" /* yacc.c:339  */
+#line 83 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -92,9 +98,9 @@ int yylex (void * yylval)
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "parser.h".  */
-#ifndef YY_YY_PARSER_H_INCLUDED
-# define YY_YY_PARSER_H_INCLUDED
+   by #include "y.tab.h".  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -108,17 +114,6 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-<<<<<<< HEAD:phase1/parser.c
-    DIGIT = 258
-  };
-#endif
-/* Tokens.  */
-#define DIGIT 258
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
-=======
     NUMBER = 258,
     IF = 259,
     ELSE = 260,
@@ -225,7 +220,6 @@ union YYSTYPE
 };
 
 typedef union YYSTYPE YYSTYPE;
->>>>>>> trelh:phase1/y.tab.c
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -233,17 +227,13 @@ typedef union YYSTYPE YYSTYPE;
 
 extern YYSTYPE yylval;
 
-int yyparse (void * yylval);
+int yyparse (void);
 
-#endif /* !YY_YY_PARSER_H_INCLUDED  */
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-<<<<<<< HEAD:phase1/parser.c
-#line 134 "parser.c" /* yacc.c:358  */
-=======
 #line 237 "y.tab.c" /* yacc.c:358  */
->>>>>>> trelh:phase1/y.tab.c
 
 #ifdef short
 # undef short
@@ -483,42 +473,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-<<<<<<< HEAD:phase1/parser.c
-#define YYFINAL  6
-/* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   3
-
-/* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  11
-=======
 #define YYFINAL  63
 /* YYLAST -- Last index in YYTABLE.  */
 #define YYLAST   432
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  54
->>>>>>> trelh:phase1/y.tab.c
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  6
+#define YYNNTS  26
 /* YYNRULES -- Number of rules.  */
-<<<<<<< HEAD:phase1/parser.c
-#define YYNRULES  7
-/* YYNSTATES -- Number of states.  */
-#define YYNSTATES  10
-=======
 #define YYNRULES  74
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  168
->>>>>>> trelh:phase1/y.tab.c
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-<<<<<<< HEAD:phase1/parser.c
-#define YYMAXUTOK   258
-=======
 #define YYMAXUTOK   301
->>>>>>> trelh:phase1/y.tab.c
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -530,28 +501,16 @@ static const yytype_uint8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-<<<<<<< HEAD:phase1/parser.c
-       2,     2,     2,     2,     2,     2,     2,    10,     5,     2,
-       2,     2,     8,     6,     2,     7,     2,     9,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-=======
        2,     2,     2,     2,     2,     2,     2,    53,    48,     2,
        2,     2,    51,    49,     2,    50,     2,    52,     2,     2,
->>>>>>> trelh:phase1/y.tab.c
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-<<<<<<< HEAD:phase1/parser.c
-=======
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,    47,     2,     2,     2,     2,     2,
->>>>>>> trelh:phase1/y.tab.c
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     4,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -563,26 +522,19 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-<<<<<<< HEAD:phase1/parser.c
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3
-=======
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
       45,    46
->>>>>>> trelh:phase1/y.tab.c
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       0,    22,    22,    23,    24,    29,    32,    35
-=======
        0,    31,    31,    32,    33,    34,    35,    36,    37,    38,
       39,    40,    41,    44,    45,    46,    48,    49,    50,    51,
       52,    53,    54,    55,    56,    57,    58,    59,    60,    63,
@@ -591,7 +543,6 @@ static const yytype_uint8 yyrline[] =
       88,    90,    91,    92,    94,    95,    97,    99,   101,   103,
      103,   105,   107,   109,   111,   113,   113,   113,   113,   113,
      115,   117,   119,   121,   123
->>>>>>> trelh:phase1/y.tab.c
 };
 #endif
 
@@ -600,11 +551,6 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-  "$end", "error", "$undefined", "DIGIT", "'|'", "'&'", "'+'", "'-'",
-  "'*'", "'/'", "'%'", "$accept", "program", "stmt", "expr", "op",
-  "number", YY_NULLPTR
-=======
   "$end", "error", "$undefined", "NUMBER", "IF", "ELSE", "WHILE", "FOR",
   "FUNCTION", "RETURN", "BREAK", "CONTINUE", "AND", "NOT", "OR", "LOCAL",
   "TRUE", "FALSE", "NIL", "STRING", "ID", "EQUALS", "PLUS", "ASSIGN",
@@ -618,7 +564,6 @@ static const char *const yytname[] =
   "normcall", "methodcall", "elist", "objectdef", "indexed", "indexedelem",
   "block", "funcdef", "const", "idlist", "ifstmt", "whilestmt", "forstmt",
   "returnstmt", YY_NULLPTR
->>>>>>> trelh:phase1/y.tab.c
 };
 #endif
 
@@ -627,17 +572,6 @@ static const char *const yytname[] =
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_uint16 yytoknum[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       0,   256,   257,   258,   124,    38,    43,    45,    42,    47,
-      37
-};
-# endif
-
-#define YYPACT_NINF -6
-
-#define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-6)))
-=======
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
@@ -651,7 +585,6 @@ static const yytype_uint16 yytoknum[] =
 
 #define yypact_value_is_default(Yystate) \
   (!!((Yystate) == (-57)))
->>>>>>> trelh:phase1/y.tab.c
 
 #define YYTABLE_NINF -1
 
@@ -660,11 +593,8 @@ static const yytype_uint16 yytoknum[] =
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-static const yytype_int8 yypact[] =
+static const yytype_int16 yypact[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-      -3,    -6,     1,    -6,    -4,    -6,    -6,    -6,    -3,    -4
-=======
      112,   -57,   -33,   -29,   -18,   -13,    -7,     4,     6,   143,
       23,   -57,   -57,   -57,   -57,   -57,   143,     8,     8,   -57,
       28,    24,   -30,     2,    50,   -57,   381,   -57,   -57,   -57,
@@ -682,7 +612,6 @@ static const yytype_int8 yypact[] =
      102,   135,   143,    32,   125,   103,   -57,   107,   -57,   -57,
      112,   263,   106,   111,   123,   -57,   121,   122,   112,   132,
      -57,   -57,   -57,   -57,   149,   126,   127,   -57
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -690,9 +619,6 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       0,     7,     0,     2,     3,     5,     1,     6,     0,     4
-=======
        0,    65,     0,     0,     0,     0,     0,     0,     0,     0,
        0,    68,    69,    67,    66,    43,     0,     0,     0,    12,
        0,     0,     0,     0,     0,     2,     3,    15,    13,    36,
@@ -710,31 +636,22 @@ static const yytype_uint8 yydefact[] =
        0,     0,     0,     0,     0,     0,    62,     0,    53,    57,
        0,     0,     0,     0,     0,    61,     0,     0,     0,     0,
       64,    71,    58,    73,     0,     0,     0,    70
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-      -6,    -6,    -6,    -5,    -6,    -6
-=======
      -57,   -57,   -56,    -9,   -57,   -57,   -57,   -57,     7,   -57,
       48,   -57,   -57,   -57,   -55,   -57,   -57,    51,    20,   -14,
      -57,   -57,   -57,   -57,   -57,   -57
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_int16 yydefgoto[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-      -1,     2,     3,     4,     8,     5
-=======
       -1,    24,    25,    26,    77,    27,    28,    29,    30,    31,
       32,    85,    86,    87,    95,    33,    34,    60,    35,    36,
       37,   145,    38,    39,    40,    41
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -742,9 +659,6 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       1,     6,     7,     9
-=======
       49,    99,    81,    82,   101,     1,    83,    51,    84,    62,
        5,    58,    42,    59,    61,     9,    43,    10,    11,    12,
       13,    14,    15,    10,    53,    55,    16,    44,    15,   110,
@@ -789,14 +703,10 @@ static const yytype_uint8 yytable[] =
       78,     0,    73,    74,    75,    76,    79,    80,     0,     0,
        0,     0,     0,     0,     0,     0,    81,    82,     0,     0,
       83,     0,    84
->>>>>>> trelh:phase1/y.tab.c
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       3,     0,     6,     8
-=======
        9,    57,    39,    40,    59,     3,    43,    16,    45,    23,
        8,    41,    45,    43,    23,    13,    45,    15,    16,    17,
       18,    19,    20,    15,    17,    18,    24,    45,    20,    84,
@@ -841,16 +751,12 @@ static const yytype_uint8 yycheck[] =
       23,    -1,    31,    32,    33,    34,    29,    30,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    39,    40,    -1,    -1,
       43,    -1,    45
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       0,     3,    12,    13,    14,    16,     0,     6,    15,    14
-=======
        0,     3,     4,     6,     7,     8,     9,    10,    11,    13,
       15,    16,    17,    18,    19,    20,    24,    29,    30,    35,
       38,    41,    43,    45,    55,    56,    57,    59,    60,    61,
@@ -868,15 +774,11 @@ static const yytype_uint8 yystos[] =
       68,    43,    36,    35,    43,    75,    42,    44,    46,    46,
        5,    57,    68,    20,    46,    44,    56,    44,    46,    43,
       72,    44,    44,    56,    36,    20,    44,    44
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       0,    11,    12,    13,    14,    14,    15,    16
-=======
        0,    54,    55,    56,    56,    56,    56,    56,    56,    56,
       56,    56,    56,    57,    57,    57,    58,    58,    58,    58,
       58,    58,    58,    58,    58,    58,    58,    58,    58,    59,
@@ -885,15 +787,11 @@ static const yytype_uint8 yyr1[] =
       63,    64,    64,    64,    65,    65,    66,    67,    68,    69,
       69,    70,    71,    72,    73,    74,    74,    74,    74,    74,
       75,    76,    77,    78,    79
->>>>>>> trelh:phase1/y.tab.c
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-<<<<<<< HEAD:phase1/parser.c
-       0,     2,     1,     1,     3,     1,     1,     1
-=======
        0,     2,     1,     1,     1,     1,     1,     1,     2,     2,
        1,     1,     1,     1,     3,     1,     1,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     3,
@@ -902,7 +800,6 @@ static const yytype_uint8 yyr2[] =
        4,     4,     2,     6,     1,     1,     3,     5,     7,     3,
        3,     7,     5,     5,     8,     1,     1,     1,     1,     1,
        7,     9,     5,     9,     4
->>>>>>> trelh:phase1/y.tab.c
 };
 
 
@@ -930,7 +827,7 @@ do                                                              \
     }                                                           \
   else                                                          \
     {                                                           \
-      yyerror (yylval, YY_("syntax error: cannot back up")); \
+      yyerror (YY_("syntax error: cannot back up")); \
       YYERROR;                                                  \
     }                                                           \
 while (0)
@@ -967,7 +864,7 @@ do {                                                                      \
     {                                                                     \
       YYFPRINTF (stderr, "%s ", Title);                                   \
       yy_symbol_print (stderr,                                            \
-                  Type, Value, yylval); \
+                  Type, Value); \
       YYFPRINTF (stderr, "\n");                                           \
     }                                                                     \
 } while (0)
@@ -978,11 +875,10 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * yylval)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
-  YYUSE (yylval);
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
@@ -998,12 +894,12 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, void * yylval)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylval);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -1036,7 +932,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * yylval)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1050,7 +946,7 @@ yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * yylval)
       yy_symbol_print (stderr,
                        yystos[yyssp[yyi + 1 - yynrhs]],
                        &(yyvsp[(yyi + 1) - (yynrhs)])
-                                              , yylval);
+                                              );
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -1058,7 +954,7 @@ yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, void * yylval)
 # define YY_REDUCE_PRINT(Rule)          \
 do {                                    \
   if (yydebug)                          \
-    yy_reduce_print (yyssp, yyvsp, Rule, yylval); \
+    yy_reduce_print (yyssp, yyvsp, Rule); \
 } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1316,10 +1212,9 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, void * yylval)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
 {
   YYUSE (yyvaluep);
-  YYUSE (yylval);
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
@@ -1346,7 +1241,7 @@ int yynerrs;
 `----------*/
 
 int
-yyparse (void * yylval)
+yyparse (void)
 {
     int yystate;
     /* Number of tokens to shift before error messages enabled.  */
@@ -1502,7 +1397,7 @@ yybackup:
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
-      yychar = yylex (yylval, yylval);
+      yychar = yylex ();
     }
 
   if (yychar <= YYEOF)
@@ -1580,18 +1475,6 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-<<<<<<< HEAD:phase1/parser.c
-        case 4:
-#line 25 "parser.y" /* yacc.c:1646  */
-    {
-           (yyval) = (yyvsp[-2]) + (yyvsp[0]);
-         }
-#line 1205 "parser.c" /* yacc.c:1646  */
-    break;
-
-
-#line 1209 "parser.c" /* yacc.c:1646  */
-=======
         case 3:
 #line 32 "parser.y" /* yacc.c:1646  */
     {printf("hello\n");}
@@ -1612,7 +1495,6 @@ yyreduce:
 
 
 #line 1498 "y.tab.c" /* yacc.c:1646  */
->>>>>>> trelh:phase1/y.tab.c
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1662,7 +1544,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (yylval, YY_("syntax error"));
+      yyerror (YY_("syntax error"));
 #else
 # define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
                                         yyssp, yytoken)
@@ -1689,7 +1571,7 @@ yyerrlab:
                 yymsgp = yymsg;
               }
           }
-        yyerror (yylval, yymsgp);
+        yyerror (yymsgp);
         if (yysyntax_error_status == 2)
           goto yyexhaustedlab;
       }
@@ -1713,7 +1595,7 @@ yyerrlab:
       else
         {
           yydestruct ("Error: discarding",
-                      yytoken, &yylval, yylval);
+                      yytoken, &yylval);
           yychar = YYEMPTY;
         }
     }
@@ -1769,7 +1651,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-                  yystos[yystate], yyvsp, yylval);
+                  yystos[yystate], yyvsp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1806,7 +1688,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (yylval, YY_("memory exhausted"));
+  yyerror (YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1818,7 +1700,7 @@ yyreturn:
          user semantic actions for why this is necessary.  */
       yytoken = YYTRANSLATE (yychar);
       yydestruct ("Cleanup: discarding lookahead",
-                  yytoken, &yylval, yylval);
+                  yytoken, &yylval);
     }
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYABORT or YYACCEPT.  */
@@ -1827,7 +1709,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-                  yystos[*yyssp], yyvsp, yylval);
+                  yystos[*yyssp], yyvsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1840,21 +1722,16 @@ yyreturn:
 #endif
   return yyresult;
 }
-<<<<<<< HEAD:phase1/parser.c
-#line 38 "parser.y" /* yacc.c:1906  */
-=======
 #line 127 "parser.y" /* yacc.c:1906  */
->>>>>>> trelh:phase1/y.tab.c
 
 
-int yyerror(char * lala)
+int yyerror( char * msg )
 {
 
 }
-
 int main(int argc , char * argv[])
 {
-  if(argc==2)
+    if(argc==2)
     {
         if(!( yyin=fopen(argv[1],"r") )  )
         {
@@ -1881,16 +1758,15 @@ int main(int argc , char * argv[])
     {
         yyin=stdin;
     }
-    alpha_token_t * alpha_head;
-    alpha_head=(alpha_token_t *)malloc(sizeof(alpha_token_t));
-    alpha_head->alpha_yylex=NULL;
+  
     
+    //yylex();
+    //yyin=stdin;
+    yyparse() ;
 
-    alpha_free_tokens_list(alpha_head);
-    if(output_file!=NULL)
-    fclose(output_file);
-    fclose(yyin);
-    
-    yyparse();
+
+    //if(output_file!=NULL)
+    //fclose(output_file);
+//    fclose(yyin);
 }
 
