@@ -1,5 +1,5 @@
 run:  scanner.l lib.c
-	yacc -d parser.y 
+	yacc -d -v  parser.y 
 	lex scanner.l
 	gcc lex.yy.c lib.c y.tab.c -o al
 
