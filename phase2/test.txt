@@ -1,2 +1,11 @@
-function im_a_function(arg1) {}
+function im_a_function(arg1) {
+    function im_a_nested_function(arg2){
+        function im_a_nested_nested_function(arg2){
+
+        }
+    }
+    function im_a_nested2_function(arg2){
+
+    }
+}
 function im_a_function2(arg1) {}

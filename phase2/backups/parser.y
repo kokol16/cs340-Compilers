@@ -7,7 +7,7 @@ SymbolTable *  symbolTable;
 FILE *output_file;
 int yylex(void);
 int yyerror( char * msg );
-unsigned int  scope=0;
+long scope=0;
 
 %}
 %union{
@@ -122,14 +122,9 @@ indexed:    indexedelem
 indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE;
 
 block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {scope--;}       
-       |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {scope--;} ;  
-       
-block_func: LEFT_BRACE  RIGHT_BRACE  {scope--;}       
-       |LEFT_BRACE   statements  RIGHT_BRACE {scope--;} ;  
-  
+       |LEFT_BRACE {scope++;}  stmt block  RIGHT_BRACE {scope--;} ;
 
-funcdef: FUNCTION  ID LEFT_BRACKETS {scope++;}  idlist RIGHT_BRACKETS block_func {Function * func;
-
+funcdef: FUNCTION  ID LEFT_BRACKETS idlist RIGHT_BRACKETS block {Function * func;
                                                                   SymbolTableEntry * bucket;
                                                                   //printf("%s\n",$3);
                                                                   func=create_func($2 , scope , yylineno);
@@ -138,7 +133,7 @@ funcdef: FUNCTION  ID LEFT_BRACKETS {scope++;}  idlist RIGHT_BRACKETS block_func
                                                                     symbolTable_insert(symbolTable, bucket, scope);
                                                                     }
                                                                 
-         |FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block_func {printf("function without id\n");};
+         |FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block {printf("function without id\n");};
 
 const: NUMBER | STRING | NIL | TRUE | FALSE;
 
@@ -196,8 +191,8 @@ int main(int argc , char * argv[])
     //yylex();
     //yyin=stdin;
     yyparse() ;
-    //symbolTable_print(symbolTable);
-    symbolTable_print_scope_list(symbolTable, 0);
+    symbolTable_print(symbolTable);
+
 
     //if(output_file!=NULL)
     //fclose(output_file);

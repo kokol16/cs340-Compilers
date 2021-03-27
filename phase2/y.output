@@ -10,9 +10,9 @@ State 33 conflicts: 2 shift/reduce
 State 47 conflicts: 1 shift/reduce
 State 50 conflicts: 1 shift/reduce
 State 52 conflicts: 1 shift/reduce
-State 113 conflicts: 13 shift/reduce
-State 114 conflicts: 1 shift/reduce
-State 139 conflicts: 1 shift/reduce
+State 114 conflicts: 13 shift/reduce
+State 115 conflicts: 1 shift/reduce
+State 140 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -105,56 +105,66 @@ Grammar
 
    68 indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE
 
-   69 block: LEFT_BRACE RIGHT_BRACE
-   70      | LEFT_BRACE stmt block RIGHT_BRACE
+   69 $@1: %empty
 
-   71 funcdef: FUNCTION ID LEFT_BRACKETS idlist RIGHT_BRACKETS block
-   72        | FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block
+   70 block: LEFT_BRACE $@1 RIGHT_BRACE
 
-   73 const: NUMBER
-   74      | STRING
-   75      | NIL
-   76      | TRUE
-   77      | FALSE
+   71 $@2: %empty
 
-   78 idlist: ID
-   79       | ID COMMA idlist
-   80       | %empty
+   72 block: LEFT_BRACE $@2 statements RIGHT_BRACE
 
-   81 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE stmt
-   82       | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt
+   73 block_func: LEFT_BRACE RIGHT_BRACE
+   74           | LEFT_BRACE statements RIGHT_BRACE
 
-   83 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS stmt
+   75 $@3: %empty
 
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
+   76 funcdef: FUNCTION ID LEFT_BRACKETS $@3 idlist RIGHT_BRACKETS block_func
+   77        | FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block_func
 
-   85 returnstmt: RETURN expr
-   86           | RETURN
+   78 const: NUMBER
+   79      | STRING
+   80      | NIL
+   81      | TRUE
+   82      | FALSE
+
+   83 idlist: ID
+   84       | ID COMMA idlist
+   85       | %empty
+
+   86 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE stmt
+   87       | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt
+
+   88 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS stmt
+
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
+
+   90 returnstmt: RETURN expr
+   91           | RETURN
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-NUMBER (258) 73
+NUMBER (258) 78
 REAL (259)
-ID (260) 44 45 46 48 50 58 71 78 79
-IF (261) 81 82
-ELSE (262) 81
-WHILE (263) 83
-FOR (264) 84
-FUNCTION (265) 71 72
-RETURN (266) 85 86
+ID (260) 44 45 46 48 50 58 76 83 84
+IF (261) 86 87
+ELSE (262) 86
+WHILE (263) 88
+FOR (264) 89
+FUNCTION (265) 76 77
+RETURN (266) 90 91
 BREAK (267) 7
 CONTINUE (268) 8
 AND (269) 28
 NOT (270) 32
 OR (271) 29
 LOCAl (272) 45
-TRUE (273) 76
-FALSE (274) 77
-NIL (275) 75
-STRING (276) 74
+TRUE (273) 81
+FALSE (274) 82
+NIL (275) 80
+STRING (276) 79
 EQUALS (277) 26
 PLUS (278) 17
 ASSIGN (279) 38
@@ -169,18 +179,18 @@ GREATER (287) 22
 LESS (288) 24
 GREATER_EQUALS (289) 23
 LESS_EQUALS (290) 25
-SEMICOLON (291) 2 7 8 11 84
-COMMA (292) 60 66 79
+SEMICOLON (291) 2 7 8 11 89
+COMMA (292) 60 66 84
 COLON (293) 68
 DOUBLE_COLON (294) 46
 DOT (295) 48 50
 Diaeresis (296) 58
-LEFT_BRACE (297) 68 69 70
-RIGHT_BRACE (298) 68 69 70
+LEFT_BRACE (297) 68 70 72 73 74
+RIGHT_BRACE (298) 68 70 72 73 74
 LEFT_SQUARE (299) 49 51 62 63 64
 RIGHT_SQUARE (300) 49 51 62 63 64
-LEFT_BRACKETS (301) 30 42 52 54 57 58 71 72 81 82 83 84
-RIGHT_BRACKETS (302) 30 42 52 54 57 58 71 72 81 82 83 84
+LEFT_BRACKETS (301) 30 42 52 54 57 58 76 77 86 87 88 89
+RIGHT_BRACKETS (302) 30 42 52 54 57 58 76 77 86 87 88 89
 
 
 Nonterminals, with rules where they appear
@@ -190,12 +200,12 @@ $accept (48)
 program (49)
     on left: 1, on right: 0
 stmt (50)
-    on left: 2 3 4 5 6 7 8 9 10 11, on right: 12 13 70 81 82 83 84
+    on left: 2 3 4 5 6 7 8 9 10 11, on right: 12 13 86 87 88 89
 statements (51)
-    on left: 12 13, on right: 1 12
+    on left: 12 13, on right: 1 12 72 74
 expr (52)
-    on left: 14 15 16, on right: 2 15 30 31 32 38 49 51 59 60 68 81
-    82 83 84 85
+    on left: 14 15 16, on right: 2 15 30 31 32 38 49 51 59 60 68 86
+    87 88 89 90
 op (53)
     on left: 17 18 19 20 21 22 23 24 25 26 27 28 29, on right: 15
 term (54)
@@ -217,7 +227,7 @@ normcall (61)
 methodcall (62)
     on left: 58, on right: 56
 elist (63)
-    on left: 59 60 61, on right: 52 54 57 58 60 62 84
+    on left: 59 60 61, on right: 52 54 57 58 60 62 89
 objectdef (64)
     on left: 62 63 64, on right: 41
 indexed (65)
@@ -225,21 +235,29 @@ indexed (65)
 indexedelem (66)
     on left: 68, on right: 65 66
 block (67)
-    on left: 69 70, on right: 9 70 71 72
-funcdef (68)
-    on left: 71 72, on right: 10 42 54
-const (69)
-    on left: 73 74 75 76 77, on right: 43
-idlist (70)
-    on left: 78 79 80, on right: 71 72 79
-ifstmt (71)
-    on left: 81 82, on right: 3
-whilestmt (72)
-    on left: 83, on right: 4
-forstmt (73)
-    on left: 84, on right: 5
-returnstmt (74)
-    on left: 85 86, on right: 6
+    on left: 70 72, on right: 9
+$@1 (68)
+    on left: 69, on right: 70
+$@2 (69)
+    on left: 71, on right: 72
+block_func (70)
+    on left: 73 74, on right: 76 77
+funcdef (71)
+    on left: 76 77, on right: 10 42 54
+$@3 (72)
+    on left: 75, on right: 76
+const (73)
+    on left: 78 79 80 81 82, on right: 43
+idlist (74)
+    on left: 83 84 85, on right: 76 77 84
+ifstmt (75)
+    on left: 86 87, on right: 3
+whilestmt (76)
+    on left: 88, on right: 4
+forstmt (77)
+    on left: 89, on right: 5
+returnstmt (78)
+    on left: 90 91, on right: 6
 
 
 State 0
@@ -292,9 +310,9 @@ State 0
 
 State 1
 
-   73 const: NUMBER .
+   78 const: NUMBER .
 
-    $default  reduce using rule 73 (const)
+    $default  reduce using rule 78 (const)
 
 
 State 2
@@ -306,30 +324,30 @@ State 2
 
 State 3
 
-   81 ifstmt: IF . LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE stmt
-   82       | IF . LEFT_BRACKETS expr RIGHT_BRACKETS stmt
+   86 ifstmt: IF . LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE stmt
+   87       | IF . LEFT_BRACKETS expr RIGHT_BRACKETS stmt
 
     LEFT_BRACKETS  shift, and go to state 42
 
 
 State 4
 
-   83 whilestmt: WHILE . LEFT_BRACKETS expr RIGHT_BRACKETS stmt
+   88 whilestmt: WHILE . LEFT_BRACKETS expr RIGHT_BRACKETS stmt
 
     LEFT_BRACKETS  shift, and go to state 43
 
 
 State 5
 
-   84 forstmt: FOR . LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
+   89 forstmt: FOR . LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
 
     LEFT_BRACKETS  shift, and go to state 44
 
 
 State 6
 
-   71 funcdef: FUNCTION . ID LEFT_BRACKETS idlist RIGHT_BRACKETS block
-   72        | FUNCTION . LEFT_BRACKETS idlist RIGHT_BRACKETS block
+   76 funcdef: FUNCTION . ID LEFT_BRACKETS $@3 idlist RIGHT_BRACKETS block_func
+   77        | FUNCTION . LEFT_BRACKETS idlist RIGHT_BRACKETS block_func
 
     ID             shift, and go to state 45
     LEFT_BRACKETS  shift, and go to state 46
@@ -337,8 +355,8 @@ State 6
 
 State 7
 
-   85 returnstmt: RETURN . expr
-   86           | RETURN .
+   90 returnstmt: RETURN . expr
+   91           | RETURN .
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -355,21 +373,21 @@ State 7
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    NUMBER         [reduce using rule 86 (returnstmt)]
-    ID             [reduce using rule 86 (returnstmt)]
-    NOT            [reduce using rule 86 (returnstmt)]
-    LOCAl          [reduce using rule 86 (returnstmt)]
-    TRUE           [reduce using rule 86 (returnstmt)]
-    FALSE          [reduce using rule 86 (returnstmt)]
-    NIL            [reduce using rule 86 (returnstmt)]
-    STRING         [reduce using rule 86 (returnstmt)]
-    MINUS          [reduce using rule 86 (returnstmt)]
-    PLUS_PLUS      [reduce using rule 86 (returnstmt)]
-    MINUS_MINUS    [reduce using rule 86 (returnstmt)]
-    DOUBLE_COLON   [reduce using rule 86 (returnstmt)]
-    LEFT_SQUARE    [reduce using rule 86 (returnstmt)]
-    LEFT_BRACKETS  [reduce using rule 86 (returnstmt)]
-    $default       reduce using rule 86 (returnstmt)
+    NUMBER         [reduce using rule 91 (returnstmt)]
+    ID             [reduce using rule 91 (returnstmt)]
+    NOT            [reduce using rule 91 (returnstmt)]
+    LOCAl          [reduce using rule 91 (returnstmt)]
+    TRUE           [reduce using rule 91 (returnstmt)]
+    FALSE          [reduce using rule 91 (returnstmt)]
+    NIL            [reduce using rule 91 (returnstmt)]
+    STRING         [reduce using rule 91 (returnstmt)]
+    MINUS          [reduce using rule 91 (returnstmt)]
+    PLUS_PLUS      [reduce using rule 91 (returnstmt)]
+    MINUS_MINUS    [reduce using rule 91 (returnstmt)]
+    DOUBLE_COLON   [reduce using rule 91 (returnstmt)]
+    LEFT_SQUARE    [reduce using rule 91 (returnstmt)]
+    LEFT_BRACKETS  [reduce using rule 91 (returnstmt)]
+    $default       reduce using rule 91 (returnstmt)
 
     expr        go to state 47
     term        go to state 28
@@ -435,30 +453,30 @@ State 11
 
 State 12
 
-   76 const: TRUE .
+   81 const: TRUE .
 
-    $default  reduce using rule 76 (const)
+    $default  reduce using rule 81 (const)
 
 
 State 13
 
-   77 const: FALSE .
+   82 const: FALSE .
 
-    $default  reduce using rule 77 (const)
+    $default  reduce using rule 82 (const)
 
 
 State 14
 
-   75 const: NIL .
+   80 const: NIL .
 
-    $default  reduce using rule 75 (const)
+    $default  reduce using rule 80 (const)
 
 
 State 15
 
-   74 const: STRING .
+   79 const: STRING .
 
-    $default  reduce using rule 74 (const)
+    $default  reduce using rule 79 (const)
 
 
 State 16
@@ -535,50 +553,14 @@ State 20
 
 State 21
 
-   69 block: LEFT_BRACE . RIGHT_BRACE
-   70      | LEFT_BRACE . stmt block RIGHT_BRACE
+   70 block: LEFT_BRACE . $@1 RIGHT_BRACE
+   72      | LEFT_BRACE . $@2 statements RIGHT_BRACE
 
-    NUMBER         shift, and go to state 1
-    ID             shift, and go to state 2
-    IF             shift, and go to state 3
-    WHILE          shift, and go to state 4
-    FOR            shift, and go to state 5
-    FUNCTION       shift, and go to state 6
-    RETURN         shift, and go to state 7
-    BREAK          shift, and go to state 8
-    CONTINUE       shift, and go to state 9
-    NOT            shift, and go to state 10
-    LOCAl          shift, and go to state 11
-    TRUE           shift, and go to state 12
-    FALSE          shift, and go to state 13
-    NIL            shift, and go to state 14
-    STRING         shift, and go to state 15
-    MINUS          shift, and go to state 16
-    PLUS_PLUS      shift, and go to state 17
-    MINUS_MINUS    shift, and go to state 18
-    SEMICOLON      shift, and go to state 19
-    DOUBLE_COLON   shift, and go to state 20
-    LEFT_BRACE     shift, and go to state 21
-    RIGHT_BRACE    shift, and go to state 58
-    LEFT_SQUARE    shift, and go to state 22
-    LEFT_BRACKETS  shift, and go to state 23
+    RIGHT_BRACE  reduce using rule 69 ($@1)
+    $default     reduce using rule 71 ($@2)
 
-    stmt        go to state 59
-    expr        go to state 27
-    term        go to state 28
-    assignexpr  go to state 29
-    primary     go to state 30
-    lvalue      go to state 31
-    member      go to state 32
-    call        go to state 33
-    objectdef   go to state 34
-    block       go to state 35
-    funcdef     go to state 36
-    const       go to state 37
-    ifstmt      go to state 38
-    whilestmt   go to state 39
-    forstmt     go to state 40
-    returnstmt  go to state 41
+    $@1  go to state 58
+    $@2  go to state 59
 
 
 State 22
@@ -872,8 +854,8 @@ State 41
 
 State 42
 
-   81 ifstmt: IF LEFT_BRACKETS . expr RIGHT_BRACKETS stmt ELSE stmt
-   82       | IF LEFT_BRACKETS . expr RIGHT_BRACKETS stmt
+   86 ifstmt: IF LEFT_BRACKETS . expr RIGHT_BRACKETS stmt ELSE stmt
+   87       | IF LEFT_BRACKETS . expr RIGHT_BRACKETS stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -903,7 +885,7 @@ State 42
 
 State 43
 
-   83 whilestmt: WHILE LEFT_BRACKETS . expr RIGHT_BRACKETS stmt
+   88 whilestmt: WHILE LEFT_BRACKETS . expr RIGHT_BRACKETS stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -933,7 +915,7 @@ State 43
 
 State 44
 
-   84 forstmt: FOR LEFT_BRACKETS . elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
+   89 forstmt: FOR LEFT_BRACKETS . elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -966,18 +948,18 @@ State 44
 
 State 45
 
-   71 funcdef: FUNCTION ID . LEFT_BRACKETS idlist RIGHT_BRACKETS block
+   76 funcdef: FUNCTION ID . LEFT_BRACKETS $@3 idlist RIGHT_BRACKETS block_func
 
     LEFT_BRACKETS  shift, and go to state 101
 
 
 State 46
 
-   72 funcdef: FUNCTION LEFT_BRACKETS . idlist RIGHT_BRACKETS block
+   77 funcdef: FUNCTION LEFT_BRACKETS . idlist RIGHT_BRACKETS block_func
 
     ID  shift, and go to state 102
 
-    $default  reduce using rule 80 (idlist)
+    $default  reduce using rule 85 (idlist)
 
     idlist  go to state 103
 
@@ -985,7 +967,7 @@ State 46
 State 47
 
    15 expr: expr . op expr
-   85 returnstmt: RETURN expr .
+   90 returnstmt: RETURN expr .
 
     AND             shift, and go to state 70
     OR              shift, and go to state 71
@@ -1001,8 +983,8 @@ State 47
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
 
-    MINUS     [reduce using rule 85 (returnstmt)]
-    $default  reduce using rule 85 (returnstmt)
+    MINUS     [reduce using rule 90 (returnstmt)]
+    $default  reduce using rule 90 (returnstmt)
 
     op  go to state 84
 
@@ -1123,18 +1105,56 @@ State 57
 
 State 58
 
-   69 block: LEFT_BRACE RIGHT_BRACE .
+   70 block: LEFT_BRACE $@1 . RIGHT_BRACE
 
-    $default  reduce using rule 69 (block)
+    RIGHT_BRACE  shift, and go to state 105
 
 
 State 59
 
-   70 block: LEFT_BRACE stmt . block RIGHT_BRACE
+   72 block: LEFT_BRACE $@2 . statements RIGHT_BRACE
 
-    LEFT_BRACE  shift, and go to state 21
+    NUMBER         shift, and go to state 1
+    ID             shift, and go to state 2
+    IF             shift, and go to state 3
+    WHILE          shift, and go to state 4
+    FOR            shift, and go to state 5
+    FUNCTION       shift, and go to state 6
+    RETURN         shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    NOT            shift, and go to state 10
+    LOCAl          shift, and go to state 11
+    TRUE           shift, and go to state 12
+    FALSE          shift, and go to state 13
+    NIL            shift, and go to state 14
+    STRING         shift, and go to state 15
+    MINUS          shift, and go to state 16
+    PLUS_PLUS      shift, and go to state 17
+    MINUS_MINUS    shift, and go to state 18
+    SEMICOLON      shift, and go to state 19
+    DOUBLE_COLON   shift, and go to state 20
+    LEFT_BRACE     shift, and go to state 21
+    LEFT_SQUARE    shift, and go to state 22
+    LEFT_BRACKETS  shift, and go to state 23
 
-    block  go to state 105
+    stmt        go to state 25
+    statements  go to state 106
+    expr        go to state 27
+    term        go to state 28
+    assignexpr  go to state 29
+    primary     go to state 30
+    lvalue      go to state 31
+    member      go to state 32
+    call        go to state 33
+    objectdef   go to state 34
+    block       go to state 35
+    funcdef     go to state 36
+    const       go to state 37
+    ifstmt      go to state 38
+    whilestmt   go to state 39
+    forstmt     go to state 40
+    returnstmt  go to state 41
 
 
 State 60
@@ -1156,7 +1176,7 @@ State 60
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 106
+    expr        go to state 107
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -1193,7 +1213,7 @@ State 62
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    COMMA           shift, and go to state 107
+    COMMA           shift, and go to state 108
 
     $default  reduce using rule 59 (elist)
 
@@ -1204,14 +1224,14 @@ State 63
 
    62 objectdef: LEFT_SQUARE elist . RIGHT_SQUARE
 
-    RIGHT_SQUARE  shift, and go to state 108
+    RIGHT_SQUARE  shift, and go to state 109
 
 
 State 64
 
    63 objectdef: LEFT_SQUARE indexed . RIGHT_SQUARE
 
-    RIGHT_SQUARE  shift, and go to state 109
+    RIGHT_SQUARE  shift, and go to state 110
 
 
 State 65
@@ -1219,7 +1239,7 @@ State 65
    65 indexed: indexedelem .
    66        | indexedelem . COMMA indexed
 
-    COMMA  shift, and go to state 110
+    COMMA  shift, and go to state 111
 
     $default  reduce using rule 65 (indexed)
 
@@ -1242,7 +1262,7 @@ State 66
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    RIGHT_BRACKETS  shift, and go to state 111
+    RIGHT_BRACKETS  shift, and go to state 112
 
     op  go to state 84
 
@@ -1252,7 +1272,7 @@ State 67
    42 primary: LEFT_BRACKETS funcdef . RIGHT_BRACKETS
    54 call: LEFT_BRACKETS funcdef . RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS
 
-    RIGHT_BRACKETS  shift, and go to state 112
+    RIGHT_BRACKETS  shift, and go to state 113
 
 
 State 68
@@ -1386,7 +1406,7 @@ State 84
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 113
+    expr        go to state 114
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -1416,7 +1436,7 @@ State 85
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 114
+    expr        go to state 115
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -1445,14 +1465,14 @@ State 88
 
    48 member: lvalue DOT . ID
 
-    ID  shift, and go to state 115
+    ID  shift, and go to state 116
 
 
 State 89
 
    58 methodcall: Diaeresis . ID LEFT_BRACKETS elist RIGHT_BRACKETS
 
-    ID  shift, and go to state 116
+    ID  shift, and go to state 117
 
 
 State 90
@@ -1474,7 +1494,7 @@ State 90
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 117
+    expr        go to state 118
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -1513,7 +1533,7 @@ State 91
     lvalue      go to state 31
     member      go to state 32
     call        go to state 33
-    elist       go to state 118
+    elist       go to state 119
     objectdef   go to state 34
     const       go to state 37
 
@@ -1543,7 +1563,7 @@ State 95
 
    50 member: call DOT . ID
 
-    ID  shift, and go to state 119
+    ID  shift, and go to state 120
 
 
 State 96
@@ -1565,7 +1585,7 @@ State 96
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 120
+    expr        go to state 121
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -1604,7 +1624,7 @@ State 97
     lvalue      go to state 31
     member      go to state 32
     call        go to state 33
-    elist       go to state 121
+    elist       go to state 122
     objectdef   go to state 34
     const       go to state 37
 
@@ -1612,31 +1632,8 @@ State 97
 State 98
 
    15 expr: expr . op expr
-   81 ifstmt: IF LEFT_BRACKETS expr . RIGHT_BRACKETS stmt ELSE stmt
-   82       | IF LEFT_BRACKETS expr . RIGHT_BRACKETS stmt
-
-    AND             shift, and go to state 70
-    OR              shift, and go to state 71
-    EQUALS          shift, and go to state 72
-    PLUS            shift, and go to state 73
-    MINUS           shift, and go to state 74
-    ASTERISK        shift, and go to state 75
-    DIVISION        shift, and go to state 76
-    PERCENT         shift, and go to state 77
-    DIFFERENT       shift, and go to state 78
-    GREATER         shift, and go to state 79
-    LESS            shift, and go to state 80
-    GREATER_EQUALS  shift, and go to state 81
-    LESS_EQUALS     shift, and go to state 82
-    RIGHT_BRACKETS  shift, and go to state 122
-
-    op  go to state 84
-
-
-State 99
-
-   15 expr: expr . op expr
-   83 whilestmt: WHILE LEFT_BRACKETS expr . RIGHT_BRACKETS stmt
+   86 ifstmt: IF LEFT_BRACKETS expr . RIGHT_BRACKETS stmt ELSE stmt
+   87       | IF LEFT_BRACKETS expr . RIGHT_BRACKETS stmt
 
     AND             shift, and go to state 70
     OR              shift, and go to state 71
@@ -1656,56 +1653,125 @@ State 99
     op  go to state 84
 
 
+State 99
+
+   15 expr: expr . op expr
+   88 whilestmt: WHILE LEFT_BRACKETS expr . RIGHT_BRACKETS stmt
+
+    AND             shift, and go to state 70
+    OR              shift, and go to state 71
+    EQUALS          shift, and go to state 72
+    PLUS            shift, and go to state 73
+    MINUS           shift, and go to state 74
+    ASTERISK        shift, and go to state 75
+    DIVISION        shift, and go to state 76
+    PERCENT         shift, and go to state 77
+    DIFFERENT       shift, and go to state 78
+    GREATER         shift, and go to state 79
+    LESS            shift, and go to state 80
+    GREATER_EQUALS  shift, and go to state 81
+    LESS_EQUALS     shift, and go to state 82
+    RIGHT_BRACKETS  shift, and go to state 124
+
+    op  go to state 84
+
+
 State 100
 
-   84 forstmt: FOR LEFT_BRACKETS elist . SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
+   89 forstmt: FOR LEFT_BRACKETS elist . SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt
 
-    SEMICOLON  shift, and go to state 124
+    SEMICOLON  shift, and go to state 125
 
 
 State 101
 
-   71 funcdef: FUNCTION ID LEFT_BRACKETS . idlist RIGHT_BRACKETS block
+   76 funcdef: FUNCTION ID LEFT_BRACKETS . $@3 idlist RIGHT_BRACKETS block_func
 
-    ID  shift, and go to state 102
+    $default  reduce using rule 75 ($@3)
 
-    $default  reduce using rule 80 (idlist)
-
-    idlist  go to state 125
+    $@3  go to state 126
 
 
 State 102
 
-   78 idlist: ID .
-   79       | ID . COMMA idlist
+   83 idlist: ID .
+   84       | ID . COMMA idlist
 
-    COMMA  shift, and go to state 126
+    COMMA  shift, and go to state 127
 
-    $default  reduce using rule 78 (idlist)
+    $default  reduce using rule 83 (idlist)
 
 
 State 103
 
-   72 funcdef: FUNCTION LEFT_BRACKETS idlist . RIGHT_BRACKETS block
+   77 funcdef: FUNCTION LEFT_BRACKETS idlist . RIGHT_BRACKETS block_func
 
-    RIGHT_BRACKETS  shift, and go to state 127
+    RIGHT_BRACKETS  shift, and go to state 128
 
 
 State 104
 
    54 call: LEFT_BRACKETS funcdef . RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS
 
-    RIGHT_BRACKETS  shift, and go to state 128
+    RIGHT_BRACKETS  shift, and go to state 129
 
 
 State 105
 
-   70 block: LEFT_BRACE stmt block . RIGHT_BRACE
+   70 block: LEFT_BRACE $@1 RIGHT_BRACE .
 
-    RIGHT_BRACE  shift, and go to state 129
+    $default  reduce using rule 70 (block)
 
 
 State 106
+
+   12 statements: statements . stmt
+   72 block: LEFT_BRACE $@2 statements . RIGHT_BRACE
+
+    NUMBER         shift, and go to state 1
+    ID             shift, and go to state 2
+    IF             shift, and go to state 3
+    WHILE          shift, and go to state 4
+    FOR            shift, and go to state 5
+    FUNCTION       shift, and go to state 6
+    RETURN         shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    NOT            shift, and go to state 10
+    LOCAl          shift, and go to state 11
+    TRUE           shift, and go to state 12
+    FALSE          shift, and go to state 13
+    NIL            shift, and go to state 14
+    STRING         shift, and go to state 15
+    MINUS          shift, and go to state 16
+    PLUS_PLUS      shift, and go to state 17
+    MINUS_MINUS    shift, and go to state 18
+    SEMICOLON      shift, and go to state 19
+    DOUBLE_COLON   shift, and go to state 20
+    LEFT_BRACE     shift, and go to state 21
+    RIGHT_BRACE    shift, and go to state 130
+    LEFT_SQUARE    shift, and go to state 22
+    LEFT_BRACKETS  shift, and go to state 23
+
+    stmt        go to state 69
+    expr        go to state 27
+    term        go to state 28
+    assignexpr  go to state 29
+    primary     go to state 30
+    lvalue      go to state 31
+    member      go to state 32
+    call        go to state 33
+    objectdef   go to state 34
+    block       go to state 35
+    funcdef     go to state 36
+    const       go to state 37
+    ifstmt      go to state 38
+    whilestmt   go to state 39
+    forstmt     go to state 40
+    returnstmt  go to state 41
+
+
+State 107
 
    15 expr: expr . op expr
    68 indexedelem: LEFT_BRACE expr . COLON expr RIGHT_BRACE
@@ -1723,12 +1789,12 @@ State 106
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    COLON           shift, and go to state 130
+    COLON           shift, and go to state 131
 
     op  go to state 84
 
 
-State 107
+State 108
 
    60 elist: expr COMMA . elist
 
@@ -1756,26 +1822,26 @@ State 107
     lvalue      go to state 31
     member      go to state 32
     call        go to state 33
-    elist       go to state 131
+    elist       go to state 132
     objectdef   go to state 34
     const       go to state 37
 
 
-State 108
+State 109
 
    62 objectdef: LEFT_SQUARE elist RIGHT_SQUARE .
 
     $default  reduce using rule 62 (objectdef)
 
 
-State 109
+State 110
 
    63 objectdef: LEFT_SQUARE indexed RIGHT_SQUARE .
 
     $default  reduce using rule 63 (objectdef)
 
 
-State 110
+State 111
 
    66 indexed: indexedelem COMMA . indexed
 
@@ -1783,18 +1849,18 @@ State 110
 
     $default  reduce using rule 67 (indexed)
 
-    indexed      go to state 132
+    indexed      go to state 133
     indexedelem  go to state 65
 
 
-State 111
+State 112
 
    30 term: LEFT_BRACKETS expr RIGHT_BRACKETS .
 
     $default  reduce using rule 30 (term)
 
 
-State 112
+State 113
 
    42 primary: LEFT_BRACKETS funcdef RIGHT_BRACKETS .
    54 call: LEFT_BRACKETS funcdef RIGHT_BRACKETS . LEFT_BRACKETS elist RIGHT_BRACKETS
@@ -1802,7 +1868,7 @@ State 112
     $default  reduce using rule 42 (primary)
 
 
-State 113
+State 114
 
    15 expr: expr . op expr
    15     | expr op expr .
@@ -1839,7 +1905,7 @@ State 113
     op  go to state 84
 
 
-State 114
+State 115
 
    15 expr: expr . op expr
    38 assignexpr: lvalue ASSIGN expr .
@@ -1864,21 +1930,21 @@ State 114
     op  go to state 84
 
 
-State 115
+State 116
 
    48 member: lvalue DOT ID .
 
     $default  reduce using rule 48 (member)
 
 
-State 116
+State 117
 
    58 methodcall: Diaeresis ID . LEFT_BRACKETS elist RIGHT_BRACKETS
 
-    LEFT_BRACKETS  shift, and go to state 134
+    LEFT_BRACKETS  shift, and go to state 135
 
 
-State 117
+State 118
 
    15 expr: expr . op expr
    49 member: lvalue LEFT_SQUARE expr . RIGHT_SQUARE
@@ -1896,26 +1962,26 @@ State 117
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    RIGHT_SQUARE    shift, and go to state 135
+    RIGHT_SQUARE    shift, and go to state 136
 
     op  go to state 84
 
 
-State 118
+State 119
 
    57 normcall: LEFT_BRACKETS elist . RIGHT_BRACKETS
 
-    RIGHT_BRACKETS  shift, and go to state 136
+    RIGHT_BRACKETS  shift, and go to state 137
 
 
-State 119
+State 120
 
    50 member: call DOT ID .
 
     $default  reduce using rule 50 (member)
 
 
-State 120
+State 121
 
    15 expr: expr . op expr
    51 member: call LEFT_SQUARE expr . RIGHT_SQUARE
@@ -1933,68 +1999,22 @@ State 120
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    RIGHT_SQUARE    shift, and go to state 137
+    RIGHT_SQUARE    shift, and go to state 138
 
     op  go to state 84
 
 
-State 121
+State 122
 
    52 call: call LEFT_BRACKETS elist . RIGHT_BRACKETS
 
-    RIGHT_BRACKETS  shift, and go to state 138
-
-
-State 122
-
-   81 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS . stmt ELSE stmt
-   82       | IF LEFT_BRACKETS expr RIGHT_BRACKETS . stmt
-
-    NUMBER         shift, and go to state 1
-    ID             shift, and go to state 2
-    IF             shift, and go to state 3
-    WHILE          shift, and go to state 4
-    FOR            shift, and go to state 5
-    FUNCTION       shift, and go to state 6
-    RETURN         shift, and go to state 7
-    BREAK          shift, and go to state 8
-    CONTINUE       shift, and go to state 9
-    NOT            shift, and go to state 10
-    LOCAl          shift, and go to state 11
-    TRUE           shift, and go to state 12
-    FALSE          shift, and go to state 13
-    NIL            shift, and go to state 14
-    STRING         shift, and go to state 15
-    MINUS          shift, and go to state 16
-    PLUS_PLUS      shift, and go to state 17
-    MINUS_MINUS    shift, and go to state 18
-    SEMICOLON      shift, and go to state 19
-    DOUBLE_COLON   shift, and go to state 20
-    LEFT_BRACE     shift, and go to state 21
-    LEFT_SQUARE    shift, and go to state 22
-    LEFT_BRACKETS  shift, and go to state 23
-
-    stmt        go to state 139
-    expr        go to state 27
-    term        go to state 28
-    assignexpr  go to state 29
-    primary     go to state 30
-    lvalue      go to state 31
-    member      go to state 32
-    call        go to state 33
-    objectdef   go to state 34
-    block       go to state 35
-    funcdef     go to state 36
-    const       go to state 37
-    ifstmt      go to state 38
-    whilestmt   go to state 39
-    forstmt     go to state 40
-    returnstmt  go to state 41
+    RIGHT_BRACKETS  shift, and go to state 139
 
 
 State 123
 
-   83 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS . stmt
+   86 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS . stmt ELSE stmt
+   87       | IF LEFT_BRACKETS expr RIGHT_BRACKETS . stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -2040,7 +2060,53 @@ State 123
 
 State 124
 
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON . expr SEMICOLON elist RIGHT_BRACKETS stmt
+   88 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS . stmt
+
+    NUMBER         shift, and go to state 1
+    ID             shift, and go to state 2
+    IF             shift, and go to state 3
+    WHILE          shift, and go to state 4
+    FOR            shift, and go to state 5
+    FUNCTION       shift, and go to state 6
+    RETURN         shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    NOT            shift, and go to state 10
+    LOCAl          shift, and go to state 11
+    TRUE           shift, and go to state 12
+    FALSE          shift, and go to state 13
+    NIL            shift, and go to state 14
+    STRING         shift, and go to state 15
+    MINUS          shift, and go to state 16
+    PLUS_PLUS      shift, and go to state 17
+    MINUS_MINUS    shift, and go to state 18
+    SEMICOLON      shift, and go to state 19
+    DOUBLE_COLON   shift, and go to state 20
+    LEFT_BRACE     shift, and go to state 21
+    LEFT_SQUARE    shift, and go to state 22
+    LEFT_BRACKETS  shift, and go to state 23
+
+    stmt        go to state 141
+    expr        go to state 27
+    term        go to state 28
+    assignexpr  go to state 29
+    primary     go to state 30
+    lvalue      go to state 31
+    member      go to state 32
+    call        go to state 33
+    objectdef   go to state 34
+    block       go to state 35
+    funcdef     go to state 36
+    const       go to state 37
+    ifstmt      go to state 38
+    whilestmt   go to state 39
+    forstmt     go to state 40
+    returnstmt  go to state 41
+
+
+State 125
+
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON . expr SEMICOLON elist RIGHT_BRACKETS stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -2057,7 +2123,7 @@ State 124
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 141
+    expr        go to state 142
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -2068,48 +2134,52 @@ State 124
     const       go to state 37
 
 
-State 125
-
-   71 funcdef: FUNCTION ID LEFT_BRACKETS idlist . RIGHT_BRACKETS block
-
-    RIGHT_BRACKETS  shift, and go to state 142
-
-
 State 126
 
-   79 idlist: ID COMMA . idlist
+   76 funcdef: FUNCTION ID LEFT_BRACKETS $@3 . idlist RIGHT_BRACKETS block_func
 
     ID  shift, and go to state 102
 
-    $default  reduce using rule 80 (idlist)
+    $default  reduce using rule 85 (idlist)
 
     idlist  go to state 143
 
 
 State 127
 
-   72 funcdef: FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS . block
+   84 idlist: ID COMMA . idlist
 
-    LEFT_BRACE  shift, and go to state 21
+    ID  shift, and go to state 102
 
-    block  go to state 144
+    $default  reduce using rule 85 (idlist)
+
+    idlist  go to state 144
 
 
 State 128
 
-   54 call: LEFT_BRACKETS funcdef RIGHT_BRACKETS . LEFT_BRACKETS elist RIGHT_BRACKETS
+   77 funcdef: FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS . block_func
 
-    LEFT_BRACKETS  shift, and go to state 133
+    LEFT_BRACE  shift, and go to state 145
+
+    block_func  go to state 146
 
 
 State 129
 
-   70 block: LEFT_BRACE stmt block RIGHT_BRACE .
+   54 call: LEFT_BRACKETS funcdef RIGHT_BRACKETS . LEFT_BRACKETS elist RIGHT_BRACKETS
 
-    $default  reduce using rule 70 (block)
+    LEFT_BRACKETS  shift, and go to state 134
 
 
 State 130
+
+   72 block: LEFT_BRACE $@2 statements RIGHT_BRACE .
+
+    $default  reduce using rule 72 (block)
+
+
+State 131
 
    68 indexedelem: LEFT_BRACE expr COLON . expr RIGHT_BRACE
 
@@ -2128,7 +2198,7 @@ State 130
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    expr        go to state 145
+    expr        go to state 147
     term        go to state 28
     assignexpr  go to state 29
     primary     go to state 30
@@ -2139,21 +2209,21 @@ State 130
     const       go to state 37
 
 
-State 131
+State 132
 
    60 elist: expr COMMA elist .
 
     $default  reduce using rule 60 (elist)
 
 
-State 132
+State 133
 
    66 indexed: indexedelem COMMA indexed .
 
     $default  reduce using rule 66 (indexed)
 
 
-State 133
+State 134
 
    54 call: LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS . elist RIGHT_BRACKETS
 
@@ -2181,12 +2251,12 @@ State 133
     lvalue      go to state 31
     member      go to state 32
     call        go to state 33
-    elist       go to state 146
+    elist       go to state 148
     objectdef   go to state 34
     const       go to state 37
 
 
-State 134
+State 135
 
    58 methodcall: Diaeresis ID LEFT_BRACKETS . elist RIGHT_BRACKETS
 
@@ -2214,61 +2284,61 @@ State 134
     lvalue      go to state 31
     member      go to state 32
     call        go to state 33
-    elist       go to state 147
+    elist       go to state 149
     objectdef   go to state 34
     const       go to state 37
 
 
-State 135
+State 136
 
    49 member: lvalue LEFT_SQUARE expr RIGHT_SQUARE .
 
     $default  reduce using rule 49 (member)
 
 
-State 136
+State 137
 
    57 normcall: LEFT_BRACKETS elist RIGHT_BRACKETS .
 
     $default  reduce using rule 57 (normcall)
 
 
-State 137
+State 138
 
    51 member: call LEFT_SQUARE expr RIGHT_SQUARE .
 
     $default  reduce using rule 51 (member)
 
 
-State 138
+State 139
 
    52 call: call LEFT_BRACKETS elist RIGHT_BRACKETS .
 
     $default  reduce using rule 52 (call)
 
 
-State 139
-
-   81 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt . ELSE stmt
-   82       | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt .
-
-    ELSE  shift, and go to state 148
-
-    ELSE      [reduce using rule 82 (ifstmt)]
-    $default  reduce using rule 82 (ifstmt)
-
-
 State 140
 
-   83 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS stmt .
+   86 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt . ELSE stmt
+   87       | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt .
 
-    $default  reduce using rule 83 (whilestmt)
+    ELSE  shift, and go to state 150
+
+    ELSE      [reduce using rule 87 (ifstmt)]
+    $default  reduce using rule 87 (ifstmt)
 
 
 State 141
 
+   88 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS stmt .
+
+    $default  reduce using rule 88 (whilestmt)
+
+
+State 142
+
    15 expr: expr . op expr
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr . SEMICOLON elist RIGHT_BRACKETS stmt
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr . SEMICOLON elist RIGHT_BRACKETS stmt
 
     AND             shift, and go to state 70
     OR              shift, and go to state 71
@@ -2283,35 +2353,82 @@ State 141
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    SEMICOLON       shift, and go to state 149
+    SEMICOLON       shift, and go to state 151
 
     op  go to state 84
 
 
-State 142
-
-   71 funcdef: FUNCTION ID LEFT_BRACKETS idlist RIGHT_BRACKETS . block
-
-    LEFT_BRACE  shift, and go to state 21
-
-    block  go to state 150
-
-
 State 143
 
-   79 idlist: ID COMMA idlist .
+   76 funcdef: FUNCTION ID LEFT_BRACKETS $@3 idlist . RIGHT_BRACKETS block_func
 
-    $default  reduce using rule 79 (idlist)
+    RIGHT_BRACKETS  shift, and go to state 152
 
 
 State 144
 
-   72 funcdef: FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block .
+   84 idlist: ID COMMA idlist .
 
-    $default  reduce using rule 72 (funcdef)
+    $default  reduce using rule 84 (idlist)
 
 
 State 145
+
+   73 block_func: LEFT_BRACE . RIGHT_BRACE
+   74           | LEFT_BRACE . statements RIGHT_BRACE
+
+    NUMBER         shift, and go to state 1
+    ID             shift, and go to state 2
+    IF             shift, and go to state 3
+    WHILE          shift, and go to state 4
+    FOR            shift, and go to state 5
+    FUNCTION       shift, and go to state 6
+    RETURN         shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    NOT            shift, and go to state 10
+    LOCAl          shift, and go to state 11
+    TRUE           shift, and go to state 12
+    FALSE          shift, and go to state 13
+    NIL            shift, and go to state 14
+    STRING         shift, and go to state 15
+    MINUS          shift, and go to state 16
+    PLUS_PLUS      shift, and go to state 17
+    MINUS_MINUS    shift, and go to state 18
+    SEMICOLON      shift, and go to state 19
+    DOUBLE_COLON   shift, and go to state 20
+    LEFT_BRACE     shift, and go to state 21
+    RIGHT_BRACE    shift, and go to state 153
+    LEFT_SQUARE    shift, and go to state 22
+    LEFT_BRACKETS  shift, and go to state 23
+
+    stmt        go to state 25
+    statements  go to state 154
+    expr        go to state 27
+    term        go to state 28
+    assignexpr  go to state 29
+    primary     go to state 30
+    lvalue      go to state 31
+    member      go to state 32
+    call        go to state 33
+    objectdef   go to state 34
+    block       go to state 35
+    funcdef     go to state 36
+    const       go to state 37
+    ifstmt      go to state 38
+    whilestmt   go to state 39
+    forstmt     go to state 40
+    returnstmt  go to state 41
+
+
+State 146
+
+   77 funcdef: FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block_func .
+
+    $default  reduce using rule 77 (funcdef)
+
+
+State 147
 
    15 expr: expr . op expr
    68 indexedelem: LEFT_BRACE expr COLON expr . RIGHT_BRACE
@@ -2329,28 +2446,28 @@ State 145
     LESS            shift, and go to state 80
     GREATER_EQUALS  shift, and go to state 81
     LESS_EQUALS     shift, and go to state 82
-    RIGHT_BRACE     shift, and go to state 151
+    RIGHT_BRACE     shift, and go to state 155
 
     op  go to state 84
 
 
-State 146
+State 148
 
    54 call: LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist . RIGHT_BRACKETS
 
-    RIGHT_BRACKETS  shift, and go to state 152
+    RIGHT_BRACKETS  shift, and go to state 156
 
 
-State 147
+State 149
 
    58 methodcall: Diaeresis ID LEFT_BRACKETS elist . RIGHT_BRACKETS
 
-    RIGHT_BRACKETS  shift, and go to state 153
+    RIGHT_BRACKETS  shift, and go to state 157
 
 
-State 148
+State 150
 
-   81 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE . stmt
+   86 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE . stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -2376,7 +2493,7 @@ State 148
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    stmt        go to state 154
+    stmt        go to state 158
     expr        go to state 27
     term        go to state 28
     assignexpr  go to state 29
@@ -2394,9 +2511,9 @@ State 148
     returnstmt  go to state 41
 
 
-State 149
+State 151
 
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON . elist RIGHT_BRACKETS stmt
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON . elist RIGHT_BRACKETS stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -2422,56 +2539,127 @@ State 149
     lvalue      go to state 31
     member      go to state 32
     call        go to state 33
-    elist       go to state 155
+    elist       go to state 159
     objectdef   go to state 34
     const       go to state 37
 
 
-State 150
+State 152
 
-   71 funcdef: FUNCTION ID LEFT_BRACKETS idlist RIGHT_BRACKETS block .
+   76 funcdef: FUNCTION ID LEFT_BRACKETS $@3 idlist RIGHT_BRACKETS . block_func
 
-    $default  reduce using rule 71 (funcdef)
+    LEFT_BRACE  shift, and go to state 145
+
+    block_func  go to state 160
 
 
-State 151
+State 153
+
+   73 block_func: LEFT_BRACE RIGHT_BRACE .
+
+    $default  reduce using rule 73 (block_func)
+
+
+State 154
+
+   12 statements: statements . stmt
+   74 block_func: LEFT_BRACE statements . RIGHT_BRACE
+
+    NUMBER         shift, and go to state 1
+    ID             shift, and go to state 2
+    IF             shift, and go to state 3
+    WHILE          shift, and go to state 4
+    FOR            shift, and go to state 5
+    FUNCTION       shift, and go to state 6
+    RETURN         shift, and go to state 7
+    BREAK          shift, and go to state 8
+    CONTINUE       shift, and go to state 9
+    NOT            shift, and go to state 10
+    LOCAl          shift, and go to state 11
+    TRUE           shift, and go to state 12
+    FALSE          shift, and go to state 13
+    NIL            shift, and go to state 14
+    STRING         shift, and go to state 15
+    MINUS          shift, and go to state 16
+    PLUS_PLUS      shift, and go to state 17
+    MINUS_MINUS    shift, and go to state 18
+    SEMICOLON      shift, and go to state 19
+    DOUBLE_COLON   shift, and go to state 20
+    LEFT_BRACE     shift, and go to state 21
+    RIGHT_BRACE    shift, and go to state 161
+    LEFT_SQUARE    shift, and go to state 22
+    LEFT_BRACKETS  shift, and go to state 23
+
+    stmt        go to state 69
+    expr        go to state 27
+    term        go to state 28
+    assignexpr  go to state 29
+    primary     go to state 30
+    lvalue      go to state 31
+    member      go to state 32
+    call        go to state 33
+    objectdef   go to state 34
+    block       go to state 35
+    funcdef     go to state 36
+    const       go to state 37
+    ifstmt      go to state 38
+    whilestmt   go to state 39
+    forstmt     go to state 40
+    returnstmt  go to state 41
+
+
+State 155
 
    68 indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE .
 
     $default  reduce using rule 68 (indexedelem)
 
 
-State 152
+State 156
 
    54 call: LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS .
 
     $default  reduce using rule 54 (call)
 
 
-State 153
+State 157
 
    58 methodcall: Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS .
 
     $default  reduce using rule 58 (methodcall)
 
 
-State 154
+State 158
 
-   81 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE stmt .
+   86 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt ELSE stmt .
 
-    $default  reduce using rule 81 (ifstmt)
-
-
-State 155
-
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist . RIGHT_BRACKETS stmt
-
-    RIGHT_BRACKETS  shift, and go to state 156
+    $default  reduce using rule 86 (ifstmt)
 
 
-State 156
+State 159
 
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS . stmt
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist . RIGHT_BRACKETS stmt
+
+    RIGHT_BRACKETS  shift, and go to state 162
+
+
+State 160
+
+   76 funcdef: FUNCTION ID LEFT_BRACKETS $@3 idlist RIGHT_BRACKETS block_func .
+
+    $default  reduce using rule 76 (funcdef)
+
+
+State 161
+
+   74 block_func: LEFT_BRACE statements RIGHT_BRACE .
+
+    $default  reduce using rule 74 (block_func)
+
+
+State 162
+
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS . stmt
 
     NUMBER         shift, and go to state 1
     ID             shift, and go to state 2
@@ -2497,7 +2685,7 @@ State 156
     LEFT_SQUARE    shift, and go to state 22
     LEFT_BRACKETS  shift, and go to state 23
 
-    stmt        go to state 157
+    stmt        go to state 163
     expr        go to state 27
     term        go to state 28
     assignexpr  go to state 29
@@ -2515,8 +2703,8 @@ State 156
     returnstmt  go to state 41
 
 
-State 157
+State 163
 
-   84 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt .
+   89 forstmt: FOR LEFT_BRACKETS elist SEMICOLON expr SEMICOLON elist RIGHT_BRACKETS stmt .
 
-    $default  reduce using rule 84 (forstmt)
+    $default  reduce using rule 89 (forstmt)
