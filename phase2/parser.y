@@ -1,20 +1,27 @@
 %{
-#include"lib.h"
+#include"symbolTable.h"
 #include <stdio.h>
 extern FILE * yyin;
+extern int yylineno; 
+SymbolTable *  symbolTable;
 FILE *output_file;
 int yylex(void);
 int yyerror( char * msg );
+long scope=0;
+
 %}
 %union{
 	int num;
+    float real;
 	char * str;
 }
 %start program
-%token <num> NUMBER 
-%token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCAL TRUE FALSE NIL STRING  ID EQUALS PLUS
-%token ASSIGN MINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
-%token SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
+%token <num> NUMBER
+%token <real> REAL
+%token <str> ID
+%token  <str>  IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCAl TRUE FALSE NIL STRING EQUALS PLUS
+%token <str>ASSIGN MINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
+%token <str>SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
 %right ASSIGN
 %left OR
 %left AND 
@@ -80,7 +87,7 @@ primary:  lvalue
           | const ;
 
 lvalue:   ID
-          | LOCAL ID
+          | LOCAl ID
           | DOUBLE_COLON ID
           | member ;
 
@@ -117,7 +124,15 @@ indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE;
 block: LEFT_BRACE RIGHT_BRACE         
        |LEFT_BRACE stmt block  RIGHT_BRACE;
 
-funcdef: FUNCTION  ID LEFT_BRACKETS idlist RIGHT_BRACKETS block {printf("function with id\n");}
+funcdef: FUNCTION  ID LEFT_BRACKETS idlist RIGHT_BRACKETS block {Function * func;
+                                                                  SymbolTableEntry * bucket;
+                                                                  //printf("%s\n",$3);
+                                                                  func=create_func($2 , scope , yylineno);
+                                                                  bucket=create_bucket_func( 1 ,  func  ,USERFUNC );
+                                                                  //print_func( func);
+                                                                    symbolTable_insert(symbolTable, bucket, scope);
+                                                                    }
+                                                                
          |FUNCTION LEFT_BRACKETS idlist RIGHT_BRACKETS block {printf("function without id\n");};
 
 const: NUMBER | STRING | NIL | TRUE | FALSE;
@@ -172,10 +187,11 @@ int main(int argc , char * argv[])
         yyin=stdin;
     }
   
-    
+    symbolTable = symbolTable_create();
     //yylex();
     //yyin=stdin;
     yyparse() ;
+    symbolTable_print(symbolTable);
 
 
     //if(output_file!=NULL)

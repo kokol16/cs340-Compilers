@@ -1,7 +1,2 @@
-if(1){} 
-x=5;
-x=5;
-x=5;
-x=5;
-x=5;
-
+function im_a_function(arg1) {}
+function im_a_function2(arg1) {}

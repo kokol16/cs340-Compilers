@@ -1,6 +1,6 @@
 
 %{ 
-#include"lib.h"
+#include "lib.h"
 #define MY_EOF 0   
 #include"y.tab.h"
 %} 
@@ -24,7 +24,7 @@ CONTINUE        continue
 AND             and     
 NOT             not 
 OR              or 
-LOCAL           local 
+LOCAl           local 
 TRUE            true 
 FALSE           false 
 NIL             nil
@@ -64,43 +64,87 @@ ONELINECOMMENTT "//".*
 
 %% 
 {FUNCTION}    {
-    printf("FUNCTION \n");
+    //printf("FUNCTION \n");
+     yylval.str=yytext;
     return FUNCTION;
 }
 
 {INT}       {
         yylval.num=atoi(yytext);  return NUMBER ;
 }
+{REAL}       {
+     yylval.real=atof(yytext); return REAL ;
+}
+{WHILE}       {
+      return WHILE ;
+}
+{FOR}       {
+      return FOR ;
+}
+
+{RETURN}       {
+      return RETURN ;
+}
+{BREAK}       {
+      return BREAK ;
+}
+{CONTINUE}       {
+      return CONTINUE ;
+}
+{AND}       {
+      return AND ;
+}
+{NOT}       {
+      return NOT ;
+}
+{OR}       {
+      return OR ;
+}
+{LOCAl}       {
+      return LOCAl ;
+}
+{TRUE}       {
+      return TRUE ;
+}
+{FALSE}       {
+      return FALSE ;
+}
+{NIL}       {
+      return NIL ;
+}
+
 {PLUS}      {
-    printf("plus \n");
+    //printf("plus \n");
     return PLUS ; 
 }
 {IF}        {
-    printf("IF \n");
+    //printf("IF \n");
     return  IF ; 
 }
 {EQUALS}    {
-    printf("find : == \n");
+    //printf("find : == \n");
     return EQUALS ; 
 }
 {LEFT_BRACKETS} {
-    printf("find : ( \n");
+    //printf("find : ( \n");
+    yylval.str=yytext;
     return LEFT_BRACKETS ; 
 }
 {RIGHT_BRACKETS}    {
-    printf("find : ) \n");
+    //printf("find : ) \n");
+     yylval.str=yytext;
     return RIGHT_BRACKETS ; 
 }
 {RIGHT_SQUARE}  {
-    printf("right\n");
+    //printf("right\n");
     return RIGHT_SQUARE ; 
 }
 {LEFT_SQUARE}   {
-    printf("left\n");
+    //printf("left\n");
     return LEFT_SQUARE ; 
 }
 {ELSE}  { 
-    printf("else\n");              
+    //printf("else\n");              
     return ELSE ; 
 }
 {ASSIGN}  {
@@ -110,7 +154,7 @@ ONELINECOMMENTT "//".*
     return MINUS;
 }  
 {ASTERISK}  {
-    printf("asteri\n");
+    //printf("asteri\n");
     return ASTERISK;
 }                
 {DIVISION}  {
@@ -141,10 +185,10 @@ ONELINECOMMENTT "//".*
     return LESS_EQUALS;
 }         
 {LEFT_BRACE}  {
-    return LEFT_BRACE;
+    yylval.str=yytext;  return LEFT_BRACE;
 } 
 {RIGHT_BRACE}  {
-    return RIGHT_BRACE;
+    yylval.str=yytext;   return RIGHT_BRACE;
 }
 {SEMICOLON}  {
     return SEMICOLON;
@@ -292,8 +336,8 @@ ONELINECOMMENTT "//".*
 
 
 {ID}        {
-    printf("ID \n");
-    return ID;
+    //printf("ID \n");
+    yylval.str=strdup(yytext);     return ID;
 }    
 
 

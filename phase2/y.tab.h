@@ -46,108 +46,111 @@ extern int yydebug;
   enum yytokentype
   {
     NUMBER = 258,
-    IF = 259,
-    ELSE = 260,
-    WHILE = 261,
-    FOR = 262,
-    FUNCTION = 263,
-    RETURN = 264,
-    BREAK = 265,
-    CONTINUE = 266,
-    AND = 267,
-    NOT = 268,
-    OR = 269,
-    LOCAL = 270,
-    TRUE = 271,
-    FALSE = 272,
-    NIL = 273,
-    STRING = 274,
-    ID = 275,
-    EQUALS = 276,
-    PLUS = 277,
-    ASSIGN = 278,
-    MINUS = 279,
-    ASTERISK = 280,
-    DIVISION = 281,
-    PERCENT = 282,
-    DIFFERENT = 283,
-    PLUS_PLUS = 284,
-    MINUS_MINUS = 285,
-    GREATER = 286,
-    LESS = 287,
-    GREATER_EQUALS = 288,
-    LESS_EQUALS = 289,
-    SEMICOLON = 290,
-    COMMA = 291,
-    COLON = 292,
-    DOUBLE_COLON = 293,
-    DOT = 294,
-    Diaeresis = 295,
-    LEFT_BRACE = 296,
-    RIGHT_BRACE = 297,
-    LEFT_SQUARE = 298,
-    RIGHT_SQUARE = 299,
-    LEFT_BRACKETS = 300,
-    RIGHT_BRACKETS = 301
+    REAL = 259,
+    ID = 260,
+    IF = 261,
+    ELSE = 262,
+    WHILE = 263,
+    FOR = 264,
+    FUNCTION = 265,
+    RETURN = 266,
+    BREAK = 267,
+    CONTINUE = 268,
+    AND = 269,
+    NOT = 270,
+    OR = 271,
+    LOCAl = 272,
+    TRUE = 273,
+    FALSE = 274,
+    NIL = 275,
+    STRING = 276,
+    EQUALS = 277,
+    PLUS = 278,
+    ASSIGN = 279,
+    MINUS = 280,
+    ASTERISK = 281,
+    DIVISION = 282,
+    PERCENT = 283,
+    DIFFERENT = 284,
+    PLUS_PLUS = 285,
+    MINUS_MINUS = 286,
+    GREATER = 287,
+    LESS = 288,
+    GREATER_EQUALS = 289,
+    LESS_EQUALS = 290,
+    SEMICOLON = 291,
+    COMMA = 292,
+    COLON = 293,
+    DOUBLE_COLON = 294,
+    DOT = 295,
+    Diaeresis = 296,
+    LEFT_BRACE = 297,
+    RIGHT_BRACE = 298,
+    LEFT_SQUARE = 299,
+    RIGHT_SQUARE = 300,
+    LEFT_BRACKETS = 301,
+    RIGHT_BRACKETS = 302
   };
 #endif
 /* Tokens.  */
 #define NUMBER 258
-#define IF 259
-#define ELSE 260
-#define WHILE 261
-#define FOR 262
-#define FUNCTION 263
-#define RETURN 264
-#define BREAK 265
-#define CONTINUE 266
-#define AND 267
-#define NOT 268
-#define OR 269
-#define LOCAL 270
-#define TRUE 271
-#define FALSE 272
-#define NIL 273
-#define STRING 274
-#define ID 275
-#define EQUALS 276
-#define PLUS 277
-#define ASSIGN 278
-#define MINUS 279
-#define ASTERISK 280
-#define DIVISION 281
-#define PERCENT 282
-#define DIFFERENT 283
-#define PLUS_PLUS 284
-#define MINUS_MINUS 285
-#define GREATER 286
-#define LESS 287
-#define GREATER_EQUALS 288
-#define LESS_EQUALS 289
-#define SEMICOLON 290
-#define COMMA 291
-#define COLON 292
-#define DOUBLE_COLON 293
-#define DOT 294
-#define Diaeresis 295
-#define LEFT_BRACE 296
-#define RIGHT_BRACE 297
-#define LEFT_SQUARE 298
-#define RIGHT_SQUARE 299
-#define LEFT_BRACKETS 300
-#define RIGHT_BRACKETS 301
+#define REAL 259
+#define ID 260
+#define IF 261
+#define ELSE 262
+#define WHILE 263
+#define FOR 264
+#define FUNCTION 265
+#define RETURN 266
+#define BREAK 267
+#define CONTINUE 268
+#define AND 269
+#define NOT 270
+#define OR 271
+#define LOCAl 272
+#define TRUE 273
+#define FALSE 274
+#define NIL 275
+#define STRING 276
+#define EQUALS 277
+#define PLUS 278
+#define ASSIGN 279
+#define MINUS 280
+#define ASTERISK 281
+#define DIVISION 282
+#define PERCENT 283
+#define DIFFERENT 284
+#define PLUS_PLUS 285
+#define MINUS_MINUS 286
+#define GREATER 287
+#define LESS 288
+#define GREATER_EQUALS 289
+#define LESS_EQUALS 290
+#define SEMICOLON 291
+#define COMMA 292
+#define COLON 293
+#define DOUBLE_COLON 294
+#define DOT 295
+#define Diaeresis 296
+#define LEFT_BRACE 297
+#define RIGHT_BRACE 298
+#define LEFT_SQUARE 299
+#define RIGHT_SQUARE 300
+#define LEFT_BRACKETS 301
+#define RIGHT_BRACKETS 302
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 9 "parser.y" /* yacc.c:1909  */
+#line 13 "parser.y" /* yacc.c:1909  */
 
 	int num;
+    float real;
 	char * str;
 
-#line 151 "y.tab.h" /* yacc.c:1909  */
+#line 154 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
