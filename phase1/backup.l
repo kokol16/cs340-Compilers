@@ -1,29 +1,17 @@
 
 %{ 
-<<<<<<< HEAD
 
-#define MY_EOF 0   
-#define YY_DECL int alpha_yylex (void * yylval)
 #include"lib.h"
-FILE *output_file;
 
-
-=======
-#include"lib.h"
 #define MY_EOF 0   
 #include"y.tab.h"
->>>>>>> omorfos
+
 %} 
 
 /*keep current line */
 %option yylineno
-<<<<<<< HEAD
 %option case-insensitive  
 
-=======
-%option case-sensitive  
-%option noyywrap
->>>>>>> omorfos
 
 ID  [a-zA-Z][a-zA-Z_0-9]*
 INT [0-9][0-9]*
@@ -81,9 +69,8 @@ ONELINECOMMENTT "//".*
 /* Rules Section*/
 
 %% 
-<<<<<<< HEAD
 
-IF      {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
+IF      {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"IF",yylineno);alpha_PrintData(tmp ,"<-enumerated" );   }
 
 ELSE    {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"ELSE",yylineno);alpha_PrintData(tmp ,"<-enumerated" );}
 
@@ -161,7 +148,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 } 
 {INT}    {
           alpha_token_t * tmp =    alpha_CreateData("INTCONST",yylval,yytext,yylineno);
-            alpha_PrintData(tmp ,"<-integer" );
+            alpha_PrintData(tmp ,"<-integer" ); return DIGIT;
 
 } 
 {ID}    {
@@ -280,7 +267,7 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
                 if(index==0) /* "" is warning as a zero length string */
                 {
                     print_Yellow();
-                    fprintf(stderr,"warning zero length in line %d string\n",yylineno);
+                    fprintf(stderr,"warning zero length string in line %d \n",yylineno);
                     reset_Yellow();
                 }
                 str[index]='\0';
@@ -390,7 +377,9 @@ NIL     {alpha_token_t * tmp =    alpha_CreateData("KEYWORD",yylval,"NIL",yyline
 \t  {
 
 }
+\v  {
 
+}
 \r  {
     
 }
@@ -481,7 +470,7 @@ void alpha_CreateInfo(void *yylval, char *identifier, char *additional_info, uns
 
 
 int yywrap(void){} 
-
+/*
 int main(int argc , char * argv[]) 
 {    
     if(argc==2)
@@ -516,7 +505,7 @@ int main(int argc , char * argv[])
     alpha_head->alpha_yylex=NULL;
     
 
-    alpha_yylex((void*)alpha_head); 
+    yylex((void*)alpha_head); 
     alpha_free_tokens_list(alpha_head);
     if(output_file!=NULL)
     fclose(output_file);
@@ -524,106 +513,4 @@ int main(int argc , char * argv[])
 
 
     return 0; 
-} 
-=======
-{INT}   {
-        yylval.num=atoi(yytext);  return NUMBER ;
-}
-{PLUS}  {
-    printf("plus \n");
-    return PLUS ; 
-}
-{IF}    {
-    printf("IF \n");
-    return  IF ; 
-}
-{EQUALS}    {
-    printf("find : == \n");
-    return EQUALS ; 
-}
-{LEFT_BRACKETS} {
-    printf("find : ( \n");
-    return LEFT_BRACKETS ; 
-}
-{RIGHT_BRACKETS}    {
-    printf("find : ) \n");
-    return RIGHT_BRACKETS ; 
-}
-{RIGHT_SQUARE}  {
-    printf("right\n");
-    return RIGHT_SQUARE ; 
-}
-{LEFT_SQUARE}   {
-    printf("left\n");
-    return LEFT_SQUARE ; 
-}
-{ELSE}  { 
-    printf("else\n");              
-    return ELSE ; 
-}
-{ASSIGN}  {
-    return ASSIGN;
-}         
-{MINUS}  {
-    return MINUS;
-}  
-{ASTERISK}  {
-    printf("asteri\n");
-    return ASTERISK;
-}                
-{DIVISION}  {
-    return DIVISION;
-}  
-{PERCENT}  {
-    return PERCENT;
-}                
-{DIFFERENT}  {
-    return DIFFERENT;
-}         
-{PLUS_PLUS}  {
-    return PLUS_PLUS;
-}  
-{MINUS_MINUS}  {
-    return MINUS_MINUS;
-}                
-{GREATER}  {
-    return GREATER;
-}         
-{LESS}  {
-    return LESS;
-}         
-{GREATER_EQUALS}  {
-    return GREATER_EQUALS;
-}         
-{LESS_EQUALS}  {
-    return LESS_EQUALS;
-}         
-{LEFT_BRACE}  {
-    return LEFT_BRACE;
-} 
-{RIGHT_BRACE}  {
-    return LEFT_BRACE;
-}
-{SEMICOLON}  {
-    return SEMICOLON;
-}
-{COMMA}  {
-    return COMMA;
-}
-{COLON}  {
-    return COLON;
-}
-{DOUBLE_COLON}  {
-    return DOUBLE_COLON;
-}
-{DOT}  {
-    return DOT;
-}
-{Diaeresis}  {
-    return Diaeresis;
-}
-                
-
-%% 
-
->>>>>>> omorfos
+} */

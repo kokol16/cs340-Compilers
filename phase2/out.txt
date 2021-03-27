@@ -1,0 +1,1 @@
+scope : 0 im_a_lala --> im_a_function2 --> fasd --> okk --> im_a_op -->

@@ -1,11 +1,13 @@
-/*assignexpr*/
-/*|*/ 
-/*| term;*/
+assignexpr
+|expr op expr
+| term;
 
-/*op :'+' | '-' | '*' | '/' | '%' | '>' | ">=" | '<' | "<=" | "==" | "!="
-   ;*/
- /*| and | or*/
-/*+       
+op :'+' | '-' | '*' | '/' | '%' | '>' | ">=" | '<' | "<=" | "==" | "!="
+| and | or
+
+
+
++       
 | - 
 | * 
 | / 
@@ -17,9 +19,10 @@
 | == 
 | != 
 | and 
-| or*/
+| or
 
-/*
+
+
 term : '(' expr ')'
 | - expr
 | not expr
@@ -79,15 +82,6 @@ ifstmt : if '(' expr ')' stmt [ else stmt ]
 whilestmt : while '(' expr ')' stmt
 
 forstmt : for '(' elist; expr; elist'')'' stmt
-returnstmt : return [expr];*/
+returnstmt : return [expr];
 
 
-/*| ifstmt 
-| whilestmt 
-| forstmt 
-| returnstmt
-| break ;
-| continue;
-| block
-| funcdef
-| ;*/

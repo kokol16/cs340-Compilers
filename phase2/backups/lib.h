@@ -40,8 +40,3 @@ unsigned int get_first_line(alpha_comments_info_t *head, unsigned int index);
 void print_comments_info(alpha_comments_info_t *head);
 void alpha_free_comments_list(alpha_comments_info_t *head);
 void push_comments_info(alpha_comments_info_t *head, int first_line,int counter);
-<<<<<<< HEAD
-
-
-=======
->>>>>>> omorfos

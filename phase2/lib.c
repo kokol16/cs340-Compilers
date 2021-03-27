@@ -16,7 +16,27 @@ void print_Red()
  */
 void reset_Red()
 {
+  fprintf(stderr, "\033[0m");
+}
 /**
+ * @brief This method changes output color to yellow
+ * 
+ */
+void print_Yellow()
+{
+  fprintf(stderr, "\033[1;33m");
+}
+
+/**
+ * @brief This method reset output color from yellow to normal
+ * 
+ */
+void reset_Yellow()
+{
+  fprintf(stderr, "\033[0m");
+}
+/**
+ * @brief This method prints the information for the current token
  * 
  * @param node The token that we will print
  * @param extra_type 
