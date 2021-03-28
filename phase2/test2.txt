@@ -1,5 +1,8 @@
+function im_a_lala(arg1,arg2,arg3) {}
 function im_a_lala(arg1) {}
-function im_a_function2(arg1) {}
-function fasd(arg1) {}
-function okk(arg1) {}
-function im_a_op(arg1) {}
+function im_a_lala() {}
+function () {}
+function (lala1,lala2) {}
+
+
+

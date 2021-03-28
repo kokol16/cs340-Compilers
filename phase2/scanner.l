@@ -1,6 +1,7 @@
 
 %{ 
 #include "lib.h"
+
 #define MY_EOF 0   
 #include"y.tab.h"
 %} 
@@ -32,6 +33,7 @@ NIL             nil
 PLUS            "+"
 ASSIGN          "=" 
 MINUS           "-"
+UMINUS          "-"
 ASTERISK        "*"
 DIVISION        "/"
 PERCENT         "%"
@@ -127,12 +129,12 @@ ONELINECOMMENTT "//".*
 }
 {LEFT_BRACKETS} {
     //printf("find : ( \n");
-    yylval.str=yytext;
+     yylval.str=(yytext);
     return LEFT_BRACKETS ; 
 }
 {RIGHT_BRACKETS}    {
     //printf("find : ) \n");
-     yylval.str=yytext;
+      yylval.str=(yytext); 
     return RIGHT_BRACKETS ; 
 }
 {RIGHT_SQUARE}  {
@@ -149,10 +151,11 @@ ONELINECOMMENTT "//".*
 }
 {ASSIGN}  {
     return ASSIGN;
-}         
+}  
 {MINUS}  {
     return MINUS;
 }  
+
 {ASTERISK}  {
     //printf("asteri\n");
     return ASTERISK;
