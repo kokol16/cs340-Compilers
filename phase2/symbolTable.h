@@ -31,7 +31,7 @@ typedef struct SymbolTableEntry
 {
     short  isActive;
     short isScopeListHead;
-    union
+    struct value
     {
         Variable *varVal;
         Function *funcVal;
@@ -52,9 +52,10 @@ static unsigned int SymTable_hash(const char *pcKey);
 SymbolTable  * symbolTable_create();
 short symbolTable_insert( SymbolTable  *symbolTable , SymbolTableEntry *  bucket );
 short symbolTable_hide(  SymbolTable * symbolTable  , unsigned int scope);
-SymbolTableEntry * symbolTable_lookup( SymbolTable * symbolTable , unsigned int  scope );
+SymbolTableEntry * symbolTable_lookup_scope( SymbolTable * symbolTable , unsigned int  scope );
 SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable );
 SymbolTableEntry *symbolTable_lookup_head(SymbolTable *symbolTable, unsigned int scope);
+short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope , const char * name);
 
 void symbolTable_print(SymbolTable *symbolTable);
 
@@ -67,5 +68,8 @@ void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope);
 static short  load_lib_functions(SymbolTable *symtable);
 Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned int scope , unsigned int line);
 void print_args(Function * func);
+SymbolTableEntry ** create_arguments_buckets(Variable ** arguments , unsigned int size );
+short symbolTable_insert_args(SymbolTable * symTable, SymbolTableEntry ** arg_buckets ,unsigned int size );
+
 
 // function lala

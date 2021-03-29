@@ -25,7 +25,7 @@ CONTINUE        continue
 AND             and     
 NOT             not 
 OR              or 
-LOCAl           local 
+LOCALL          local 
 TRUE            true 
 FALSE           false 
 NIL             nil
@@ -102,8 +102,8 @@ ONELINECOMMENTT "//".*
 {OR}       {
       return OR ;
 }
-{LOCAl}       {
-      return LOCAl ;
+{LOCALL}       {
+      return LOCALL ;
 }
 {TRUE}       {
       return TRUE ;
@@ -188,7 +188,7 @@ ONELINECOMMENTT "//".*
     return LESS_EQUALS;
 }         
 {LEFT_BRACE}  {
-    yylval.str=yytext;  return LEFT_BRACE;
+   yylval.str=strdup(yytext);  return LEFT_BRACE;
 } 
 {RIGHT_BRACE}  {
     yylval.str=yytext;   return RIGHT_BRACE;

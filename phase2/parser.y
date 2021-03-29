@@ -4,6 +4,7 @@
 #include "lib.h"
 extern FILE * yyin;
 extern int yylineno; 
+int func_line=0;
 SymbolTable *  symbolTable;
 FILE *output_file;
 int yylex(void);
@@ -20,7 +21,7 @@ unsigned int  scope=0;
 %token <num> NUMBER
 %token <real> REAL
 %token <str> ID
-%token  <str>  IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCAl TRUE FALSE NIL STRING EQUALS PLUS
+%token  <str>  IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCALL TRUE FALSE NIL STRING EQUALS PLUS
 %token <str>ASSIGN MINUS UMINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
 %token <str>SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
 %right ASSIGN
@@ -87,8 +88,18 @@ primary:  lvalue
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS 
           | const ;
 
-lvalue:   ID
-          | LOCAl ID
+lvalue:   ID                    
+          | LOCALL ID            {   SymbolTableEntry * bucket;
+                                    Variable * var  ;       
+                                    printf("%s\n",$2);               
+
+                                    var = create_var($2,scope,yylineno);
+                                    if(scope!=0) bucket=create_bucket_var( 1 ,  var  ,LOCAL );
+                                    else bucket=create_bucket_var( 1 ,  var  ,GLOBAL );
+                                    if (!symbolTable_lookup_exists(symbolTable,  scope,(const char*)$2) )
+                                    symbolTable_insert(symbolTable, bucket);
+
+                                }
           | DOUBLE_COLON ID
           | member ;
 
@@ -122,42 +133,72 @@ indexed:    indexedelem
 
 indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE;
 
-block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {scope--;}       
-       |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {scope--;} ;  
+block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {symbolTable_hide(symbolTable, scope); scope--;}       
+       |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {symbolTable_hide(symbolTable, scope); scope--;} ;  
        
-block_func: LEFT_BRACE  RIGHT_BRACE  {scope--;}       
-       |LEFT_BRACE   statements  RIGHT_BRACE {scope--;} ;  
+block_func: LEFT_BRACE  RIGHT_BRACE  {symbolTable_hide(symbolTable, scope); scope--;}       
+       |LEFT_BRACE   statements  RIGHT_BRACE {symbolTable_hide(symbolTable, scope); scope--;} ;  
   
 
-funcdef: FUNCTION  ID LEFT_BRACKETS {scope++;}  idlist RIGHT_BRACKETS block_func {
+funcdef: FUNCTION {func_line=yylineno;}  ID LEFT_BRACKETS {scope++;}  idlist RIGHT_BRACKETS block_func {
                                                                     Function * func;
                                                                     Variable **arguments;
+                                                                    SymbolTableEntry ** arguments_buckets;
                                                                     unsigned int size;
-                                                                    arguments=sanitize_arguments((char*)$3, &size,scope,yylineno);
+                                                                    printf("%s\n",$3);
+                                                                    arguments=sanitize_arguments((char*)$4, &size,scope,func_line);
+                                                                    printf("scope : %d ,line : %d\n",scope,func_line);
                                                                     SymbolTableEntry * bucket;
-                                                                    func=create_func($2 , scope , yylineno,arguments,size);
-                                                                    free(arguments);
+                                                                    func=create_func($3 , scope , func_line,arguments,size);
+
                                                                     bucket=create_bucket_func( 1 ,  func  ,USERFUNC );
                                                                     print_args(func);
-                                                                    symbolTable_insert(symbolTable, bucket);
+                                                                    if (!symbolTable_lookup_exists(symbolTable,  scope,(const char*)$3) )
+                                                                    {
+                                                                        if(arguments!=NULL)//no argumens provided
+                                                                        {
+                                                                            arguments_buckets=create_arguments_buckets(arguments,size);
+                                                                            symbolTable_insert_args(symbolTable ,arguments_buckets,size);
+                                                                        }
+                                                                       
+                                                                        symbolTable_insert(symbolTable, bucket);
+
+                                                                    } 
+                                                                    //free(arguments);
+
+
                                                                     }
                                                                 
          |FUNCTION LEFT_BRACKETS {scope++;} idlist RIGHT_BRACKETS block_func {
-                                                                    Function * func;
+                                                                      Function * func;
                                                                     Variable **arguments;
+                                                                    SymbolTableEntry ** arguments_buckets;
                                                                     unsigned int size;
+
                                                                     arguments=sanitize_arguments((char*)$2, &size,scope,yylineno);
                                                                     SymbolTableEntry * bucket;
                                                                     func=create_func(NULL , scope , yylineno,arguments,size);
-                                                                    free(arguments);
                                                                     bucket=create_bucket_func( 1 ,  func  ,USERFUNC );
+                                                                    //print_args(func);
                                                                     print_args(func);
-                                                                    symbolTable_insert(symbolTable, bucket);};
+
+                                                                    if(arguments!=NULL)//no argumens provided
+                                                                    {
+                                                                        arguments_buckets=create_arguments_buckets(arguments,size);
+                                                                        symbolTable_insert_args(symbolTable ,arguments_buckets,size);
+                                                                    }
+                                                                       
+                                                                    symbolTable_insert(symbolTable, bucket);
+
+                                                                     
+                                                                    //free(arguments);
+                                                                    }
+
 
 const: NUMBER | STRING | NIL | TRUE | FALSE;
 
 idlist: ID  {}
-        | ID COMMA idlist { printf("multtiple arguemnts\n");}
+        | ID COMMA idlist { }
         |   ;
 
 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt   { printf("if statement\n"); }
@@ -213,8 +254,8 @@ int main(int argc , char * argv[])
     //yylex();
     //yyin=stdin;
     yyparse() ;
-    //symbolTable_print(symbolTable);
-    symbolTable_print_scope_list(symbolTable, 0);
+    symbolTable_print(symbolTable);
+    //symbolTable_print_scope_list(symbolTable, 0);
 
     //if(output_file!=NULL)
     //fclose(output_file);
