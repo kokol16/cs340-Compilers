@@ -1,1 +1,8 @@
-scope : 0 im_a_lala --> im_a_function2 --> fasd --> okk --> im_a_op -->
+lala2222
+scope : 1 a -->
+scope : 2 z -->
+scope : 3
+func name : 3
+
+func name : 3
+

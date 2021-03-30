@@ -12,7 +12,8 @@ int yyerror( char * msg );
 unsigned int  scope=0;
 
 %}
-%union{
+%union {
+    
 	int num;
     float real;
 	char * str;
@@ -24,25 +25,30 @@ unsigned int  scope=0;
 %token  <str>  IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCALL TRUE FALSE NIL STRING EQUALS PLUS
 %token <str>ASSIGN MINUS UMINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
 %token <str>SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
+
 %right ASSIGN
 %left OR
 %left AND 
 %nonassoc EQUALS DIFFERENT  
 %nonassoc GREATER GREATER_EQUALS LESS_EQUALS LESS
 %left PLUS MINUS
-%left ASTERISK  PERCENT
+%left ASTERISK  PERCENT DIVISION
 %right NOT PLUS_PLUS MINUS_MINUS UMINUS
 %left DOT Diaeresis
 %left LEFT_SQUARE RIGHT_SQUARE
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
+/*%type <num> expr
+%type <num> assignexpr
+%type <num> term*/
+
 %%         
 program: statements   ;
-stmt:   expr SEMICOLON   {printf("colon end\n");}  /*trexei xwris to SEMICOLON*/
+stmt:   expr SEMICOLON   {}  /*trexei xwris to SEMICOLON*/
         | ifstmt 
         | whilestmt 
         | forstmt 
-        | returnstmt
+        | returnstmt 
         | BREAK SEMICOLON
         | CONTINUE SEMICOLON
         | block
@@ -53,22 +59,21 @@ statements: statements stmt
             |stmt;
 
 expr:   assignexpr
-        |expr op expr
+        |expr PLUS expr
+        |expr MINUS expr
+        |expr ASTERISK expr
+        |expr DIVISION expr
+        |expr PERCENT expr
+        |expr GREATER expr
+        |expr GREATER_EQUALS expr
+        |expr LESS  expr
+        |expr LESS_EQUALS expr
+        |expr EQUALS expr
+        |expr DIFFERENT expr
+        |expr AND expr
+        |expr OR expr
         | term;
 
-op:     PLUS
-        | MINUS 
-        | ASTERISK 
-        | DIVISION
-        | PERCENT 
-        | GREATER 
-        | GREATER_EQUALS 
-        | LESS 
-        | LESS_EQUALS 
-        | EQUALS 
-        | DIFFERENT
-        | AND 
-        | OR;
         
 
 term:   LEFT_BRACKETS expr RIGHT_BRACKETS
@@ -80,7 +85,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
         | lvalue MINUS_MINUS
         | primary ;
 
-assignexpr: lvalue ASSIGN expr  {printf("assign\n");}
+assignexpr: lvalue ASSIGN expr  {}
 
 primary:  lvalue
           | call
@@ -88,19 +93,68 @@ primary:  lvalue
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS 
           | const ;
 
-lvalue:   ID                    
-          | LOCALL ID            {   SymbolTableEntry * bucket;
+lvalue:   ID                    {
+                                    SymbolTableEntry * bucket;
                                     Variable * var  ;       
-                                    printf("%s\n",$2);               
+                                    //printf("%s\n",$2);               
+                                    //fprintf(stderr,"$1 : %s  scope : %d line : %d\n",$1,scope,yylineno);
+                                    var = create_var($1,scope,yylineno);
+                                    if(scope!=0) bucket=create_bucket_var( 1 ,  var  ,LOCAL );
+                                    else bucket=create_bucket_var( 1 ,  var  ,GLOBAL );
+                                
+                                    if(!symbolTable_lookup_exists(symbolTable,scope,(char * )$1))
+                                    {
+                                            symbolTable_insert(symbolTable ,bucket );   
+                                    }
+                                    else
+                                    {
+                                        //printf("im here for : %s in line %d in scope %d \n", $1,yylineno,(scope-1));
+                                        if (!symbolTable_lookup_exists_exact_scope(symbolTable,0,$1)  && symbolTable_lookup_function(symbolTable , scope-1))
+                                        {
+
+                                            print_Red(); fprintf(stderr,"error no access to this variable in line :%d \n",yylineno); reset_Red();
+                                        }
+                                        //eisai prosbasimos?
+                                        
+                                    }
+
+                                
+                                
+                                }
+          | LOCALL ID           {  
+                                    printf("lala2222\n");
+                                    
+                                    SymbolTableEntry * bucket;
+                                    Variable * var  ;       
+                                    //printf("%s\n",$2);               
 
                                     var = create_var($2,scope,yylineno);
                                     if(scope!=0) bucket=create_bucket_var( 1 ,  var  ,LOCAL );
                                     else bucket=create_bucket_var( 1 ,  var  ,GLOBAL );
-                                    if (!symbolTable_lookup_exists(symbolTable,  scope,(const char*)$2) )
-                                    symbolTable_insert(symbolTable, bucket);
+                                    if (!symbolTable_lookup_exists_exact_scope(symbolTable,  scope,(const char*)$2)    )                               
+                                    {
+                                        if(is_library_func(symbolTable,(const char*)$2) ) 
+                                        {
+                                            print_Red(); fprintf(stderr,"error conflict with library function in line :%d \n",yylineno); reset_Red();
+                                        }
+                                        else
+                                        {
+                                            symbolTable_insert(symbolTable, bucket);
+
+                                        }
+                                    }
+                                   
+                                        //error 
+
 
                                 }
-          | DOUBLE_COLON ID
+          | DOUBLE_COLON ID     {   
+                                    if(!symbolTable_lookup_exists_exact_scope(symbolTable,0,(char*)$2) ) {
+                                    print_Red(); 
+                                    fprintf(stderr,"global variable doesnt exist\n"); 
+                                    reset_Red();
+                                    }
+                                }
           | member ;
 
 member:    lvalue DOT ID
@@ -122,10 +176,10 @@ methodcall:    Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS; /* equivalent to
 elist:   expr    
         | expr COMMA elist
         |    ;
-
+            
 objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE
            |LEFT_SQUARE  indexed  RIGHT_SQUARE
-           |LEFT_SQUARE RIGHT_SQUARE ;
+           |LEFT_SQUARE  RIGHT_SQUARE ;
 
 indexed:    indexedelem  
             | indexedelem COMMA  indexed
@@ -140,20 +194,20 @@ block_func: LEFT_BRACE  RIGHT_BRACE  {symbolTable_hide(symbolTable, scope); scop
        |LEFT_BRACE   statements  RIGHT_BRACE {symbolTable_hide(symbolTable, scope); scope--;} ;  
   
 
-funcdef: FUNCTION {func_line=yylineno;}  ID LEFT_BRACKETS {scope++;}  idlist RIGHT_BRACKETS block_func {
+funcdef: FUNCTION   ID {func_line=yylineno;} LEFT_BRACKETS {scope++;}  idlist RIGHT_BRACKETS block_func {
                                                                     Function * func;
                                                                     Variable **arguments;
                                                                     SymbolTableEntry ** arguments_buckets;
                                                                     unsigned int size;
-                                                                    printf("%s\n",$3);
+                                                                   // printf("%s\n",);
                                                                     arguments=sanitize_arguments((char*)$4, &size,scope,func_line);
-                                                                    printf("scope : %d ,line : %d\n",scope,func_line);
+                                                                    //printf("scope : %d ,line : %d\n",scope,func_line);
                                                                     SymbolTableEntry * bucket;
-                                                                    func=create_func($3 , scope , func_line,arguments,size);
-
+                                                                    printf("func name : %d\n",USERFUNC);
+                                                                    func=create_func($2 , scope , func_line,arguments,size);
                                                                     bucket=create_bucket_func( 1 ,  func  ,USERFUNC );
                                                                     print_args(func);
-                                                                    if (!symbolTable_lookup_exists(symbolTable,  scope,(const char*)$3) )
+                                                                    if (!symbolTable_lookup_exists(symbolTable,  scope,(const char*)$2) )
                                                                     {
                                                                         if(arguments!=NULL)//no argumens provided
                                                                         {
@@ -170,7 +224,7 @@ funcdef: FUNCTION {func_line=yylineno;}  ID LEFT_BRACKETS {scope++;}  idlist RIG
                                                                     }
                                                                 
          |FUNCTION LEFT_BRACKETS {scope++;} idlist RIGHT_BRACKETS block_func {
-                                                                      Function * func;
+                                                                    Function * func;
                                                                     Variable **arguments;
                                                                     SymbolTableEntry ** arguments_buckets;
                                                                     unsigned int size;
@@ -197,18 +251,18 @@ funcdef: FUNCTION {func_line=yylineno;}  ID LEFT_BRACKETS {scope++;}  idlist RIG
 
 const: NUMBER | STRING | NIL | TRUE | FALSE;
 
-idlist: ID  {}
-        | ID COMMA idlist { }
+idlist: ID  { /*printf("%s:",$1); printf("lineee2 : %d\n",yylineno);*/}
+        | ID { /*printf("%s:",$1); printf( "lineee : %d\n",yylineno)*/ }  COMMA idlist { /*printf("lineee : %d\n",yylineno);*/ }
         |   ;
 
-ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt   { printf("if statement\n"); }
+ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt   { /*printf("if statement\n");*/ }
         | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt; 
 whilestmt: WHILE LEFT_BRACKETS expr RIGHT_BRACKETS stmt;
 
 forstmt:  FOR LEFT_BRACKETS elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt;
 
-returnstmt: RETURN expr {printf("return\n");} 
-            |  RETURN;
+returnstmt: RETURN expr SEMICOLON {/*printf("return\n");*/} 
+            |  RETURN SEMICOLON;
 
 
 %%
@@ -254,8 +308,8 @@ int main(int argc , char * argv[])
     //yylex();
     //yyin=stdin;
     yyparse() ;
-    symbolTable_print(symbolTable);
-    //symbolTable_print_scope_list(symbolTable, 0);
+    //symbolTable_print(symbolTable);
+    //symbolTable_print_scope_list(symbolTable, 1);
 
     //if(output_file!=NULL)
     //fclose(output_file);

@@ -1,6 +1,6 @@
 #include "symbolTable.h"
 #include "lib.h"
-unsigned int SIZE = 1;
+unsigned int SIZE = 15;
 SymbolTable *symbolTable_create()
 {
     unsigned int i = 0;
@@ -17,7 +17,7 @@ SymbolTable *symbolTable_create()
 }
 static short load_lib_functions(SymbolTable *symtable)
 {
-    /*
+    
     unsigned int size;
     Variable **arguments = sanitize_arguments("lala", &size, 0, 0);
     Function *func_print = create_func("print", 0, 0, arguments, size);
@@ -57,7 +57,7 @@ static short load_lib_functions(SymbolTable *symtable)
     symbolTable_insert(symtable, strtonum_bucket);
     symbolTable_insert(symtable, sqrt_bucket);
     symbolTable_insert(symtable, cos_bucket);
-    symbolTable_insert(symtable, sin_bucket);*/
+    symbolTable_insert(symtable, sin_bucket);
 
     return 1;
 }
@@ -85,9 +85,11 @@ Variable *create_var(const char *name, unsigned int scope, unsigned int line)
     int length = strlen(name) + 1;
     var->name = malloc(sizeof(char) * length);
     memcpy((void *)var->name, name, length * sizeof(char));
+
     var->scope = scope;
     var->line = line;
     var->next_arg = NULL;
+
     return var;
 }
 Function *create_func(const char *name, unsigned int scope, unsigned int line, Variable **arguments, unsigned int arg_size)
@@ -380,7 +382,7 @@ short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope, co
                     fprintf(stderr, "error librady function name exists : %s\n ", name);
                 else
                 {
-                    fprintf(stderr, "error function  with same  name exists : %s\n", name);
+                    //fprintf(stderr, "error function  with same  name exists : %s\n", name);
                 }
                 reset_Red();
 
@@ -390,9 +392,36 @@ short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope, co
             {
                 print_Red();
 
-                fprintf(stderr, "error variable  with same  name exists : %s\n", name);
+                //fprintf(stderr, "error variable  with same  name exists : %s\n", name);
 
                 reset_Red();
+                return 1;
+            }
+        }
+        bucket = bucket->next;
+    }
+
+    return 0;
+}
+
+short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned int scope, const char *name)
+{
+    unsigned int index;
+    SymbolTableEntry *bucket;
+    index = SymTable_hash(name);
+    bucket = symbolTable->symboltable[index];
+    while (bucket != NULL)
+    {
+        if (bucket->isActive)
+        {
+            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->value.funcVal->scope == scope && bucket->isActive)
+            {
+
+                return 1;
+            }
+            else if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->value.varVal->scope == scope && bucket->isActive)
+            {
+
                 return 1;
             }
         }
@@ -443,7 +472,41 @@ short symbolTable_insert_args(SymbolTable *symTable, SymbolTableEntry **arg_buck
     return 1;
 }
 
+short is_library_func(SymbolTable *symTable ,const char *name)
+{
+        unsigned int index =SymTable_hash(name);
+        SymbolTableEntry * head =symTable->symboltable[index];
+        while(head!=NULL )
+        {
+            if(head->type==LIBFUNC && strcmp(name,head->value.funcVal->name)==0)
+            {
+                return 1;   
+            }
+            head=head->next;
+        }
+
+
+    return 0;
+}
+short symbolTable_lookup_function(SymbolTable *symTable ,unsigned int scope)
+{
+    unsigned int i = 0;
+    SymbolTableEntry *head, *tmp;
+    head = symbolTable_lookup_head(symTable, scope);
+    tmp = head;
+    while (tmp != NULL)
+    {
+        fprintf(stdout, "scope : %d name  : %d \n", scope ,tmp->value);
+        if(tmp->type==USERFUNC)
+        {
+            return 1;
+        }
+        tmp = tmp->next_same_scope;
+    }
+    return 0;
+}
 //static short  create_function_arguments_list(Function * func , )
+
 Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned int scope, unsigned int line)
 {
     Variable **arguments_array = NULL;
@@ -466,9 +529,10 @@ Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned 
     while (ptr != NULL)
     {
         size++;
-        printf("lala : %s\n", ptr);
         ptr = strtok(NULL, delim);
     }
+        
+
     if (size == 0)
     {
         return NULL;
@@ -481,7 +545,7 @@ Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned 
     }
     *arg_size = size;
     ptr = strtok(tmp_args, delim);
-    while (ptr !=NULL)
+    while (ptr != NULL)
     {
         arguments_array[arg_index] = create_var(ptr, scope, line);
         //printf("'%s'\n", arguments_array[arg_index]->name);

@@ -70,6 +70,8 @@ Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned 
 void print_args(Function * func);
 SymbolTableEntry ** create_arguments_buckets(Variable ** arguments , unsigned int size );
 short symbolTable_insert_args(SymbolTable * symTable, SymbolTableEntry ** arg_buckets ,unsigned int size );
-
+short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned int scope, const char *name);
+short is_library_func(SymbolTable *symTable ,const char *name);
+short symbolTable_lookup_function(SymbolTable *symTable ,unsigned int scope);
 
 // function lala

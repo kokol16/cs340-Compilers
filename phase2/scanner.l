@@ -62,9 +62,12 @@ Diaeresis       ".."
 
 
 ONELINECOMMENTT "//".*         
-/* Rules Section*/
+/* Rules Section*/      
 
 %% 
+{ONELINECOMMENTT} {
+
+}
 {FUNCTION}    {
     //printf("FUNCTION \n");
      yylval.str=yytext;
