@@ -2,7 +2,8 @@
 #include<stdio.h> 
 #include<string.h> 
 #define HASH_MULTIPLIER 65599
-
+#define ERROR_FUNC 2
+#define ERROR_VAR 3 
 typedef struct Variable
 {
     const char *name;
@@ -61,7 +62,7 @@ void symbolTable_print(SymbolTable *symbolTable);
 
 
 Variable * create_var(const char *name,unsigned int scope,unsigned int line);
-Function * create_func(const char *name , unsigned int scope , unsigned int line , Variable ** arguments , unsigned int arg_size);
+Function * create_func(const char *name , unsigned int scope , unsigned int line  );
 SymbolTableEntry *  create_bucket_var( short  isActive , Variable  * var  , enum SymbolType type  );
 SymbolTableEntry *  create_bucket_func( short  isActive , Function *  func  , enum SymbolType type  );
 void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope);

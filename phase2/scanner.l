@@ -333,12 +333,93 @@ ONELINECOMMENTT "//".*
 
             }
             
-            //free(str);
         yylval.str = malloc(sizeof(char)* (strlen(str)+1 ))    ;
         memcpy( yylval.str  , str ,strlen(str)+1 );
+        free(str);
         return STRING;
 
 } 
+
+"/*"    {
+    /* line_comment to multi_line_comment?? */
+    int c;
+    int nested=0;
+    unsigned int opened_comments=1;/*probably don't need this */   
+    //alpha_comments_info_t * head;
+    //head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
+    //head->next=NULL;
+    //head->first_line =yylineno;
+    //head->is_closed=0;
+    //unsigned int counter=0;
+    while((c=input())>MY_EOF )
+    {
+        if(c=='*')
+        {
+            if((c=input())=='/' )
+            {
+                /* mark that the current comment closed */
+               // alpha_comments_info_t * curr_node = get_node(head,counter);
+            //    if(curr_node!=NULL)
+            //    curr_node->is_closed=1;
+
+            //    unsigned int first_line= get_first_line(head,counter);
+            //    alpha_token_t * tmp;
+                if(counter==0)
+                {
+            //        tmp = alpha_CreateData("COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
+                else
+                {
+            //        tmp = alpha_CreateData("NESTED COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
+            //    alpha_PrintData(tmp ,"<-enumerated" );
+                if(counter==0)break;
+               
+                counter--;
+            //    opened_comments--;  
+            }
+            else
+            {
+                unput(c);
+            }
+        }
+        else if(c=='/')
+        {
+            if((c=input())=='*' )
+            {
+                
+              //  opened_comments++;
+               // push_comments_info(head,yylineno,counter);
+                counter++;
+            }
+            else
+            {
+                unput(c);
+            }
+        }
+    }
+    /* if(c<=MY_EOF)  comment never closed 
+    {
+        alpha_comments_info_t * tmp=head;
+        print_Red();
+        while(tmp!=NULL)
+        {
+            if(tmp->is_closed==0) print all the unclosed comments 
+            {
+                
+                fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+
+            }
+            tmp=tmp->next;
+        
+        }
+        reset_Red();
+
+    }
+    alpha_free_comments_list(head);*/
+}
 
 
 {ID}        {

@@ -1,6 +1,7 @@
 #include "symbolTable.h"
 #include "lib.h"
-unsigned int SIZE = 15;
+unsigned int SIZE = 10;
+
 SymbolTable *symbolTable_create()
 {
     unsigned int i = 0;
@@ -20,18 +21,18 @@ static short load_lib_functions(SymbolTable *symtable)
     
     unsigned int size;
     Variable **arguments = sanitize_arguments("lala", &size, 0, 0);
-    Function *func_print = create_func("print", 0, 0, arguments, size);
-    Function *func_input = create_func("input", 0, 0, arguments, size);
-    Function *func_objectmemberkeys = create_func("objectmemberkeys", 0, 0, arguments, size);
-    Function *func_objecttotalmembers = create_func("objecttotalmembers", 0, 0, arguments, size);
-    Function *func_objectcopy = create_func("objectcopy", 0, 0, arguments, size);
-    Function *func_totalarguments = create_func("totalarguments", 0, 0, arguments, size);
-    Function *func_argument = create_func("argument", 0, 0, arguments, size);
-    Function *func_typeof = create_func(" typeof", 0, 0, arguments, size);
-    Function *func_strtonum = create_func("strtonum", 0, 0, arguments, size);
-    Function *func_sqrt = create_func("sqrt", 0, 0, arguments, size);
-    Function *func_cos = create_func("cos", 0, 0, arguments, size);
-    Function *func_sin = create_func("sin", 0, 0, arguments, size);
+    Function *func_print = create_func("print", 0, 0 );
+    Function *func_input = create_func("input", 0, 0 );
+    Function *func_objectmemberkeys = create_func("objectmemberkeys", 0, 0 );
+    Function *func_objecttotalmembers = create_func("objecttotalmembers", 0, 0 );
+    Function *func_objectcopy = create_func("objectcopy", 0, 0 );
+    Function *func_totalarguments = create_func("totalarguments", 0, 0 );
+    Function *func_argument = create_func("argument", 0, 0 );
+    Function *func_typeof = create_func(" typeof", 0, 0 );
+    Function *func_strtonum = create_func("strtonum", 0, 0 );
+    Function *func_sqrt = create_func("sqrt", 0, 0 );
+    Function *func_cos = create_func("cos", 0, 0 );
+    Function *func_sin = create_func("sin", 0, 0 );
 
     SymbolTableEntry *print_bucket = create_bucket_func(1, func_print, LIBFUNC);
     SymbolTableEntry *input_bucket = create_bucket_func(1, func_input, LIBFUNC);
@@ -92,7 +93,7 @@ Variable *create_var(const char *name, unsigned int scope, unsigned int line)
 
     return var;
 }
-Function *create_func(const char *name, unsigned int scope, unsigned int line, Variable **arguments, unsigned int arg_size)
+Function *create_func(const char *name, unsigned int scope, unsigned int line)
 {
     static unsigned int counter = 1;
     unsigned int index = 0;
@@ -126,7 +127,7 @@ Function *create_func(const char *name, unsigned int scope, unsigned int line, V
     func->line = line;
     func->arg_head = NULL;
     //Think abou doing memcpy instead of = and free the arguments array
-    if (arguments != NULL)
+   /* if (arguments != NULL)
     {
         while (index < arg_size)
         {
@@ -148,7 +149,7 @@ Function *create_func(const char *name, unsigned int scope, unsigned int line, V
 
             index++;
         }
-    }
+    }*/
 
     return func;
 }
@@ -259,6 +260,7 @@ void symbolTable_print(SymbolTable *symbolTable)
         tmp = symbolTable->symboltable[i];
         while (tmp != NULL)
         {
+
             fprintf(stdout, "status : %d", tmp->isActive);
             fprintf(stdout, " type : %d", tmp->type);
             (tmp->value.funcVal == NULL) ? print_var(tmp->value.varVal) : print_func(tmp->value.funcVal);
@@ -374,28 +376,17 @@ short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope, co
     {
         if (bucket->isActive)
         {
-            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->value.funcVal->scope <= scope)
+            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->value.funcVal->scope <= scope )
             {
-                print_Red();
+              
 
-                if (bucket->type == LIBFUNC)
-                    fprintf(stderr, "error librady function name exists : %s\n ", name);
-                else
-                {
-                    //fprintf(stderr, "error function  with same  name exists : %s\n", name);
-                }
-                reset_Red();
-
-                return 1;
+                return ERROR_FUNC;
             }
             else if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->value.varVal->scope <= scope)
             {
-                print_Red();
+               
 
-                //fprintf(stderr, "error variable  with same  name exists : %s\n", name);
-
-                reset_Red();
-                return 1;
+                return ERROR_VAR;
             }
         }
         bucket = bucket->next;
@@ -414,15 +405,15 @@ short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned i
     {
         if (bucket->isActive)
         {
-            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->value.funcVal->scope == scope && bucket->isActive)
+            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->value.funcVal->scope == scope )
             {
 
-                return 1;
+                return ERROR_FUNC;
             }
-            else if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->value.varVal->scope == scope && bucket->isActive)
+            else if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->value.varVal->scope == scope)
             {
 
-                return 1;
+                return ERROR_VAR;
             }
         }
         bucket = bucket->next;
@@ -496,7 +487,7 @@ short symbolTable_lookup_function(SymbolTable *symTable ,unsigned int scope)
     tmp = head;
     while (tmp != NULL)
     {
-        fprintf(stdout, "scope : %d name  : %d \n", scope ,tmp->value);
+        //fprintf(stdout, "scope : %d name  : %d \n", scope ,tmp->value);
         if(tmp->type==USERFUNC)
         {
             return 1;

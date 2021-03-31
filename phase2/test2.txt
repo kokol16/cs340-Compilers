@@ -1,17 +1,14 @@
-x = y = 1; //new variables x, y
-{ 
-        x = 2; //ok, refers to global x 
-        a = 3; //new var a in scope 1 
-        function f() { 
-                local z;
-                x = 4; //ok, refers to global x
-                a = 5; //error: cannot access 
-                //a in scope 1 
-                y = 6; //ok, refers to global y 
-                { 
-                        z = 7; //ok, refers to formal 
-                        function g() { return z; } 
-                        //error: cannot access z 
-                } 
-        } 
-} 
+local print+1;
+function f() { // f in scope 0
+function f() {}// f in scope 1
+f=3;
+//function f() {}//error: f exists
+
+}
+x = 1; /* lsdlsdl*/
+y;
+function x() {} //error: x is var
+function sin() {} //error: func
+//shadows libfunc
+y(1, 2); //new variable y, not
+//function y
