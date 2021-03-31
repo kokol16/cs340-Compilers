@@ -1,0 +1,23 @@
+
+
+
+=============== scope #0=====================
+ "print" [library function] (line 0) (scope 0) (active 1)
+ "input" [library function] (line 0) (scope 0) (active 1)
+ "objectmemberkeys" [library function] (line 0) (scope 0) (active 1)
+ "objecttotalmembers" [library function] (line 0) (scope 0) (active 1)
+ "objectcopy" [library function] (line 0) (scope 0) (active 1)
+ "totalarguments" [library function] (line 0) (scope 0) (active 1)
+ "argument" [library function] (line 0) (scope 0) (active 1)
+ "typeof" [library function] (line 0) (scope 0) (active 1)
+ "strtonum" [library function] (line 0) (scope 0) (active 1)
+ "sqrt" [library function] (line 0) (scope 0) (active 1)
+ "cos" [library function] (line 0) (scope 0) (active 1)
+ "sin" [library function] (line 0) (scope 0) (active 1)
+=============== scope #1=====================
+=============== scope #2=====================
+ "x" [local variable] (line  5) (scope 2) (active 0)
+ "a" [user function] (line 7) (scope 2) (active 0)
+=============== scope #3=====================
+ "b" [user function] (line 9) (scope 3) (active 0)
+ "c" [user function] (line 14) (scope 3) (active 0)

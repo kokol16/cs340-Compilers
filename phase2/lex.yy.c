@@ -860,7 +860,7 @@ case 4:
 YY_RULE_SETUP
 #line 80 "scanner.l"
 {
-     yylval.real=atof(yytext); return REAL ;
+     yylval.num=atof(yytext); return NUMBER ;
 }
 	YY_BREAK
 case 5:

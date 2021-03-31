@@ -78,7 +78,7 @@ ONELINECOMMENTT "//".*
         yylval.num=atoi(yytext);  return NUMBER ;
 }
 {REAL}       {
-     yylval.real=atof(yytext); return REAL ;
+     yylval.num=atof(yytext); return NUMBER ;
 }
 {WHILE}       {
       return WHILE ;

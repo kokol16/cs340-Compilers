@@ -1,14 +1,9 @@
-local print+1;
-function f() { // f in scope 0
-function f() {}// f in scope 1
-f=3;
-//function f() {}//error: f exists
+x = input();
+ function g(x, y) {
+ local z = x + y;
+ print(z);
+ return(function f(a, b) {
+ return a + b;
+ });
+ }
 
-}
-x = 1; /* lsdlsdl*/
-y;
-function x() {} //error: x is var
-function sin() {} //error: func
-//shadows libfunc
-y(1, 2); //new variable y, not
-//function y

@@ -46,114 +46,112 @@ extern int yydebug;
   enum yytokentype
   {
     NUMBER = 258,
-    REAL = 259,
-    ID = 260,
-    IF = 261,
-    ELSE = 262,
-    WHILE = 263,
-    FOR = 264,
-    FUNCTION = 265,
-    RETURN = 266,
-    BREAK = 267,
-    CONTINUE = 268,
-    AND = 269,
-    NOT = 270,
-    OR = 271,
-    LOCALL = 272,
-    TRUE = 273,
-    FALSE = 274,
-    NIL = 275,
-    STRING = 276,
-    EQUALS = 277,
-    PLUS = 278,
-    ASSIGN = 279,
-    MINUS = 280,
-    UMINUS = 281,
-    ASTERISK = 282,
-    DIVISION = 283,
-    PERCENT = 284,
-    DIFFERENT = 285,
-    PLUS_PLUS = 286,
-    MINUS_MINUS = 287,
-    GREATER = 288,
-    LESS = 289,
-    GREATER_EQUALS = 290,
-    LESS_EQUALS = 291,
-    SEMICOLON = 292,
-    COMMA = 293,
-    COLON = 294,
-    DOUBLE_COLON = 295,
-    DOT = 296,
-    Diaeresis = 297,
-    LEFT_BRACE = 298,
-    RIGHT_BRACE = 299,
-    LEFT_SQUARE = 300,
-    RIGHT_SQUARE = 301,
-    LEFT_BRACKETS = 302,
-    RIGHT_BRACKETS = 303
+    ID = 259,
+    IF = 260,
+    ELSE = 261,
+    WHILE = 262,
+    FOR = 263,
+    FUNCTION = 264,
+    RETURN = 265,
+    BREAK = 266,
+    CONTINUE = 267,
+    AND = 268,
+    NOT = 269,
+    OR = 270,
+    LOCALL = 271,
+    TRUE = 272,
+    FALSE = 273,
+    NIL = 274,
+    STRING = 275,
+    EQUALS = 276,
+    PLUS = 277,
+    ASSIGN = 278,
+    MINUS = 279,
+    UMINUS = 280,
+    ASTERISK = 281,
+    DIVISION = 282,
+    PERCENT = 283,
+    DIFFERENT = 284,
+    PLUS_PLUS = 285,
+    MINUS_MINUS = 286,
+    GREATER = 287,
+    LESS = 288,
+    GREATER_EQUALS = 289,
+    LESS_EQUALS = 290,
+    SEMICOLON = 291,
+    COMMA = 292,
+    COLON = 293,
+    DOUBLE_COLON = 294,
+    DOT = 295,
+    Diaeresis = 296,
+    LEFT_BRACE = 297,
+    RIGHT_BRACE = 298,
+    LEFT_SQUARE = 299,
+    RIGHT_SQUARE = 300,
+    LEFT_BRACKETS = 301,
+    RIGHT_BRACKETS = 302
   };
 #endif
 /* Tokens.  */
 #define NUMBER 258
-#define REAL 259
-#define ID 260
-#define IF 261
-#define ELSE 262
-#define WHILE 263
-#define FOR 264
-#define FUNCTION 265
-#define RETURN 266
-#define BREAK 267
-#define CONTINUE 268
-#define AND 269
-#define NOT 270
-#define OR 271
-#define LOCALL 272
-#define TRUE 273
-#define FALSE 274
-#define NIL 275
-#define STRING 276
-#define EQUALS 277
-#define PLUS 278
-#define ASSIGN 279
-#define MINUS 280
-#define UMINUS 281
-#define ASTERISK 282
-#define DIVISION 283
-#define PERCENT 284
-#define DIFFERENT 285
-#define PLUS_PLUS 286
-#define MINUS_MINUS 287
-#define GREATER 288
-#define LESS 289
-#define GREATER_EQUALS 290
-#define LESS_EQUALS 291
-#define SEMICOLON 292
-#define COMMA 293
-#define COLON 294
-#define DOUBLE_COLON 295
-#define DOT 296
-#define Diaeresis 297
-#define LEFT_BRACE 298
-#define RIGHT_BRACE 299
-#define LEFT_SQUARE 300
-#define RIGHT_SQUARE 301
-#define LEFT_BRACKETS 302
-#define RIGHT_BRACKETS 303
+#define ID 259
+#define IF 260
+#define ELSE 261
+#define WHILE 262
+#define FOR 263
+#define FUNCTION 264
+#define RETURN 265
+#define BREAK 266
+#define CONTINUE 267
+#define AND 268
+#define NOT 269
+#define OR 270
+#define LOCALL 271
+#define TRUE 272
+#define FALSE 273
+#define NIL 274
+#define STRING 275
+#define EQUALS 276
+#define PLUS 277
+#define ASSIGN 278
+#define MINUS 279
+#define UMINUS 280
+#define ASTERISK 281
+#define DIVISION 282
+#define PERCENT 283
+#define DIFFERENT 284
+#define PLUS_PLUS 285
+#define MINUS_MINUS 286
+#define GREATER 287
+#define LESS 288
+#define GREATER_EQUALS 289
+#define LESS_EQUALS 290
+#define SEMICOLON 291
+#define COMMA 292
+#define COLON 293
+#define DOUBLE_COLON 294
+#define DOT 295
+#define Diaeresis 296
+#define LEFT_BRACE 297
+#define RIGHT_BRACE 298
+#define LEFT_SQUARE 299
+#define RIGHT_SQUARE 300
+#define LEFT_BRACKETS 301
+#define RIGHT_BRACKETS 302
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 15 "parser.y" /* yacc.c:1909  */
+#line 16 "parser.y" /* yacc.c:1909  */
 
     
-	int num;
-    float real;
+	float num;
+    //float real;
 	char * str;
 
-#line 157 "y.tab.h" /* yacc.c:1909  */
+#line 155 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
