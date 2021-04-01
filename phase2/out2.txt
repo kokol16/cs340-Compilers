@@ -14,10 +14,14 @@
  "sqrt" [library function] (line 0) (scope 0) (active 1)
  "cos" [library function] (line 0) (scope 0) (active 1)
  "sin" [library function] (line 0) (scope 0) (active 1)
+ "f" [user function] (line 3) (scope 0) (active 1)
 =============== scope #1=====================
+ "f" [user function] (line 4) (scope 1) (active 0)
 =============== scope #2=====================
- "x" [local variable] (line  5) (scope 2) (active 0)
- "a" [user function] (line 7) (scope 2) (active 0)
 =============== scope #3=====================
- "b" [user function] (line 9) (scope 3) (active 0)
- "c" [user function] (line 14) (scope 3) (active 0)
+=============== scope #4=====================
+=============== scope #5=====================
+=============== scope #6=====================
+=============== scope #7=====================
+=============== scope #8=====================
+=============== scope #9=====================

@@ -384,6 +384,7 @@ SymbolTableEntry *symbolTable_lookup_head(SymbolTable *symbolTable, unsigned int
     }
     return NULL;
 }
+/* na tin allaxw na diatrexei tin lista twn scopes*/
 SymbolTableEntry *symbolTable_lookup_scope(SymbolTable *symbolTable, unsigned int scope)
 {
     unsigned int i = 0;
@@ -465,24 +466,24 @@ short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned i
 {
     unsigned int index;
     SymbolTableEntry *bucket;
-    index = SymTable_hash(name);
-    bucket = symbolTable->symboltable[index];
+    //index = SymTable_hash(name);
+    bucket = symbolTable_lookup_head(symbolTable,scope) ;
     while (bucket != NULL)
     {
         if (bucket->isActive)
         {
-            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->value.funcVal->scope == scope)
+            if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 )
             {
 
                 return ERROR_FUNC;
             }
-            else if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->value.varVal->scope == scope)
+            else if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 )
             {
 
                 return ERROR_VAR;
             }
         }
-        bucket = bucket->next;
+        bucket = bucket->next_same_scope;
     }
 
     return 0;
@@ -700,4 +701,33 @@ Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned 
     //printf("size : %u \n", *arg_size);
 
     return arguments_array;
+}
+SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable, char * name )
+{
+    unsigned int i=0,index=0;
+    double  prev_scope=-1;
+    SymbolTableEntry * head , *tmp =NULL;
+        index= SymTable_hash(name);
+        head= symbolTable->symboltable[index];
+        while(head!=NULL)
+        {
+            if(head->isActive && head->value.funcVal!=NULL  && strcmp (head->value.funcVal->name , name )==0 && prev_scope <head->value.funcVal->scope )
+            {
+                prev_scope= head->value.funcVal->scope;
+                tmp=head;
+            }
+            else if(head->isActive && head->value.varVal!=NULL  && strcmp (head->value.varVal->name , name )==0 && prev_scope <head->value.varVal->scope)
+            {
+                prev_scope= head->value.varVal->scope;
+                tmp=head;
+            }
+            head=head->next;
+        }
+    return tmp;
+}
+
+short is_function(SymbolTableEntry * lvalue)
+{
+    if(lvalue->value.funcVal!=NULL){return 1;}
+    return 0;
 }

@@ -57,6 +57,10 @@ short symbolTable_hide(  SymbolTable * symbolTable  , unsigned int scope);
 SymbolTableEntry * symbolTable_lookup_scope( SymbolTable * symbolTable , unsigned int  scope );
 SymbolTableEntry *  symbolTable_lookup_scopeless_var( SymbolTable * symbolTable, char * );
 SymbolTableEntry *symbolTable_lookup_head(SymbolTable *symbolTable, unsigned int scope);
+
+
+SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable, char * );
+
 short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope , const char * name);
 
 void symbolTable_print(SymbolTable *symbolTable);
@@ -83,4 +87,7 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
 SymbolTableEntry * last_func_inserted_in_current_scope(SymbolTable *symtable,  unsigned int scope);
 double  find_bucket_scope( SymbolTable * symbolTable  , char * name);
 
+
+
 // function lala
+short is_function(SymbolTableEntry * lvalue);

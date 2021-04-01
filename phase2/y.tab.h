@@ -144,9 +144,9 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 16 "parser.y" /* yacc.c:1909  */
+#line 19 "parser.y" /* yacc.c:1909  */
 
-    
+    struct SymbolTableEntry * exprNode;
 	float num;
     //float real;
 	char * str;
