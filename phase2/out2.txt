@@ -1,6 +1,9 @@
-
-
-
+[x]
+[x][y]
+[x][y][z]
+[g]
+[g][x]
+[x]
 =============== scope #0=====================
  "print" [library function] (line 0) (scope 0) (active 1)
  "input" [library function] (line 0) (scope 0) (active 1)
@@ -14,11 +17,19 @@
  "sqrt" [library function] (line 0) (scope 0) (active 1)
  "cos" [library function] (line 0) (scope 0) (active 1)
  "sin" [library function] (line 0) (scope 0) (active 1)
- "f" [user function] (line 3) (scope 0) (active 1)
+ "g" [user function] (line 1) (scope 0) (active 1)
 =============== scope #1=====================
- "f" [user function] (line 4) (scope 1) (active 0)
+ "x" [formal argument] (line  1) (scope 1) (active 0)
+ "y" [formal argument] (line  1) (scope 1) (active 0)
+ "z" [formal argument] (line  1) (scope 1) (active 0)
+ "m" [user function] (line 3) (scope 1) (active 0)
 =============== scope #2=====================
+ "g" [formal argument] (line  3) (scope 2) (active 0)
+ "x" [formal argument] (line  3) (scope 2) (active 0)
+ "t" [user function] (line 5) (scope 2) (active 0)
 =============== scope #3=====================
+ "x" [formal argument] (line  5) (scope 3) (active 0)
+ "f" [user function] (line 8) (scope 3) (active 0)
 =============== scope #4=====================
 =============== scope #5=====================
 =============== scope #6=====================

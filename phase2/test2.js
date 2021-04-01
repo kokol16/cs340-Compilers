@@ -1,5 +1,13 @@
-function g()
+function g(x , y , z ,x )
 {
-    local x=6;
-    local x=3;
+    function m( g, x )
+    {
+        function t(x , print  ,x )
+        {
+           not t();
+           function f() {;}
+
+        }
+    }
 }
+

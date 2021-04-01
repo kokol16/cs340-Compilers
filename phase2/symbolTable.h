@@ -88,6 +88,6 @@ SymbolTableEntry * last_func_inserted_in_current_scope(SymbolTable *symtable,  u
 double  find_bucket_scope( SymbolTable * symbolTable  , char * name);
 
 
-
+short create_argument(SymbolTable *symtable, char *argument, unsigned int scope);
 // function lala
 short is_function(SymbolTableEntry * lvalue);
