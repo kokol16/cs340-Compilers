@@ -766,3 +766,63 @@ short is_function(SymbolTableEntry *lvalue)
     }
     return 0;
 }
+
+short is_argument(SymbolTableEntry *func)
+{
+}
+
+int push(function_stack **root, SymbolTableEntry *func)
+{
+    function_stack *stack_entry = malloc(sizeof(function_stack));
+    stack_entry->func = func;
+    stack_entry->next = NULL;
+
+    if (*root == NULL)
+    {
+        *root = stack_entry;
+        return 1;
+    }
+
+    stack_entry->next = *root;
+    *root = stack_entry;
+    return 1;
+}
+
+int pop(function_stack **root)
+{
+    if (*root == NULL)
+    {
+        return 0;
+    }
+    *root = (*root)->next;
+    return 1;
+}
+
+SymbolTableEntry *top(function_stack *root)
+{
+    if (root != NULL)
+    {
+        return root->func;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+void print_stack(function_stack *root)
+{
+    function_stack *tmp = root;
+    if (root == NULL)
+    {
+        fprintf(stderr, "wtf\n");
+    }
+
+    while (tmp != NULL)
+    {
+        fprintf(stderr, " %s", tmp->func->value.funcVal->name);
+        tmp = tmp->next;
+    }
+    fprintf(stderr, "\n");
+
+}

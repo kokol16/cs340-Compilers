@@ -48,6 +48,16 @@ typedef struct SymbolTable
 {
     SymbolTableEntry **symboltable;
 } SymbolTable;
+
+typedef struct function_stack
+{
+  SymbolTableEntry * func;
+  struct function_stack * next;
+} function_stack;
+
+
+
+
 static unsigned int SymTable_hash(const char *pcKey);
 
 
@@ -87,7 +97,11 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
 SymbolTableEntry * last_func_inserted_in_current_scope(SymbolTable *symtable,  unsigned int scope);
 double  find_bucket_scope( SymbolTable * symbolTable  , char * name);
 
-
+short is_argument( SymbolTableEntry * func);
 short create_argument(SymbolTable *symtable, char *argument, unsigned int scope);
 // function lala
 short is_function(SymbolTableEntry * lvalue);
+int  push(function_stack ** root ,SymbolTableEntry * func);
+int  pop(function_stack ** root  );
+SymbolTableEntry *  top(function_stack * root );
+void print_stack(function_stack * root);

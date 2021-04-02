@@ -853,14 +853,14 @@ case 3:
 YY_RULE_SETUP
 #line 77 "scanner.l"
 {
-        yylval.num=atoi(yytext);  return NUMBER ;
+        yylval.intigerVal =atoi(yytext);  return INTEGER ;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 80 "scanner.l"
 {
-     yylval.num=atof(yytext); return NUMBER ;
+     yylval.floatVal=atof(yytext); return FLOAT ;
 }
 	YY_BREAK
 case 5:

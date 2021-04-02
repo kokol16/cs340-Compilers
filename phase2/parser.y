@@ -1,7 +1,6 @@
 %{
-#include"symbolTable.h"
+#include "bison_functions.h"
 #include <stdio.h>
-#include "lib.h"
 extern FILE * yyin;
 extern int yylineno; 
 int func_line=0;
@@ -13,18 +12,21 @@ int yyerror( char * msg );
 unsigned int  scope=0;
 unsigned int iam_in_function=0;
 unsigned int iam_in_loop=0;
+function_stack * functions_stack=NULL;
 
 
 %}
 %union {
     struct SymbolTableEntry * exprNode;
-	float num;
+	float floatVal;
+    int intigerVal;
     //float real;
 	char * str;
 }
 %start program
-%token <num> NUMBER
 %token <str> ID
+%token <intigerVal> INTEGER
+%token <floatVar> FLOAT
 %token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCALL TRUE FALSE NIL STRING EQUALS PLUS
 %token ASSIGN MINUS UMINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
 %token SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
@@ -41,24 +43,26 @@ unsigned int iam_in_loop=0;
 %left LEFT_SQUARE RIGHT_SQUARE
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
-%type <exprNode> lvalue
-%type<exprNode> expr 
-//%type <str> member
-/*%type <num> assignexpr
+%type <exprNode> lvalue 
+/*%type <exprNode> funcdef 
+%type <exprNode> call  
+%type <exprNode> member  
+
+%type <num> assignexpr
 %type <num> term*/
 
 %%         
 program: statements   ;
 stmt:   expr SEMICOLON   {printf("Statement\n");}  
-        | ifstmt         {printf("If Statement\n");}
-        | whilestmt      {printf("While Statement\n");}
+        | ifstmt         {print_to_stream("If Statement");  }
+        | whilestmt      {print_to_stream("While Statement");}
         | forstmt        {printf("For Statement\n");}
         | returnstmt     {printf("Return Statement\n");}
         | BREAK SEMICOLON {         if(iam_in_loop==0)
                                     {
                                         print_Red(); 
 
-                                        fprintf(stderr,"error:BREAK not in a loop in line %d\n",yylineno); 
+                                        fprintf(stderr,"Error in line %d: use BREAK not in a loop\n",yylineno); 
                                        reset_Red();
                                     } 
         
@@ -67,7 +71,7 @@ stmt:   expr SEMICOLON   {printf("Statement\n");}
                                     {
                                         print_Red(); 
 
-                                        fprintf(stderr,"error:CONTINUE not in a loop in line %d\n",yylineno); 
+                                        fprintf(stderr,"Error in line %d:use CONTINUE not in a loop\n",yylineno); 
                                        reset_Red();
                                     } 
                             }
@@ -98,24 +102,12 @@ expr:   assignexpr {printf("Assign expression\n");}
 
 term:   LEFT_BRACKETS expr RIGHT_BRACKETS
         | MINUS expr %prec UMINUS  {  
-                                            if(is_function($2) )
-                                            {
-                                                print_Red();
-                                                fprintf(stderr, "Error in line %d: can't use unary operator -  to function\n",yylineno);
-                                                reset_Red();
-
-                                            }
+                                           
 
         }
                                            
         
-        | NOT expr{                         if(is_function($2) )
-                                            {
-                                                print_Red();
-                                                fprintf(stderr, "Error in line %d: can't use not operator to function\n",yylineno);
-                                                reset_Red();
-
-                                            }
+        | NOT expr{                        
                                            
         }
         | PLUS_PLUS lvalue  {               if(is_function($2) )
@@ -151,7 +143,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
         }
         | primary ;
 
-assignexpr: lvalue  ASSIGN  expr {
+assignexpr: lvalue  ASSIGN  expr    {
                                         if(is_function($1))
                                         {
                                             print_Red();
@@ -159,7 +151,7 @@ assignexpr: lvalue  ASSIGN  expr {
                                             reset_Red();
                                         }    
                                         
-                                                }  
+                                    }  
     
                                    
 
@@ -170,175 +162,23 @@ primary:  lvalue
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS 
           | const ;
 
-lvalue:   ID                    {   
-                                    SymbolTableEntry * bucket=    symbolTable_lookup_scopeless(symbolTable,$1);
-                                    if(bucket==NULL)
-                                    {
-                                        Variable * var  ;       
-                                  
-                                        var = create_var($1,scope,yylineno);
-                                        if(scope!=0) bucket=create_bucket_var( 1 ,  var  ,LOCAL );
-                                        else bucket=create_bucket_var( 1 ,  var  ,GLOBAL );
-                                        symbolTable_insert(symbolTable ,bucket );   
-                                    }
-                                    else
-                                    {
-                                        $$=bucket;
-
-                                    }
-                                    if(is_function(bucket)){
-                                        //tipota
-                                    }
-                                    if(!is_function(bucket)&&bucket->value.varVal->scope==0){
-                                        //tipota
-                                    }
-                                    unsigned int tmp_scope=1,func_scope=-1,id_scope;
-                                        short  is_function_blocking=1;
-                                        while(tmp_scope<scope)
-                                        {
-                                            if (symbolTable_lookup_function(symbolTable , tmp_scope) )
-                                            {
-                                                func_scope=tmp_scope;
-
-                                            }
-                                            tmp_scope++;
-                                        }
-                                        //fprintf(stderr, "fun scope : %d\n",func_scope);
-                                        if(func_scope==-1) is_function_blocking=0;
-                                        else
-                                        {
-                                            id_scope =find_bucket_scope(symbolTable,$1);
-                                            //fprintf(stderr, "id scope : %d\n",id_scope);
-
-                                            if(id_scope==-1) { fprintf(stderr,"lalalala\n"); is_function_blocking=1;}
-                                            else if(id_scope <= func_scope) {is_function_blocking=1;}
-                                            else is_function_blocking=0;
-                                        }   
-
-
-                                    if(!is_function(bucket)&&bucket->value.varVal->scope<=scope&&is_function_blocking&&bucket->value.varVal->scope!=0)
-                                    {
-                                        print_Red(); 
-                                        fprintf(stderr,"Error in line %d: no access to variable  %s \n",yylineno,$1); 
-                                        reset_Red();
-                                    }
-
-                                   /*  fprintf(stderr, "ID \n");  
-                                    SymbolTableEntry * bucket;
-                                    Variable * var  ;       
-                                  
-                                    var = create_var($1,scope,yylineno);
-                                    if(scope!=0) bucket=create_bucket_var( 1 ,  var  ,LOCAL );
-                                    else bucket=create_bucket_var( 1 ,  var  ,GLOBAL );
-                                
-                                    if(symbolTable_lookup_exists(symbolTable,scope,(char * )$1)==0)
-                                    {
-
-                                            symbolTable_insert(symbolTable ,bucket );   
-                                    }
-                                    else
-                                    {
-                                        //if (symbolTable_lookup_exists_exact_scope(symbolTable,0,$1)==0  && symbolTable_lookup_function(symbolTable , scope-1) 
-                                        //&& symbolTable_lookup_exists_exact_scope(symbolTable,scope,$1)==0  )
-                                        unsigned int tmp_scope=1,func_scope=-1,id_scope;
-                                        short  is_function_blocking=1;
-                                        while(tmp_scope<scope)
-                                        {
-                                            if (symbolTable_lookup_function(symbolTable , tmp_scope) )
-                                            {
-                                                func_scope=tmp_scope;
-
-                                            }
-                                            tmp_scope++;
-                                        }
-                                        //fprintf(stderr, "fun scope : %d\n",func_scope);
-                                        if(func_scope==-1) is_function_blocking=0;
-                                        else
-                                        {
-                                            id_scope =find_bucket_scope(symbolTable,$1);
-                                            //fprintf(stderr, "id scope : %d\n",id_scope);
-
-                                            if(id_scope==-1) { fprintf(stderr,"lalalala\n"); is_function_blocking=1;}
-                                            else if(id_scope <= func_scope) {is_function_blocking=1;}
-                                            else is_function_blocking=0;
-                                        }   
-
-
-                                        if (symbolTable_lookup_exists_exact_scope(symbolTable,0,$1)==0 || symbolTable_lookup_exists_exact_scope(symbolTable,0,$1)==ERROR_FUNC
-                                         && is_function_blocking )
-                                        {
-                                                if ( !is_library_func(symbolTable,$1) )
-                                                {
-                                                    print_Red(); 
-                                                    fprintf(stderr,"error no access to this variable  %s in line :%d \n",$1,yylineno); 
-                                                    reset_Red();
-
-                                                }
-                                        }
-                                        //eisai prosbasimos?
-                                        
-                                    }*/
-
-                                
-                                
-                                }
-          | LOCALL ID           {  
-                                    
-                                    SymbolTableEntry * bucket;
-                                    Variable * var  ;       
-                                    //printf("%s\n",$2);               
-
-                                    var = create_var($2,scope,yylineno);
-                                    if(scope!=0) bucket=create_bucket_var( 1 ,  var  ,LOCAL );
-                                    else bucket=create_bucket_var( 1 ,  var  ,GLOBAL );
-                                    if (symbolTable_lookup_exists_exact_scope(symbolTable,  scope,(const char*)$2)==0    )                               
-                                    {
-                                        if(is_library_func(symbolTable,(const char*)$2) ) 
-                                        {
-                                            print_Red(); fprintf(stderr,"Error in line %d: conflict with library function\n",yylineno); reset_Red();
-                                        }
-                                        else
-                                        {
-                                            //fprintf(stderr,"eisai otti nane  %s  line %d\n", bucket->value.varVal->name , yylineno);
-
-                                           // printf("%d\n",symbolTable_insert(symbolTable, bucket));
-                                            $$=bucket;
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                           
-                                        $$=symbolTable_lookup_scope(symbolTable,scope);//iparxon
-                                        
-
-                                    }
-                                    
-                                   
-
-
-                                }
-          | DOUBLE_COLON ID     {   
-                                    if(symbolTable_lookup_exists_exact_scope(symbolTable,0,(char*)$2)==0 ) {
-                                    print_Red(); 
-                                    fprintf(stderr,"Error in line %d:global variable doesn't exist\n",yylineno); 
-                                    reset_Red();
-                                    }
-                                }
-          | member ;
+lvalue:   ID                    {process_id(symbolTable,scope,yylineno,$1,iam_in_function,&functions_stack,$$);}
+          | LOCALL ID           { process_local_id(symbolTable,  scope,  yylineno, $2,  iam_in_function,  $$);}
+          | DOUBLE_COLON ID     { process_double_colon_id(symbolTable,$2,yylineno); }             
+          | member {$$=NULL;} ; //alliws apaiteitai typos gia to member
 
 member:    lvalue DOT ID
             | lvalue LEFT_SQUARE expr RIGHT_SQUARE
             | call DOT ID
             | call LEFT_SQUARE expr RIGHT_SQUARE ;
 
-call:      call LEFT_BRACKETS elist RIGHT_BRACKETS
+call:      call LEFT_BRACKETS elist RIGHT_BRACKETS  
             | lvalue callsuffix {  if(!is_function($1) ) {
                                     print_Red(); 
-                                    fprintf(stderr,"Error in line %d: can't use variable as function\n",yylineno); 
+                                    fprintf(stderr,"Error in line %d : can't use variable as function\n",yylineno); 
                                     reset_Red();
             }            }
-            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS;
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS ;
 
 callsuffix: normcall
             | methodcall ;
@@ -349,11 +189,11 @@ methodcall:    Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS; /* equivalent to
 
 elist:   expr    
         | expr COMMA elist
-        |    ;
+        |    ;  
             
-objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE
-           |LEFT_SQUARE  indexed  RIGHT_SQUARE
-           |LEFT_SQUARE  RIGHT_SQUARE ;
+objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {   printf("elist\n");    }
+           |LEFT_SQUARE  indexed  RIGHT_SQUARE {   printf("indexed\n");    };
+           
 
 indexed:    indexedelem  
             | indexedelem COMMA  indexed
@@ -364,111 +204,37 @@ indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE;
 block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {symbolTable_hide(symbolTable, scope); scope--;}       
        |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {symbolTable_hide(symbolTable, scope); scope--;} ;  
        
-block_func: LEFT_BRACE {iam_in_function++;}  RIGHT_BRACE  {symbolTable_hide(symbolTable, scope); scope--; iam_in_function--;}       
-       |LEFT_BRACE {iam_in_function++;}    statements  RIGHT_BRACE {symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--; } ;  
+block_func: LEFT_BRACE {iam_in_function++;}  RIGHT_BRACE  {symbolTable_hide(symbolTable, scope); scope--; iam_in_function--;printf("lala\n"); 
+pop(&functions_stack); printf("lala\n");}       
+       |LEFT_BRACE {iam_in_function++;}    statements  RIGHT_BRACE {symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
+       printf("lala\n"); pop(&functions_stack); printf("lala2\n"); } ;  
   
 
-funcdef: FUNCTION   ID  {
-                            Function * func;
-                            SymbolTableEntry * bucket;
-                            func=create_func($2 , scope , yylineno);
-                            bucket=create_bucket_func( 1 ,  func  ,USERFUNC );
-                            short status = symbolTable_lookup_exists_exact_scope(symbolTable,scope,$2);
-                            if(is_library_func(symbolTable,$2))
-                            {
-                                    print_Red(); 
-                                    fprintf(stderr,"Error in line %d: formal argument shadows libfunc\n",yylineno); 
-                                    reset_Red();
-                            }
-                            else if (status==ERROR_FUNC )
-                            {
-                                    print_Red(); 
-                                    fprintf(stderr,"Error in line %d: function %s already exists\n",yylineno,$2); 
-                                    reset_Red();
-                            }
-                            else if(status==ERROR_VAR)
-                            {
-                                print_Red(); 
-                                fprintf(stderr,"Error in line %d: %s is variable\n" ,yylineno,$2); 
-                                reset_Red();
+funcdef: FUNCTION   ID  { process_function_id(symbolTable,  scope,  yylineno, $2,  iam_in_function, &functions_stack  );
 
-                            }
-                            else 
-                            {
-                                //fprintf(stderr,"staus : %d\n",status);
-                                symbolTable_insert(symbolTable, bucket);
-                            }
-                            
-
-
-                        } LEFT_BRACKETS {scope++;}  idlist {  /*create_arguments(symbolTable,$4,scope);*/      }  RIGHT_BRACKETS  block_func {
-
-                                                                 
-
-
-                                                                    }
+                        } LEFT_BRACKETS {scope++;}  idlist   RIGHT_BRACKETS  block_func 
                                                                 
-         |FUNCTION {Function * func;
-                            SymbolTableEntry * bucket;
-                            func=create_func(NULL , scope , yylineno);
-                            bucket=create_bucket_func( 1 ,  func  ,USERFUNC );
-                            symbolTable_insert(symbolTable, bucket);
-                                                }
-                            LEFT_BRACKETS {scope++;} idlist {  /*create_arguments(symbolTable,$3,scope);*/    } RIGHT_BRACKETS block_func 
-                                                                    {
-                                                                    
-                                                                    }
+         |FUNCTION {   process_anonymous_function(symbolTable,  scope,  yylineno, &functions_stack); 
 
+                            }
+                            LEFT_BRACKETS {scope++;} idlist RIGHT_BRACKETS block_func 
+                                                                  
 
-const: NUMBER | STRING | NIL | TRUE | FALSE;
+const:  INTEGER {printf("Integer\n");};
+        |FLOAT  {printf("Float\n");};
+        | STRING 
+        | NIL 
+        | TRUE 
+        | FALSE;
 
-idlist: ID  {                       SymbolTableEntry * bucket;
-                                    Variable * var  ;       
-                                    var = create_var($1,scope,yylineno);
-                                    bucket=create_bucket_var( 1 ,  var  ,FORMAL );
-                                    if(is_library_func(symbolTable,$1)){
-                                        print_Red(); 
+idlist: ID  {  process_function_arguments(symbolTable,scope,yylineno,$1);                     
 
-                                        fprintf(stderr,"Error in line %d:formal argument shadows libfunc\n",yylineno); 
-                                       reset_Red();
-                                    }
-                                    else  if(symbolTable_lookup_exists_exact_scope(symbolTable,scope,$1)!=0){
-                                        print_Red(); 
-
-                                       fprintf(stderr,"Error in line %d:formal argument redeclaration\n",yylineno); 
-                                       reset_Red();
-
-                                     } 
-                                     else{
-                                       symbolTable_insert(symbolTable,bucket);
-                                       create_argument(symbolTable, $1,  scope);
-                                     }    
                                            
             }
-        | ID {                      SymbolTableEntry * bucket;
-                                    Variable * var  ;       
-                                    var = create_var($1,scope,yylineno);
-                                    bucket=create_bucket_var( 1 ,  var  ,FORMAL );
-                                     if(symbolTable_lookup_exists_exact_scope(symbolTable,scope,$1)!=0){
-                                        print_Red(); 
-                                       fprintf(stderr,"Error in line %d:formal argument redeclaration\n",yylineno); 
-                                       reset_Red();
-                                     }else if(is_library_func(symbolTable,$1)){
-                                        print_Red(); 
-
-                                        fprintf(stderr,"Error in line %d:formal argument shadows libfunc\n",yylineno); 
-                                       reset_Red();
-
-                                     }else{
-                                       symbolTable_insert(symbolTable,bucket);
-                                       create_argument(symbolTable, $1,  scope);
-
-                                     }   
-
-                                   
-                                    }  COMMA idlist { /*printf("lineee : %d\n",yylineno);*/ }
+            |   ID {                   process_function_arguments(symbolTable,scope,yylineno,$1); 
+            }  COMMA idlist
         
-        |   ;
+            |   ;
 
 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt   { /*printf("if statement\n");*/ }
         | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt; 

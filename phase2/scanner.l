@@ -75,10 +75,10 @@ ONELINECOMMENTT "//".*
 }
 
 {INT}       {
-        yylval.num=atoi(yytext);  return NUMBER ;
+        yylval.intigerVal =atoi(yytext);  return INTEGER ;
 }
 {REAL}       {
-     yylval.num=atof(yytext); return NUMBER ;
+     yylval.floatVal=atof(yytext); return FLOAT ;
 }
 {WHILE}       {
       return WHILE ;
