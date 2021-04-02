@@ -42,18 +42,18 @@ unsigned int iam_in_loop=0;
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
 %type <exprNode> lvalue
-%type<exprNode> expr assignexpr term member
+%type<exprNode> expr 
 //%type <str> member
 /*%type <num> assignexpr
 %type <num> term*/
 
 %%         
 program: statements   ;
-stmt:   expr SEMICOLON   {}  /*trexei xwris to SEMICOLON*/
-        | ifstmt 
-        | whilestmt 
-        | forstmt 
-        | returnstmt 
+stmt:   expr SEMICOLON   {printf("Statement\n");}  
+        | ifstmt         {printf("If Statement\n");}
+        | whilestmt      {printf("While Statement\n");}
+        | forstmt        {printf("For Statement\n");}
+        | returnstmt     {printf("Return Statement\n");}
         | BREAK SEMICOLON {         if(iam_in_loop==0)
                                     {
                                         print_Red(); 
@@ -72,13 +72,13 @@ stmt:   expr SEMICOLON   {}  /*trexei xwris to SEMICOLON*/
                                     } 
                             }
         | block
-        | funcdef
+        | funcdef           {printf("Function definition\n");}
         |SEMICOLON
         ;
 statements: statements stmt
             |stmt;
 
-expr:   assignexpr
+expr:   assignexpr {printf("Assign expression\n");}
         |expr PLUS expr
         |expr MINUS expr
         |expr ASTERISK expr
@@ -101,7 +101,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
                                             if(is_function($2) )
                                             {
                                                 print_Red();
-                                                fprintf(stderr, "error can't use unary operator -  to function in line %d\n",yylineno);
+                                                fprintf(stderr, "Error in line %d: can't use unary operator -  to function\n",yylineno);
                                                 reset_Red();
 
                                             }
@@ -112,7 +112,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
         | NOT expr{                         if(is_function($2) )
                                             {
                                                 print_Red();
-                                                fprintf(stderr, "error can't use NOT operator to function in line %d\n",yylineno);
+                                                fprintf(stderr, "Error in line %d: can't use not operator to function\n",yylineno);
                                                 reset_Red();
 
                                             }
@@ -121,7 +121,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
         | PLUS_PLUS lvalue  {               if(is_function($2) )
                                             {
                                                 print_Red();
-                                                fprintf(stderr, "error can't use ++  to function in line %d\n",yylineno);
+                                                fprintf(stderr, "Error in line %d: can't use ++ operator to function\n",yylineno);
                                                 reset_Red();
 
                                             }
@@ -129,7 +129,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
         | lvalue PLUS_PLUS  {               if(is_function($1) )
                                             {
                                                 print_Red();
-                                                fprintf(stderr, "error  can't use ++ to function in line %d\n",yylineno);
+                                                fprintf(stderr, "Error in line %d: can't use ++ to function\n",yylineno);
                                                 reset_Red();
                                             }
                             }
@@ -137,7 +137,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
                                             if(is_function($2) )
                                             {
                                                 print_Red();
-                                                fprintf(stderr, "error  can't use -- to function in line %d\n",yylineno);
+                                                fprintf(stderr, "Error in line %d: can't use -- to function\n",yylineno);
                                                 reset_Red();
                                             }
         }
@@ -145,7 +145,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS
                                             if(is_function($1) )
                                             {
                                                 print_Red();
-                                                fprintf(stderr, "error  can't use -- to function in line %d\n",yylineno);
+                                                fprintf(stderr, "Error in line %d: can't use -- to function\n",yylineno);
                                                 reset_Red();
                                             }
         }
@@ -155,7 +155,7 @@ assignexpr: lvalue  ASSIGN  expr {
                                         if(is_function($1))
                                         {
                                             print_Red();
-                                            fprintf(stderr, "error assign to function in line %d\n",yylineno);
+                                            fprintf(stderr, "Error in line %d: assign to function\n",yylineno);
                                             reset_Red();
                                         }    
                                         
@@ -216,9 +216,10 @@ lvalue:   ID                    {
                                         }   
 
 
-                                    if(!is_function(bucket)&&bucket->value.varVal->scope<=scope&&is_function_blocking&&bucket->value.varVal->scope!=0){
+                                    if(!is_function(bucket)&&bucket->value.varVal->scope<=scope&&is_function_blocking&&bucket->value.varVal->scope!=0)
+                                    {
                                         print_Red(); 
-                                        fprintf(stderr,"error no access to this variable  %s in line :%d \n",$1,yylineno); 
+                                        fprintf(stderr,"Error in line %d: no access to variable  %s \n",yylineno,$1); 
                                         reset_Red();
                                     }
 
@@ -294,13 +295,13 @@ lvalue:   ID                    {
                                     {
                                         if(is_library_func(symbolTable,(const char*)$2) ) 
                                         {
-                                            print_Red(); fprintf(stderr,"error conflict with library function in line :%d \n",yylineno); reset_Red();
+                                            print_Red(); fprintf(stderr,"Error in line %d: conflict with library function\n",yylineno); reset_Red();
                                         }
                                         else
                                         {
-                                            fprintf(stderr,"eisai otti nane  %s  line %d\n", bucket->value.varVal->name , yylineno);
+                                            //fprintf(stderr,"eisai otti nane  %s  line %d\n", bucket->value.varVal->name , yylineno);
 
-                                            printf("%d\n",symbolTable_insert(symbolTable, bucket));
+                                           // printf("%d\n",symbolTable_insert(symbolTable, bucket));
                                             $$=bucket;
 
                                         }
@@ -320,7 +321,7 @@ lvalue:   ID                    {
           | DOUBLE_COLON ID     {   
                                     if(symbolTable_lookup_exists_exact_scope(symbolTable,0,(char*)$2)==0 ) {
                                     print_Red(); 
-                                    fprintf(stderr,"global variable doesnt exist in line %u \n",yylineno); 
+                                    fprintf(stderr,"Error in line %d:global variable doesn't exist\n",yylineno); 
                                     reset_Red();
                                     }
                                 }
@@ -334,7 +335,7 @@ member:    lvalue DOT ID
 call:      call LEFT_BRACKETS elist RIGHT_BRACKETS
             | lvalue callsuffix {  if(!is_function($1) ) {
                                     print_Red(); 
-                                    fprintf(stderr,"can't use variable as function in line %u \n",yylineno); 
+                                    fprintf(stderr,"Error in line %d: can't use variable as function\n",yylineno); 
                                     reset_Red();
             }            }
             | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS;
@@ -376,19 +377,19 @@ funcdef: FUNCTION   ID  {
                             if(is_library_func(symbolTable,$2))
                             {
                                     print_Red(); 
-                                    fprintf(stderr,"error:formal shadows libfunc in line : %d\n",yylineno); 
+                                    fprintf(stderr,"Error in line %d: formal argument shadows libfunc\n",yylineno); 
                                     reset_Red();
                             }
                             else if (status==ERROR_FUNC )
                             {
                                     print_Red(); 
-                                    fprintf(stderr,"error:function %s exists line : %d\n",$2,yylineno); 
+                                    fprintf(stderr,"Error in line %d: function %s already exists\n",yylineno,$2); 
                                     reset_Red();
                             }
                             else if(status==ERROR_VAR)
                             {
                                 print_Red(); 
-                                fprintf(stderr,"%s is variable line : %d \n",$2 ,yylineno); 
+                                fprintf(stderr,"Error in line %d: %s is variable\n" ,yylineno,$2); 
                                 reset_Red();
 
                             }
@@ -428,13 +429,13 @@ idlist: ID  {                       SymbolTableEntry * bucket;
                                     if(is_library_func(symbolTable,$1)){
                                         print_Red(); 
 
-                                        fprintf(stderr,"error:formal shadows libfunc in line %d\n",yylineno); 
+                                        fprintf(stderr,"Error in line %d:formal argument shadows libfunc\n",yylineno); 
                                        reset_Red();
                                     }
                                     else  if(symbolTable_lookup_exists_exact_scope(symbolTable,scope,$1)!=0){
                                         print_Red(); 
 
-                                       fprintf(stderr,"error:formal redeclaration in line %d\n",yylineno); 
+                                       fprintf(stderr,"Error in line %d:formal argument redeclaration\n",yylineno); 
                                        reset_Red();
 
                                      } 
@@ -450,12 +451,12 @@ idlist: ID  {                       SymbolTableEntry * bucket;
                                     bucket=create_bucket_var( 1 ,  var  ,FORMAL );
                                      if(symbolTable_lookup_exists_exact_scope(symbolTable,scope,$1)!=0){
                                         print_Red(); 
-                                       fprintf(stderr,"error:formal redeclaration in line : %d\n",yylineno); 
+                                       fprintf(stderr,"Error in line %d:formal argument redeclaration\n",yylineno); 
                                        reset_Red();
                                      }else if(is_library_func(symbolTable,$1)){
                                         print_Red(); 
 
-                                        fprintf(stderr,"error:formal shadows libfunc in line %d\n",yylineno); 
+                                        fprintf(stderr,"Error in line %d:formal argument shadows libfunc\n",yylineno); 
                                        reset_Red();
 
                                      }else{
@@ -480,7 +481,7 @@ returnstmt: RETURN expr SEMICOLON {
                                     {
                                         print_Red(); 
 
-                                        fprintf(stderr,"error:return not in a function in line %d\n",yylineno); 
+                                        fprintf(stderr,"Error in line %d: return not in a function\n",yylineno); 
                                        reset_Red();
                                     } 
                                     
@@ -491,7 +492,7 @@ returnstmt: RETURN expr SEMICOLON {
                                         {
                                             print_Red(); 
 
-                                            fprintf(stderr,"error: return not in a function in line %d\n",yylineno); 
+                                            fprintf(stderr,"Error in line %d: return not in a function\n",yylineno); 
                                          reset_Red();
                                         } 
                                         
@@ -514,7 +515,7 @@ int main(int argc , char * argv[])
     {
         if(!( yyin=fopen(argv[1],"r") )  )
         {
-            fprintf(stderr,"error can't read file\n");
+            fprintf(stderr,"Error: can't read file\n");
             return -1;
         }   
         
@@ -523,13 +524,13 @@ int main(int argc , char * argv[])
     {
         if(!( yyin=fopen(argv[1],"r") )  )
         {
-            fprintf(stderr,"error can't read file\n");
+            fprintf(stderr,"Error: can't read file\n");
             return -1;
         } 
         output_file=fopen(argv[2],"w");
         if(output_file==NULL)
         {
-            fprintf(stderr,"error can't open write file\n");
+            fprintf(stderr,"Error: can't open write file\n");
             return -1;
         }
     }

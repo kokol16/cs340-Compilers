@@ -1,0 +1,45 @@
+[x]
+[x][y]
+[x][y][z]
+[g]
+[g][x]
+[x]
+Assign expression
+Statement
+Function definition
+Function definition
+Function definition
+Function definition
+=============== scope #0=====================
+ "print" [library function] (line 0) (scope 0) (active 1)
+ "input" [library function] (line 0) (scope 0) (active 1)
+ "objectmemberkeys" [library function] (line 0) (scope 0) (active 1)
+ "objecttotalmembers" [library function] (line 0) (scope 0) (active 1)
+ "objectcopy" [library function] (line 0) (scope 0) (active 1)
+ "totalarguments" [library function] (line 0) (scope 0) (active 1)
+ "argument" [library function] (line 0) (scope 0) (active 1)
+ "typeof" [library function] (line 0) (scope 0) (active 1)
+ "strtonum" [library function] (line 0) (scope 0) (active 1)
+ "sqrt" [library function] (line 0) (scope 0) (active 1)
+ "cos" [library function] (line 0) (scope 0) (active 1)
+ "sin" [library function] (line 0) (scope 0) (active 1)
+ "g" [user function] (line 1) (scope 0) (active 1)
+=============== scope #1=====================
+ "x" [formal argument] (line  1) (scope 1) (active 0)
+ "y" [formal argument] (line  1) (scope 1) (active 0)
+ "z" [formal argument] (line  1) (scope 1) (active 0)
+ "m" [user function] (line 3) (scope 1) (active 0)
+=============== scope #2=====================
+ "g" [formal argument] (line  3) (scope 2) (active 0)
+ "x" [formal argument] (line  3) (scope 2) (active 0)
+ "t" [user function] (line 5) (scope 2) (active 0)
+=============== scope #3=====================
+ "x" [formal argument] (line  5) (scope 3) (active 0)
+ "f" [user function] (line 8) (scope 3) (active 0)
+=============== scope #4=====================
+ "a" [local variable] (line  8) (scope 4) (active 0)
+=============== scope #5=====================
+=============== scope #6=====================
+=============== scope #7=====================
+=============== scope #8=====================
+=============== scope #9=====================

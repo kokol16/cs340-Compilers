@@ -4,8 +4,8 @@ function g(x , y , z ,x )
     {
         function t(x , print  ,x )
         {
-           not t();
-           function f() {;}
+           
+           function f() {a=5;}
 
         }
     }
