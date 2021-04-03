@@ -1,7 +1,7 @@
 {
+    print(x+y);
     function()
     {
-        
         {
             local a;
             function()
@@ -24,5 +24,6 @@
         }
     }
 }
-while(1);
+while(1); 
+x="lala\"";
 //blocks : 3  im_in_func : 2   scope : 5

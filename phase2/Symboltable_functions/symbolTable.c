@@ -1,5 +1,5 @@
 #include "symbolTable.h"
-#include "lib.h"
+#include "../general_functions/lib.h"
 unsigned int SIZE = 10;
 
 SymbolTable *symbolTable_create()
@@ -64,13 +64,6 @@ static short load_lib_functions(SymbolTable *symtable)
 
 static unsigned int SymTable_hash(const char *pcKey)
 {
-
-    /*size_t ui;
-    unsigned int uiHash = 0U;
-    for (ui = 0U; pcKey[ui] != '\0'; ui++)
-
-        uiHash = (uiHash + pcKey[ui]) / 3;*/
-
     size_t ui;
     unsigned int uiHash = 0U;
     for (ui = 0U; pcKey[ui] != '\0'; ui++)
@@ -120,35 +113,9 @@ Function *create_func(const char *name, unsigned int scope, unsigned int line)
         func->name = malloc(sizeof(char) * length);
         memcpy((void *)func->name, name, length * sizeof(char));
     }
-
     func->scope = scope;
     func->line = line;
     func->head_arg = NULL;
-    //Think abou doing memcpy instead of = and free the arguments array
-    /* if (arguments != NULL)
-    {
-        while (index < arg_size)
-        {
-            if (func->arg_head == NULL)
-            {
-                func->arg_head = malloc(sizeof(Variable));
-                memcpy(func->arg_head, arguments[index], sizeof(Variable));
-            }
-            else
-            {
-                tmp = func->arg_head;
-                while (tmp->next_arg != NULL)
-                {
-                    tmp = tmp->next_arg;
-                }
-                tmp->next_arg = malloc(sizeof(Variable));
-                memcpy(tmp->next_arg, arguments[index], sizeof(Variable));
-            }
-
-            index++;
-        }
-    }*/
-
     return func;
 }
 SymbolTableEntry *create_bucket_var(short isActive, Variable *var, enum SymbolType type)
@@ -264,36 +231,43 @@ char *SymbolType_to_string(enum SymbolType type)
 }
 void print_var(SymbolTableEntry *var)
 {
-    fprintf(stdout, " \"%s\"", var->value.varVal->name);
-    fprintf(stdout, " [%s]", SymbolType_to_string(var->type));
+    if (var == NULL)
+        return;
 
-    fprintf(stdout, " (line  %d)", var->value.varVal->line);
-    fprintf(stdout, " (scope %d)", var->value.varVal->scope);
-    fprintf(stdout, " (active %d)", var->isActive);
+    fprintf(output_file, " \"%s\"", var->value.varVal->name);
+    fprintf(output_file, " [%s]", SymbolType_to_string(var->type));
+
+    fprintf(output_file, " (line  %d)", var->value.varVal->line);
+    fprintf(output_file, " (scope %d)", var->value.varVal->scope);
+    fprintf(output_file, " (active %d)", var->isActive);
 }
 void print_func(SymbolTableEntry *func)
 {
+    if (func == NULL)
+        return;
 
-    fprintf(stdout, " \"%s\"", func->value.funcVal->name);
-    fprintf(stdout, " [%s]", SymbolType_to_string(func->type));
+    fprintf(output_file, " \"%s\"", func->value.funcVal->name);
+    fprintf(output_file, " [%s]", SymbolType_to_string(func->type));
 
-    fprintf(stdout, " (line %d)", func->value.funcVal->line);
-    fprintf(stdout, " (scope %d)", func->value.funcVal->scope);
-    fprintf(stdout, " (active %d)", func->isActive);
+    fprintf(output_file, " (line %d)", func->value.funcVal->line);
+    fprintf(output_file, " (scope %d)", func->value.funcVal->scope);
+    fprintf(output_file, " (active %d)", func->isActive);
 }
 void symbolTable_print(SymbolTable *symbolTable)
 {
     unsigned int i = 0;
     SymbolTableEntry *head, *tmp;
+    if (symbolTable == NULL)
+        return;
     for (i = 0; i < SIZE; i++)
     {
-        fprintf(stdout, "index : %d\n", i);
         tmp = symbolTable->symboltable[i];
+        fprintf(output_file, "index : %d\n", i);
         while (tmp != NULL)
         {
 
             (tmp->value.funcVal == NULL) ? print_var(tmp) : print_func(tmp);
-            fprintf(stdout, "\n");
+            fprintf(output_file, "\n");
 
             tmp = tmp->next;
         }
@@ -303,10 +277,13 @@ void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope)
 {
     unsigned int i = 0;
     SymbolTableEntry *head, *tmp;
+    if (symbolTable == NULL)
+        return;
+
     head = symbolTable_lookup_head(symbolTable, scope);
     tmp = head;
-
-    fprintf(stdout, "=============== scope #%d=====================\n", scope);
+    if (tmp != NULL)
+        fprintf(output_file, "=============== scope #%d=====================\n", scope);
 
     while (tmp != NULL)
     {
@@ -320,7 +297,7 @@ void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope)
             print_func(tmp);
         }
 
-        fprintf(stdout, "\n");
+        fprintf(output_file, "\n");
 
         tmp = tmp->next_same_scope;
     }
@@ -331,6 +308,9 @@ void symbolTable_print_scopes(SymbolTable *symbolTable, unsigned int scope)
     unsigned int tmp_scope = 0;
     unsigned int i = 0;
     SymbolTableEntry *head, *tmp;
+    if (symbolTable == NULL)
+        return;
+
     while (tmp_scope < scope)
     {
         symbolTable_print_scope_list(symbolTable, tmp_scope);
@@ -418,6 +398,8 @@ SymbolTableEntry *symbolTable_lookup_scopeless_var(SymbolTable *symbolTable, cha
 {
     unsigned int i = 0;
     SymbolTableEntry *head, *tmp;
+    if (symbolTable == NULL)
+        return NULL;
     for (i = 0; i < SIZE; i++)
     {
         tmp = symbolTable->symboltable[i];
@@ -438,6 +420,8 @@ short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope, co
 {
     unsigned int index;
     SymbolTableEntry *bucket;
+    if (symbolTable == NULL)
+        return 0;
     index = SymTable_hash(name);
     bucket = symbolTable->symboltable[index];
     while (bucket != NULL)
@@ -466,6 +450,8 @@ short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned i
     unsigned int index;
     SymbolTableEntry *bucket;
     //index = SymTable_hash(name);
+    if (symbolTable == NULL)
+        return 0;
     bucket = symbolTable_lookup_head(symbolTable, scope);
     while (bucket != NULL)
     {
@@ -488,34 +474,6 @@ short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned i
     return 0;
 }
 
-/*void print_args(Function *func)
-{
-    Variable *head;
-    unsigned int argument_number = 0;
-    head = func->arg_head;
-    while (head != NULL)
-    {
-        fprintf(stdout, "argument %u : %s ", argument_number, head->name);
-        argument_number++;
-        head = head->next_arg;
-    }
-    fprintf(stdout, "\n");
-}*/
-/*
-SymbolTableEntry **create_arguments_buckets(Variable **arguments, unsigned int size)
-{
-    SymbolTableEntry **arg_buckets;
-    unsigned int i = 0;
-    arg_buckets = malloc(sizeof(SymbolTableEntry *));
-
-    for (i = 0; i < size; i++)
-    {
-        arg_buckets[i] = malloc(sizeof(SymbolTableEntry));
-        arg_buckets[i] = create_bucket_var(1, arguments[i], FORMAL);
-        //printf("%s\n",arg_buckets[i]->value.varVal->name);
-    }
-    return arg_buckets;
-}*/
 short symbolTable_insert_args(SymbolTable *symTable, SymbolTableEntry **arg_buckets, unsigned int size)
 {
     unsigned int i = 0;
@@ -532,8 +490,12 @@ short symbolTable_insert_args(SymbolTable *symTable, SymbolTableEntry **arg_buck
 
 short is_library_func(SymbolTable *symTable, const char *name)
 {
-    unsigned int index = SymTable_hash(name);
-    SymbolTableEntry *head = symTable->symboltable[index];
+    SymbolTableEntry *head;
+    unsigned int index;
+    if (symTable == NULL)
+        return 0;
+    index = SymTable_hash(name);
+    head = symTable->symboltable[index];
     while (head != NULL)
     {
         if (head->type == LIBFUNC && strcmp(name, head->value.funcVal->name) == 0)
@@ -549,11 +511,13 @@ short symbolTable_lookup_function(SymbolTable *symTable, unsigned int scope)
 {
     unsigned int i = 0;
     SymbolTableEntry *head, *tmp;
+    if (symTable == NULL)
+        return 0;
+
     head = symbolTable_lookup_head(symTable, scope);
     tmp = head;
     while (tmp != NULL)
     {
-        //fprintf(stdout, "scope : %d name  : %d \n", scope ,tmp->value);
         if (tmp->type == USERFUNC)
         {
             return 1;
@@ -570,6 +534,7 @@ short create_arguments(SymbolTable *symtable, char *arguments, unsigned int scop
     unsigned int size = 0;
     SymbolTableEntry *arg = NULL, *func, *tmp;
     char *ptr;
+    if(symtable==NULL) return 0;
     func = last_func_inserted_in_current_scope(symtable, scope - 1);
 
     if (func == NULL)
@@ -596,13 +561,13 @@ short create_arguments(SymbolTable *symtable, char *arguments, unsigned int scop
 
         ptr = strtok(NULL, delim);
     }
-    //print_func_args(func);
 }
 
 short create_argument(SymbolTable *symtable, char *argument, unsigned int scope)
 {
     SymbolTableEntry *arg = NULL, *func, *tmp;
     char *ptr;
+    if(symtable==NULL) return 0;
     func = last_func_inserted_in_current_scope(symtable, scope - 1);
     if (func == NULL)
     {
@@ -634,16 +599,17 @@ void print_func_args(SymbolTableEntry *fnc)
     SymbolTableEntry *head = fnc->value.funcVal->head_arg;
     while (head != NULL)
     {
-        fprintf(stdout, "[%s]", head->value.varVal->name);
+        fprintf(output_file, "[%s]", head->value.varVal->name);
         head = head->next_arg;
     }
-    fprintf(stdout, "\n");
+    fprintf(output_file, "\n");
 }
 
 SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *name, unsigned int scope)
 {
     unsigned int index;
     SymbolTableEntry *bucket;
+    if(symtable==NULL) return NULL;
     bucket = symbolTable_lookup_head(symtable, scope);
     while (bucket != NULL)
     {
@@ -664,6 +630,8 @@ SymbolTableEntry *last_func_inserted_in_current_scope(SymbolTable *symtable, uns
 {
     unsigned int index;
     SymbolTableEntry *bucket, *last_func = NULL;
+    if(symtable==NULL) return NULL;
+
     bucket = symbolTable_lookup_head(symtable, scope);
     while (bucket != NULL)
     {
@@ -678,67 +646,22 @@ SymbolTableEntry *last_func_inserted_in_current_scope(SymbolTable *symtable, uns
 }
 double find_bucket_scope(SymbolTable *symbolTable, char *name)
 {
-    SymbolTableEntry *func = symbolTable_lookup_scopeless_var(symbolTable, name);
+    SymbolTableEntry * func;
+    if(symbolTable==NULL) return -1;
+    func = symbolTable_lookup_scopeless_var(symbolTable, name);
     if (func != NULL)
     {
         return func->value.varVal->scope;
     }
     return -1;
 }
-Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned int scope, unsigned int line)
-{
-    Variable **arguments_array = NULL;
-    char delim[] = ",(";
-    char *ptr, *tmp_args;
-    unsigned int index = 0, size = 0, arg_index = 0, counter = 0;
 
-    while (arguments[index] != '\0')
-    {
-        if (arguments[index] == ')')
-        {
-            arguments[index] = '\0';
-            break;
-        }
-        index++;
-    }
-    tmp_args = malloc(sizeof(char) * (strlen(arguments) + 1));
-    memcpy(tmp_args, arguments, strlen(arguments) + 1);
-    ptr = strtok(arguments, delim);
-    while (ptr != NULL)
-    {
-        size++;
-        ptr = strtok(NULL, delim);
-    }
-
-    if (size == 0)
-    {
-        return NULL;
-    } //no arguments found
-    arguments_array = malloc(sizeof(Variable *));
-    while (counter < size)
-    {
-        arguments_array[counter] = malloc(sizeof(Variable));
-        counter++;
-    }
-    *arg_size = size;
-    ptr = strtok(tmp_args, delim);
-    while (ptr != NULL)
-    {
-        arguments_array[arg_index] = create_var(ptr, scope, line);
-        //printf("'%s'\n", arguments_array[arg_index]->name);
-        arg_index++;
-
-        ptr = strtok(NULL, delim);
-    }
-    //printf("size : %u \n", *arg_size);
-
-    return arguments_array;
-}
 SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, char *name)
 {
     unsigned int i = 0, index = 0;
     double prev_scope = -1;
     SymbolTableEntry *head, *tmp = NULL;
+    if(symbolTable==NULL || name==NULL) return NULL;
     index = SymTable_hash(name);
     head = symbolTable->symboltable[index];
     while (head != NULL)
@@ -760,6 +683,7 @@ SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, char *n
 
 short is_function(SymbolTableEntry *lvalue)
 {
+    if(lvalue==NULL) return 0;
     if (lvalue->value.funcVal != NULL)
     {
         return 1;
@@ -815,14 +739,13 @@ void print_stack(function_stack *root)
     function_stack *tmp = root;
     if (root == NULL)
     {
-        fprintf(stderr, "wtf\n");
+        fprintf(output_file, "wtf\n");
     }
 
     while (tmp != NULL)
     {
-        fprintf(stderr, " %s", tmp->func->value.funcVal->name);
+        fprintf(output_file, " %s", tmp->func->value.funcVal->name);
         tmp = tmp->next;
     }
     fprintf(stderr, "\n");
-
 }

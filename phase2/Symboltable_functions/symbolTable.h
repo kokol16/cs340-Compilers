@@ -82,7 +82,6 @@ SymbolTableEntry *  create_bucket_var( short  isActive , Variable  * var  , enum
 SymbolTableEntry *  create_bucket_func( short  isActive , Function *  func  , enum SymbolType type  );
 void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope);
 static short  load_lib_functions(SymbolTable *symtable);
-Variable **sanitize_arguments(char *arguments, unsigned int *arg_size, unsigned int scope , unsigned int line);
 SymbolTableEntry ** create_arguments_buckets(Variable ** arguments , unsigned int size );
 short symbolTable_insert_args(SymbolTable * symTable, SymbolTableEntry ** arg_buckets ,unsigned int size );
 short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned int scope, const char *name);
@@ -99,7 +98,6 @@ double  find_bucket_scope( SymbolTable * symbolTable  , char * name);
 
 short is_argument( SymbolTableEntry * func);
 short create_argument(SymbolTable *symtable, char *argument, unsigned int scope);
-// function lala
 short is_function(SymbolTableEntry * lvalue);
 int  push(function_stack ** root ,SymbolTableEntry * func);
 int  pop(function_stack ** root  );

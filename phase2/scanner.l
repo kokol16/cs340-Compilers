@@ -1,6 +1,6 @@
 
 %{ 
-#include "lib.h"
+#include "general_functions/lib.h"
 
 #define MY_EOF 0   
 #include"y.tab.h"
@@ -341,16 +341,15 @@ ONELINECOMMENTT "//".*
 } 
 
 "/*"    {
-    /* line_comment to multi_line_comment?? */
     int c;
     int nested=0;
     unsigned int opened_comments=1;/*probably don't need this */   
-    //alpha_comments_info_t * head;
-    //head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
-    //head->next=NULL;
-    //head->first_line =yylineno;
-    //head->is_closed=0;
-    //unsigned int counter=0;
+    alpha_comments_info_t * head;
+    head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
+    head->next=NULL;
+    head->first_line =yylineno;
+    head->is_closed=0;
+    unsigned int counter=0;
     while((c=input())>MY_EOF )
     {
         if(c=='*')
@@ -358,11 +357,11 @@ ONELINECOMMENTT "//".*
             if((c=input())=='/' )
             {
                 /* mark that the current comment closed */
-               // alpha_comments_info_t * curr_node = get_node(head,counter);
-            //    if(curr_node!=NULL)
-            //    curr_node->is_closed=1;
+                alpha_comments_info_t * curr_node = get_node(head,counter);
+                if(curr_node!=NULL)
+                curr_node->is_closed=1;
 
-            //    unsigned int first_line= get_first_line(head,counter);
+                unsigned int first_line= get_first_line(head,counter);
             //    alpha_token_t * tmp;
                 if(counter==0)
                 {
@@ -391,7 +390,7 @@ ONELINECOMMENTT "//".*
             {
                 
               //  opened_comments++;
-               // push_comments_info(head,yylineno,counter);
+                push_comments_info(head,yylineno,counter);
                 counter++;
             }
             else
@@ -400,13 +399,13 @@ ONELINECOMMENTT "//".*
             }
         }
     }
-    /* if(c<=MY_EOF)  comment never closed 
+     if(c<=MY_EOF) /* comment never closed */
     {
         alpha_comments_info_t * tmp=head;
         print_Red();
         while(tmp!=NULL)
         {
-            if(tmp->is_closed==0) print all the unclosed comments 
+            if(tmp->is_closed==0) /* print all the unclosed comments */
             {
                 
                 fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
@@ -418,7 +417,7 @@ ONELINECOMMENTT "//".*
         reset_Red();
 
     }
-    alpha_free_comments_list(head);*/
+    alpha_free_comments_list(head);
 }
 
 

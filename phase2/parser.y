@@ -1,5 +1,5 @@
 %{
-#include "bison_functions.h"
+#include "bison_functions/bison_functions.h"
 #include <stdio.h>
 extern FILE * yyin;
 extern int yylineno; 
@@ -148,8 +148,8 @@ primary:  lvalue {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary");}
           | const {print_to_stream("Primary");} ;
 
-lvalue:   ID                    {print_to_stream("ID"); process_id(symbolTable,scope,yylineno,$1,iam_in_function,&functions_stack,$$);}
-          | LOCALL ID           {print_to_stream("LOCAL ID"); process_local_id(symbolTable,  scope,  yylineno, $2,  iam_in_function,  $$);}
+lvalue:   ID                    {print_to_stream("ID"); process_id(symbolTable,scope,yylineno,$1,iam_in_function,&functions_stack,&$$); }
+          | LOCALL ID           {print_to_stream("LOCAL ID"); process_local_id(symbolTable,  scope,  yylineno, $2,  iam_in_function,  &$$);}
           | DOUBLE_COLON ID     {print_to_stream("::ID"); process_double_colon_id(symbolTable,$2,yylineno); }             
           | member {print_to_stream("Member"); $$=NULL;} ; //alliws apaiteitai typos gia to member
 
@@ -264,6 +264,7 @@ int main(int argc , char * argv[])
             fprintf(stderr,"Error: can't read file\n");
             return -1;
         }   
+        output_file=stdout;
         
     }
     else if (argc>2)
@@ -282,6 +283,7 @@ int main(int argc , char * argv[])
     }
     else
     {
+        output_file=stdout;
         yyin=stdin;
     }
   
@@ -289,9 +291,9 @@ int main(int argc , char * argv[])
     //yylex();
     //yyin=stdin;
     yyparse() ;
-    //symbolTable_print(symbolTable);
+    symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
-    symbolTable_print_scopes(symbolTable,10);
+    symbolTable_print_scopes(symbolTable,100);
     //if(output_file!=NULL)
     //fclose(output_file);
 //    fclose(yyin);
