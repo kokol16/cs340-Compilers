@@ -50,9 +50,8 @@ void process_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char
         }
         else
         {
-            print_Red();
-            fprintf(stderr, "Error in line %d: no access to variable  %s \n", yylineno, id_name);
-            reset_Red();
+            print_error(id_name,yylineno, "ERROR : no access to variable");
+           
         }
     }
     //printf("haha\n");
@@ -78,9 +77,9 @@ void process_function_id(SymbolTable *symbolTable, unsigned int scope, int yylin
     }
     else if (status == ERROR_VAR)
     {
-        print_Red();
-        fprintf(stderr, "Error in line %d: %s is variable\n", yylineno, func_name);
-        reset_Red();
+        print_error(func_name,yylineno, "ERROR : use variable as function"); //kalo?
+      
+       // fprintf(stderr, "Error in line %d: %s is variable\n", yylineno, func_name);
     }
     else
     {
@@ -125,17 +124,13 @@ void process_function_arguments(SymbolTable *symbolTable, unsigned int scope, in
     bucket = create_bucket_var(1, var, FORMAL);
     if (is_library_func(symbolTable, arg_name))
     {
-        print_Red();
-
-        fprintf(stderr, "Error in line %d:formal argument shadows libfunc\n", yylineno);
-        reset_Red();
+        print_error(NULL,yylineno, "ERROR : formal argument shadows libfunc");
+       
     }
     else if (symbolTable_lookup_exists_exact_scope(symbolTable, scope, arg_name) != 0)
     {
-        print_Red();
-
-        fprintf(stderr, "Error in line %d:formal argument redeclaration\n", yylineno);
-        reset_Red();
+         print_error(NULL,yylineno, "ERROR : formal argument redeclaration");
+       
     }
     else
     {
@@ -147,9 +142,8 @@ void process_double_colon_id(SymbolTable *symbolTable, char *name, int yylineno)
 {
     if (symbolTable_lookup_exists_exact_scope(symbolTable, 0, name) == 0)
     {
-        print_Red();
-        fprintf(stderr, "Error in line %d:global variable : %s doesn't exist\n", yylineno, name);
-        reset_Red();
+         print_error(name,yylineno, "ERROR : global variable doesn't exist");
+        
     }
 }
 void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char *id_name, unsigned int iam_in_function,  SymbolTableEntry **lvalue)
@@ -168,9 +162,8 @@ void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno
     {
         if (is_library_func(symbolTable, (const char *)id_name))
         {
-            print_Red();
-            fprintf(stderr, "Error in line %d: conflict with library function\n", yylineno);
-            reset_Red();
+             print_error(NULL,yylineno, "ERROR : conflict with library function");
+           
         }
         else
         {

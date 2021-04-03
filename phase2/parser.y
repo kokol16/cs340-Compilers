@@ -54,32 +54,33 @@ function_stack * functions_stack=NULL;
 %%         
 program: statements {print_to_stream("Program");}  ;
 stmt:   expr SEMICOLON   {print_to_stream("Statement");}  
-        | ifstmt         {print_to_stream("If Statement");  }
-        | whilestmt      {print_to_stream("While Statement");}
-        | forstmt        {print_to_stream("For Statement");}
-        | returnstmt     {print_to_stream("Return Statement");}
-        | BREAK SEMICOLON {         if(iam_in_loop==0)
+        | ifstmt         {print_to_stream("Statement");}  
+        | whilestmt      {print_to_stream("Statement");}  
+        | forstmt        {print_to_stream("Statement");}  
+        | returnstmt     {print_to_stream("Statement");}  
+        | BREAK SEMICOLON {      {print_to_stream("Statement");}  
+                                   if(iam_in_loop==0)
                                     {
                                         print_error(NULL,yylineno, "ERROR : use BREAK not in a loop");
                                     } 
-                                    {print_to_stream("Break");}
+                                    
         
                             }
-        | CONTINUE SEMICOLON {      if(iam_in_loop==0)
+        | CONTINUE SEMICOLON {     {print_to_stream("Statement");}  
+                                    if(iam_in_loop==0)
                                     {
                                        print_error(NULL,yylineno, "ERROR : use CONTINUE not in a loop");
                                     } 
-                                    {print_to_stream("Continue");}
+                                    
                             }
-        | block             {print_to_stream("Block");}
-        |block_func         {print_to_stream("Function Block");}
-        | funcdef           {print_to_stream("Function definition");}
-        |SEMICOLON          {print_to_stream("Semicolon");}
+        | block             {print_to_stream("Statement");}  
+        | funcdef           {print_to_stream("Statement");}  
+        |SEMICOLON          {print_to_stream("Statement");}  
         ;
 statements: statements stmt
             |stmt;
 
-expr:   assignexpr 
+expr:   assignexpr  {print_to_stream("Expression");}
         |expr PLUS expr {print_to_stream("+ expression");}
         |expr MINUS expr {print_to_stream("- expression");}
         |expr ASTERISK expr {print_to_stream("* expression");}
@@ -93,43 +94,43 @@ expr:   assignexpr
         |expr DIFFERENT expr {print_to_stream("!= expression");}
         |expr AND expr {print_to_stream("and expression");}
         |expr OR expr {print_to_stream("or expression");}
-        | term  {print_to_stream("Term");};
+        | term  {print_to_stream("Expression");};
 
         
 
-term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("(Expression)");}
-        | MINUS expr %prec UMINUS  { {print_to_stream("-Expression");} }
+term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term");}
+        | MINUS expr %prec UMINUS   {print_to_stream("Term");}
                                   
         
-        | NOT expr{     {print_to_stream(" not Expression");}                    
+        | NOT expr        {print_to_stream("Term");}                   
                                            
-        }
-        | PLUS_PLUS lvalue  {              {print_to_stream("++lvalue");}
+        
+        | PLUS_PLUS lvalue  {               {print_to_stream("Term");}
                                            if(is_function($2) )
                                             {
                                                 print_error(NULL,yylineno, "ERROR : can't use ++ to function");
                                             }
                                             
                             }
-        | lvalue PLUS_PLUS  {               {print_to_stream("lvalue++");}
+        | lvalue PLUS_PLUS  {                {print_to_stream("Term");}
                                             if(is_function($1) )
                                             {
                                                 print_error(NULL,yylineno, "ERROR : can't use ++ to function");
                                             }
                             }
-        | MINUS_MINUS lvalue{              {print_to_stream("--lvalue");}
+        | MINUS_MINUS lvalue{              {print_to_stream("Term");}
                                             if(is_function($2) )
                                             {
                                                print_error(NULL,yylineno, "ERROR : can't use -- to function");
                                             }
         }
-        | lvalue MINUS_MINUS {              {print_to_stream("lvalue--");}
+        | lvalue MINUS_MINUS {               {print_to_stream("Term");}
                                             if(is_function($1) )
                                             {
                                                 print_error(NULL,yylineno, "ERROR : can't use -- to function");
                                             }
         }
-        | primary                            {print_to_stream("Primary");};  
+        | primary                             {print_to_stream("Term");};  
 
 assignexpr: lvalue  ASSIGN  expr    { {print_to_stream("Assign expression");}
                                         if(is_function($1))
@@ -148,15 +149,15 @@ primary:  lvalue {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary");}
           | const {print_to_stream("Primary");} ;
 
-lvalue:   ID                    {print_to_stream("ID"); process_id(symbolTable,scope,yylineno,$1,iam_in_function,&functions_stack,&$$); }
-          | LOCALL ID           {print_to_stream("LOCAL ID"); process_local_id(symbolTable,  scope,  yylineno, $2,  iam_in_function,  &$$);}
-          | DOUBLE_COLON ID     {print_to_stream("::ID"); process_double_colon_id(symbolTable,$2,yylineno); }             
-          | member {print_to_stream("Member"); $$=NULL;} ; //alliws apaiteitai typos gia to member
+lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTable,scope,yylineno,$1,iam_in_function,&functions_stack,&$$); }
+          | LOCALL ID           {print_to_stream("Lvalue"); process_local_id(symbolTable,  scope,  yylineno, $2,  iam_in_function,  &$$);}
+          | DOUBLE_COLON ID     {print_to_stream("Lvalue"); process_double_colon_id(symbolTable,$2,yylineno); }             
+          | member {print_to_stream("Lvalue"); $$=NULL;} ; //alliws apaiteitai typos gia to member
 
 member:    lvalue DOT ID {print_to_stream("Member");}
-            | lvalue LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Call Suffix");}
-            | call DOT ID {print_to_stream("Call Suffix");}
-            | call LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Call Suffix");} ;
+            | lvalue LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");}
+            | call DOT ID {print_to_stream("Member");}
+            | call LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");} ;
 
 call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");} 
             | lvalue callsuffix { print_to_stream("Call");
@@ -203,7 +204,7 @@ funcdef: FUNCTION   ID  { process_function_id(symbolTable,  scope,  yylineno, $2
          |FUNCTION {   process_anonymous_function(symbolTable,  scope,  yylineno, &functions_stack); 
 
                             }
-                            LEFT_BRACKETS {scope++;} idlist RIGHT_BRACKETS block_func {print_to_stream("Function Definition");}  
+                            LEFT_BRACKETS {scope++;} idlist RIGHT_BRACKETS block_func {print_to_stream("Function Definition");}; 
                                                                   
 
 const:  INTEGER {print_to_stream("Integer");}
@@ -224,9 +225,9 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
 
 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt {print_to_stream("If Statement");} 
         | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt {print_to_stream("If Statement");}; 
-whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++;} expr RIGHT_BRACKETS stmt {print_to_stream("While Statement");iam_in_loop--;};
+whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++;} expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); iam_in_loop--;};
 
-forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt { print_to_stream("For Statement");iam_in_loop--;};
+forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt { print_to_stream("For Statement"); iam_in_loop--;};
 
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                     if(iam_in_function==0)
@@ -234,7 +235,7 @@ returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                        print_error(NULL,yylineno, "ERROR : return out of function");
                                     } 
                                     
-                                } 
+                                 } 
                                     
             |  RETURN SEMICOLON    {    print_to_stream("Return Statement");
                                         if(iam_in_function==0)
@@ -243,7 +244,7 @@ returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                         } 
                                         
                                         
-                                         };
+                                     };
 
 
 %%
