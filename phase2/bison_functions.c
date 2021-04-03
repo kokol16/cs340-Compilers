@@ -106,7 +106,7 @@ void   print_error( char * name , int line , char *  msg )
 {
     print_Red();
     fprintf(stderr,"%s",msg);
-    fprintf(stderr," line : %d",line);
+    fprintf(stderr," in line : %d",line);
     if(name!=NULL)
     fprintf(stderr," ID : %s\n",name);
     else 

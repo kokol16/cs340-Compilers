@@ -1,1 +1,17 @@
+Statement
+Block
+Function definition
+Integer
+Assign expression
+Statement
+Block
+Function definition
+Integer
+Assign expression
+Statement
+Block
+Function definition
+Block
+Integer
+Semicolon
 While Statement
