@@ -165,26 +165,28 @@ call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");}
                                     print_error(NULL,yylineno, "ERROR : can't use variable as function");
                                   }            
                                 }
-            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");}  ;
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");}
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call");}
+            | call LEFT_BRACKETS  RIGHT_BRACKETS;
 
 callsuffix: normcall {print_to_stream("Call Suffix");}
             | methodcall {print_to_stream("Call Suffix");} ;
 
-normcall: LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Normal Call");};
-
-methodcall:    Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Method Call");}; /* equivalent to lvalue.ID'('lvalue, elist')';*/
-
+normcall: LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Normal Call");}
+          |LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Normal Call");};
+methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Method Call");} /* equivalent to lvalue.ID'('lvalue, elist')';*/
+           |Diaeresis ID LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Method Call");}
 elist:   expr   {print_to_stream("Expression List");} 
-        | expr COMMA elist {print_to_stream("Expression List");}
-        |    {print_to_stream("Expression List");};  
+        | expr COMMA elist {print_to_stream("Expression List");};
+        //|    {print_to_stream("Expression List");};  
             
 objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");}
-           |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition");};
-           
+           |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition");}
+           |LEFT_SQUARE  RIGHT_SQUARE {print_to_stream("Object Definition");};
 
 indexed:    indexedelem  {print_to_stream("Indexed");}
-            | indexedelem COMMA  indexed {print_to_stream("Indexed");}
-            |  {print_to_stream("Indexed");} ;
+            | indexedelem COMMA  indexed {print_to_stream("Indexed");};
+           // |  {print_to_stream("Indexed");} ;
 
 indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE {print_to_stream("Index Element");};
 
@@ -192,7 +194,7 @@ block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTabl
        |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;} ;  
        
 block_func: LEFT_BRACE {iam_in_function++;}  RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--; iam_in_function--; 
-pop(&functions_stack);}       
+        pop(&functions_stack);}       
        |LEFT_BRACE {iam_in_function++;}    statements  RIGHT_BRACE {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
      pop(&functions_stack);  } ;  
   
@@ -224,11 +226,13 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
             |    {print_to_stream("ID List");};
 
 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt {print_to_stream("If Statement");} 
-        | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt {print_to_stream("If Statement");}; 
+        | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt {print_to_stream("If Statement");} 
 whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++;} expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); iam_in_loop--;};
 
-forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt { print_to_stream("For Statement"); iam_in_loop--;};
-
+forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt { print_to_stream("For Statement"); iam_in_loop--;}
+        |  FOR LEFT_BRACKETS {iam_in_loop++;}     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   {print_to_stream("For Statement"); iam_in_loop--;};  
+        
+            
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                     if(iam_in_function==0)
                                     {

@@ -35,7 +35,7 @@ void process_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char
     }
     else
     {
-        print_stack(*functions_stack);
+        //print_stack(*functions_stack);
         SymbolTableEntry *func_entry = top(*functions_stack);
        
         //printf("haha\n");
@@ -50,6 +50,7 @@ void process_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char
         }
         else
         {
+            *lvalue=NULL;
             print_error(id_name,yylineno, "ERROR : no access to variable");
            
         }

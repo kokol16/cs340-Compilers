@@ -1,86 +1,31 @@
-ID
-ID
-Primary
-Primary
-Term
-ID
-Primary
-Primary
-Term
-+ expression
-Expression List
-Normal Call
-Call Suffix
-Call
-Primary
-Primary
-Term
-Statement
 ID List
-LOCAL ID
-Primary
+Lvalue
+ fInteger
 Primary
 Term
+Expression
+Assign expression
+Expression
 Statement
-ID List
-Block
-Block
 Function Block
 Function Definition
-Function definition
+Statement
 ID List
-ID
- $func3 $func1Integer
-Primary
-Primary
-Term
-Assign expression
-Statement
-Block
-Block
+ID List
 Function Block
 Function Definition
-Function definition
-ID
- $func1Integer
-Primary
-Primary
-Term
-Assign expression
 Statement
-Block
-Block
 Function Block
 Function Definition
-Function definition
-Block
-Block
-Integer
-Primary
-Primary
-Term
-Semicolon
-While Statement
-While Statement
-ID
-String
-Primary
-Primary
-Term
-Assign expression
 Statement
 Program
 index : 0
  "sin" [library function] (line 0) (scope 0) (active 1)
- "x" [local variable] (line  2) (scope 1) (active 0)
- "x" [global variable] (line  28) (scope 0) (active 1)
 index : 1
- "y" [local variable] (line  2) (scope 1) (active 0)
- "$func1" [user function] (line 3) (scope 1) (active 0)
+ "y" [user function] (line 5) (scope 0) (active 1)
 index : 2
- "$func2" [user function] (line 7) (scope 3) (active 0)
+ "f" [user function] (line 1) (scope 0) (active 1)
 index : 3
- "$func3" [user function] (line 15) (scope 3) (active 0)
 index : 4
  "objecttotalmembers" [library function] (line 0) (scope 0) (active 1)
 index : 5
@@ -91,7 +36,8 @@ index : 6
  "sqrt" [library function] (line 0) (scope 0) (active 1)
 index : 7
  "typeof" [library function] (line 0) (scope 0) (active 1)
- "a" [local variable] (line  6) (scope 3) (active 0)
+ "a" [local variable] (line  3) (scope 1) (active 0)
+ "a" [user function] (line 6) (scope 1) (active 0)
 index : 8
  "objectcopy" [library function] (line 0) (scope 0) (active 1)
  "totalarguments" [library function] (line 0) (scope 0) (active 1)
@@ -112,12 +58,8 @@ index : 9
  "sqrt" [library function] (line 0) (scope 0) (active 1)
  "cos" [library function] (line 0) (scope 0) (active 1)
  "sin" [library function] (line 0) (scope 0) (active 1)
- "x" [global variable] (line  28) (scope 0) (active 1)
+ "f" [user function] (line 1) (scope 0) (active 1)
+ "y" [user function] (line 5) (scope 0) (active 1)
 =============== scope #1=====================
- "x" [local variable] (line  2) (scope 1) (active 0)
- "y" [local variable] (line  2) (scope 1) (active 0)
- "$func1" [user function] (line 3) (scope 1) (active 0)
-=============== scope #3=====================
- "a" [local variable] (line  6) (scope 3) (active 0)
- "$func2" [user function] (line 7) (scope 3) (active 0)
- "$func3" [user function] (line 15) (scope 3) (active 0)
+ "a" [local variable] (line  3) (scope 1) (active 0)
+ "a" [user function] (line 6) (scope 1) (active 0)
