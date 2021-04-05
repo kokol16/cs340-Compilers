@@ -69,7 +69,7 @@ SymbolTableEntry *  symbolTable_lookup_scopeless_var( SymbolTable * symbolTable,
 SymbolTableEntry *symbolTable_lookup_head(SymbolTable *symbolTable, unsigned int scope);
 
 
-SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable, char * );
+SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable, const  char * );
 
 short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope , const char * name);
 

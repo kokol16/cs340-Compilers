@@ -1,23 +1,58 @@
-Lvalue
-Integer
-Primary
-Term
-Expression
-Assign expression
-Expression
-Statement
 ID List
 ID List
 Lvalue
+Normal Call
+Call Suffix
+Call
 Primary
-Term
-Expression
 Term
 Expression
 Return Statement
 Statement
 Function Block
 Function Definition
+Statement
+Function Block
+Function Definition
+Statement
+Lvalue
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Return Statement
+Statement
+Statement
+Statement
+Lvalue
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Return Statement
+Statement
+Statement
+Statement
+Block
+Statement
+Block
+Statement
+Block
+Statement
+Integer
+Primary
+Term
+Expression
+Statement
+Return Statement
+Statement
+Block
+Statement
+While Statement
 Statement
 Program
 =============== scope #0=====================
@@ -33,7 +68,6 @@ Program
  "sqrt" [library function] (line 0) (scope 0) (active 1)
  "cos" [library function] (line 0) (scope 0) (active 1)
  "sin" [library function] (line 0) (scope 0) (active 1)
- "x" [global variable] (line  1) (scope 0) (active 1)
+ "G" [user function] (line 3) (scope 0) (active 1)
 =============== scope #1=====================
- "y" [formal argument] (line  3) (scope 1) (active 0)
- "x" [formal argument] (line  3) (scope 1) (active 0)
+ "F" [user function] (line 4) (scope 1) (active 0)

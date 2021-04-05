@@ -17,49 +17,112 @@ void process_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char
             bucket = create_bucket_var(1, var, GLOBAL);
         symbolTable_insert(symbolTable, bucket);
     }
-    if (is_function(bucket))
+    *lvalue = bucket;
+   
+}
+
+void process_assign(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
+{
+    if (lvalue == NULL)
     {
-        //tipota
-        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
-        *lvalue = bucket;
+        return;
     }
-    if (!is_function(bucket) && bucket->value.varVal->scope == 0)
+    if (is_function(*lvalue))
     {
-        *lvalue = bucket;
+
+        print_error(NULL, yylineno, "ERROR : assign to function");
 
         //tipota
+        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
+        *lvalue = NULL;
+        return;
     }
-    if (iam_in_function == 0) //i have access
+    check_access(symbolTable, scope, yylineno, iam_in_function, functions_stack, lvalue);
+    //fprintf(stderr,"lala\n");
+}
+
+void process_callsuffix(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
+{
+    check_access(symbolTable, scope, yylineno, iam_in_function, functions_stack, lvalue);
+}
+void process_primary(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
+{
+
+    check_access(symbolTable, scope, yylineno, iam_in_function, functions_stack, lvalue);
+}
+
+void process_plus_plus(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
+{
+    if (is_function(*lvalue))
     {
-        *lvalue = bucket;
+
+        print_error(NULL, yylineno, "ERROR : ++ to function");
+
+        //tipota
+        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
+        *lvalue = NULL;
+        return;
+    }
+    check_access(symbolTable, scope, yylineno, iam_in_function, functions_stack, lvalue);
+}
+void process_minus_minus(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
+{
+    if (is_function(*lvalue))
+    {
+        //fprintf(stderr, "lala\n");
+
+        print_error(NULL, yylineno, "ERROR : -- to function");
+
+        //tipota
+        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
+        *lvalue = NULL;
+        return;
+    }
+    check_access(symbolTable, scope, yylineno, iam_in_function, functions_stack, lvalue);
+}
+
+short check_access(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
+{
+    if (*lvalue == NULL || lvalue == NULL)
+    {
+        return 0;
+    }
+    const char *id_name;
+    //fprintf(stderr,"lala\n");
+    id_name = ((*lvalue)->value.varVal != NULL) ? (*lvalue)->value.varVal->name : (*lvalue)->value.funcVal->name;
+    if((*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope || (*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope )
+    {
+        //all good
+    }
+    else if (!is_function(*lvalue) && (*lvalue)->value.varVal->scope == 0)
+    {
+        //tipota
+    }
+    else if (iam_in_function <= 0) //i have access
+    {
     }
     else
     {
         //print_stack(*functions_stack);
         SymbolTableEntry *func_entry = top(*functions_stack);
-       
-        //printf("haha\n");
-
-        //fprintf(stderr,"scope func :%d\n",func_entry->value.funcVal->scope);
-        //fprintf(stderr,"scope var :%d\n",bucket->value.varVal->scope);
-
-        if (is_function(bucket) || bucket->value.varVal->scope == 0 ||
-            func_entry!=NULL &&  bucket->value.varVal->scope > func_entry->value.funcVal->scope)
+        if (is_function(*lvalue) || (*lvalue)->value.varVal->scope == 0 ||
+            func_entry != NULL && (*lvalue)->value.varVal->scope > func_entry->value.funcVal->scope)
         {
-            *lvalue = bucket;
+
         }
         else
         {
-            *lvalue=NULL;
-            print_error(id_name,yylineno, "ERROR : no access to variable");
-           
+
+            print_error(id_name, yylineno, "ERROR : no access to variable");
+            *lvalue = NULL;
+            return 0;
         }
     }
-    //printf("haha\n");
-
+    return 1;
 }
+
 void process_function_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char *func_name,
-                         unsigned int iam_in_function, function_stack **functions_stack)
+                         unsigned int *iam_in_function, function_stack **functions_stack)
 {
     Function *func;
     SymbolTableEntry *bucket;
@@ -68,19 +131,20 @@ void process_function_id(SymbolTable *symbolTable, unsigned int scope, int yylin
     short status = symbolTable_lookup_exists_exact_scope(symbolTable, scope, func_name);
     if (is_library_func(symbolTable, func_name))
     {
-        print_error(func_name,yylineno, "ERROR : function name shadows libfunc");
-        
+        print_error(func_name, yylineno, "ERROR : function name shadows libfunc");
+        //(*iam_in_function)--;
     }
     else if (status == ERROR_FUNC)
     {
-        print_error(func_name,yylineno, "ERROR : function already exists");
-
+        print_error(func_name, yylineno, "ERROR : function already exists");
+        //(*iam_in_function)--;
     }
     else if (status == ERROR_VAR)
     {
-        print_error(func_name,yylineno, "ERROR : use variable as function"); //kalo?
-      
-       // fprintf(stderr, "Error in line %d: %s is variable\n", yylineno, func_name);
+        print_error(func_name, yylineno, "ERROR : use variable as function"); //kalo?
+        //(*iam_in_function)--;
+
+        // fprintf(stderr, "Error in line %d: %s is variable\n", yylineno, func_name);
     }
     else
     {
@@ -90,20 +154,20 @@ void process_function_id(SymbolTable *symbolTable, unsigned int scope, int yylin
     }
 }
 
-void   print_to_stream(char *msg )
+void print_to_stream(char *msg)
 {
-  
-  fprintf(output_file,"%s\n",msg);
+
+    fprintf(output_file, "%s\n", msg);
 }
-void   print_error( char * name , int line , char *  msg )
+void print_error(const char *name, int line, char *msg)
 {
     print_Red();
-    fprintf(stderr,"%s",msg);
-    fprintf(stderr," in line : %d",line);
-    if(name!=NULL)
-    fprintf(stderr," ID : %s\n",name);
-    else 
-    fprintf(stderr,"\n");
+    fprintf(stderr, "%s", msg);
+    fprintf(stderr, " in line : %d", line);
+    if (name != NULL)
+        fprintf(stderr, " ID : %s\n", name);
+    else
+        fprintf(stderr, "\n");
 
     reset_Red();
 }
@@ -115,7 +179,6 @@ void process_anonymous_function(SymbolTable *symbolTable, unsigned int scope, in
     bucket = create_bucket_func(1, func, USERFUNC);
     symbolTable_insert(symbolTable, bucket);
     push(functions_stack, bucket);
-
 }
 void process_function_arguments(SymbolTable *symbolTable, unsigned int scope, int yylineno, char *arg_name)
 {
@@ -125,29 +188,27 @@ void process_function_arguments(SymbolTable *symbolTable, unsigned int scope, in
     bucket = create_bucket_var(1, var, FORMAL);
     if (is_library_func(symbolTable, arg_name))
     {
-        print_error(NULL,yylineno, "ERROR : formal argument shadows libfunc");
-       
+        print_error(NULL, yylineno, "ERROR : formal argument shadows libfunc");
     }
     else if (symbolTable_lookup_exists_exact_scope(symbolTable, scope, arg_name) != 0)
     {
-         print_error(NULL,yylineno, "ERROR : formal argument redeclaration");
-       
+        print_error(NULL, yylineno, "ERROR : formal argument redeclaration");
     }
     else
     {
         symbolTable_insert(symbolTable, bucket);
-        create_argument(symbolTable,arg_name, scope);
+        create_argument(symbolTable, arg_name, scope);
     }
 }
-void process_double_colon_id(SymbolTable *symbolTable, char *name, int yylineno)
+void process_double_colon_id(SymbolTable *symbolTable, char *name, int yylineno, SymbolTableEntry **lvalue)
 {
     if (symbolTable_lookup_exists_exact_scope(symbolTable, 0, name) == 0)
     {
-         print_error(name,yylineno, "ERROR : global variable doesn't exist");
-        
+        print_error(name, yylineno, "ERROR : global variable doesn't exist");
     }
+    (*lvalue) = find_bucket_by_scope_and_name(symbolTable, name, 0);
 }
-void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char *id_name, unsigned int iam_in_function,  SymbolTableEntry **lvalue)
+void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char *id_name, unsigned int iam_in_function, SymbolTableEntry **lvalue)
 {
 
     SymbolTableEntry *bucket;
@@ -161,10 +222,11 @@ void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno
         bucket = create_bucket_var(1, var, GLOBAL);
     if (symbolTable_lookup_exists_exact_scope(symbolTable, scope, (const char *)id_name) == 0)
     {
+
         if (is_library_func(symbolTable, (const char *)id_name))
         {
-             print_error(NULL,yylineno, "ERROR : conflict with library function");
-           
+            print_error(NULL, yylineno, "ERROR : conflict with library function");
+            *lvalue = NULL;
         }
         else
         {
@@ -177,6 +239,11 @@ void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno
     }
     else
     {
-        *lvalue = symbolTable_lookup_scope(symbolTable, scope); //iparxon
+
+        *lvalue = find_bucket_by_scope_and_name(symbolTable, id_name, scope); //iparxon
+        if (lvalue == NULL)
+        {
+            //            printf("lala2 ; %s\n",(*lvalue)->value.varVal->name );
+        }
     }
 }

@@ -589,7 +589,7 @@ short create_argument(SymbolTable *symtable, char *argument, unsigned int scope)
         tmp->next_arg = arg;
     }
 
-    print_func_args(func);
+    //print_func_args(func);
 
     return 1;
 }
@@ -656,7 +656,7 @@ double find_bucket_scope(SymbolTable *symbolTable, char *name)
     return -1;
 }
 
-SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, char *name)
+SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, const char *name)
 {
     unsigned int i = 0, index = 0;
     double prev_scope = -1;

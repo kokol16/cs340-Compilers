@@ -10,6 +10,7 @@ int yylex(void);
 short is_local_id=0;
 int yyerror( char * msg );
 unsigned int  scope=0;
+unsigned int need_check=0;
 unsigned int iam_in_function=0;
 unsigned int iam_in_loop=0;
 function_stack * functions_stack=NULL;
@@ -106,44 +107,39 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term");}
                                            
         
         | PLUS_PLUS lvalue  {               {print_to_stream("Term");}
-                                           if(is_function($2) )
-                                            {
-                                                print_error(NULL,yylineno, "ERROR : can't use ++ to function");
-                                            }
+                                          process_plus_plus(symbolTable, scope, yylineno,
+                                        iam_in_function, &functions_stack, &$2);
+                                           
                                             
                             }
         | lvalue PLUS_PLUS  {                {print_to_stream("Term");}
-                                            if(is_function($1) )
-                                            {
-                                                print_error(NULL,yylineno, "ERROR : can't use ++ to function");
-                                            }
+                                            process_plus_plus(symbolTable, scope, yylineno,
+                                        iam_in_function, &functions_stack, &$1);
                             }
-        | MINUS_MINUS lvalue{              {print_to_stream("Term");}
-                                            if(is_function($2) )
-                                            {
-                                               print_error(NULL,yylineno, "ERROR : can't use -- to function");
-                                            }
+        | MINUS_MINUS lvalue{              {print_to_stream("Term");
+                                          process_minus_minus(symbolTable, scope, yylineno,
+                                        iam_in_function, &functions_stack, &$2);
+                                        }
+                                          
         }
-        | lvalue MINUS_MINUS {               {print_to_stream("Term");}
-                                            if(is_function($1) )
-                                            {
-                                                print_error(NULL,yylineno, "ERROR : can't use -- to function");
-                                            }
-        }
+        | lvalue MINUS_MINUS {               print_to_stream("Term");
+                                                process_minus_minus(symbolTable, scope, yylineno,
+                                                iam_in_function, &functions_stack, &$1);}
+                                           
+        
         | primary                             {print_to_stream("Term");};  
 
-assignexpr: lvalue  ASSIGN  expr    { {print_to_stream("Assign expression");}
-                                        if(is_function($1))
-                                        {
-                                            print_error(NULL,yylineno, "ERROR : assign to function");
-                                        }    
-                                        
-                                    }  
+assignexpr: lvalue  ASSIGN  expr    { 
+                                        print_to_stream("Assign expression");
+                                         
+                                        process_assign(symbolTable, scope, yylineno,
+                                        iam_in_function, &functions_stack, &$1);
+                                    }; 
     
                                    
 
 
-primary:  lvalue {print_to_stream("Primary");}
+primary:  lvalue { print_to_stream("Primary");  process_primary(symbolTable, scope, yylineno,iam_in_function, &functions_stack, &$1);   }
           | call {print_to_stream("Primary");}
           | objectdef {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary");}
@@ -151,7 +147,7 @@ primary:  lvalue {print_to_stream("Primary");}
 
 lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTable,scope,yylineno,$1,iam_in_function,&functions_stack,&$$); }
           | LOCALL ID           {print_to_stream("Lvalue"); process_local_id(symbolTable,  scope,  yylineno, $2,  iam_in_function,  &$$);}
-          | DOUBLE_COLON ID     {print_to_stream("Lvalue"); process_double_colon_id(symbolTable,$2,yylineno); }             
+          | DOUBLE_COLON ID     {print_to_stream("Lvalue"); process_double_colon_id(symbolTable,$2,yylineno,&$$); }             
           | member {print_to_stream("Lvalue"); $$=NULL;} ; //alliws apaiteitai typos gia to member
 
 member:    lvalue DOT ID {print_to_stream("Member");}
@@ -161,9 +157,9 @@ member:    lvalue DOT ID {print_to_stream("Member");}
 
 call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");} 
             | lvalue callsuffix { print_to_stream("Call");
-                                  if(!is_function($1) ) {
-                                    print_error(NULL,yylineno, "ERROR : can't use variable as function");
-                                  }            
+                process_callsuffix(symbolTable, scope,  yylineno,  iam_in_function, 
+                &functions_stack, &$1);
+
                                 }
             | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");}
             | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call");}
@@ -199,7 +195,7 @@ block_func: LEFT_BRACE {iam_in_function++;}  RIGHT_BRACE  {print_to_stream("Func
      pop(&functions_stack);  } ;  
   
 
-funcdef: FUNCTION   ID  { process_function_id(symbolTable,  scope,  yylineno, $2,  iam_in_function, &functions_stack  );
+funcdef: FUNCTION   ID  { process_function_id(symbolTable,  scope,  yylineno, $2,  &iam_in_function, &functions_stack  );
 
                         } LEFT_BRACKETS {scope++;}  idlist   RIGHT_BRACKETS  block_func {print_to_stream("Function Definition");} 
                                                                 
@@ -220,7 +216,7 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
 
                                            
             }
-            |   ID {                   process_function_arguments(symbolTable,scope,yylineno,$1); 
+            |   ID { process_function_arguments(symbolTable,scope,yylineno,$1); 
             }  COMMA idlist  {print_to_stream("ID List");}
         
             |    {print_to_stream("ID List");};
@@ -296,7 +292,7 @@ int main(int argc , char * argv[])
     //yylex();
     //yyin=stdin;
     yyparse() ;
-    symbolTable_print(symbolTable);
+    //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
     //if(output_file!=NULL)
