@@ -7,7 +7,6 @@ void process_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char
     if (bucket == NULL)
     {
 
-        // printf("do insert in line %d\n",yylineno);
         Variable *var;
 
         var = create_var(id_name, scope, yylineno);
@@ -32,13 +31,11 @@ void process_assign(SymbolTable *symbolTable, unsigned int scope, int yylineno, 
 
         print_error(NULL, yylineno, "ERROR : assign to function");
 
-        //tipota
-        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
+        
         *lvalue = NULL;
         return;
     }
     check_access(symbolTable, scope, yylineno, iam_in_function, functions_stack, lvalue);
-    //fprintf(stderr,"lala\n");
 }
 
 void process_callsuffix(SymbolTable *symbolTable, unsigned int scope, int yylineno, unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
@@ -58,8 +55,7 @@ void process_plus_plus(SymbolTable *symbolTable, unsigned int scope, int yylinen
 
         print_error(NULL, yylineno, "ERROR : ++ to function");
 
-        //tipota
-        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
+        
         *lvalue = NULL;
         return;
     }
@@ -69,12 +65,10 @@ void process_minus_minus(SymbolTable *symbolTable, unsigned int scope, int yylin
 {
     if (is_function(*lvalue))
     {
-        //fprintf(stderr, "lala\n");
 
         print_error(NULL, yylineno, "ERROR : -- to function");
 
-        //tipota
-        //fprintf(stderr,"it is a funcion %s\n",bucket->value.funcVal->name);
+        
         *lvalue = NULL;
         return;
     }
@@ -88,7 +82,6 @@ short check_access(SymbolTable *symbolTable, unsigned int scope, int yylineno, u
         return 0;
     }
     const char *id_name;
-    //fprintf(stderr,"lala\n");
     id_name = ((*lvalue)->value.varVal != NULL) ? (*lvalue)->value.varVal->name : (*lvalue)->value.funcVal->name;
     if((*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope || (*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope )
     {
@@ -103,7 +96,6 @@ short check_access(SymbolTable *symbolTable, unsigned int scope, int yylineno, u
     }
     else
     {
-        //print_stack(*functions_stack);
         SymbolTableEntry *func_entry = top(*functions_stack);
         if (is_function(*lvalue) || (*lvalue)->value.varVal->scope == 0 ||
             func_entry != NULL && (*lvalue)->value.varVal->scope > func_entry->value.funcVal->scope)
@@ -213,7 +205,6 @@ void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno
 
     SymbolTableEntry *bucket;
     Variable *var;
-    //printf("%s\n",$2);
 
     var = create_var(id_name, scope, yylineno);
     if (scope != 0)
@@ -230,10 +221,8 @@ void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno
         }
         else
         {
-            //fprintf(stderr,"eisai otti nane  %s  line %d\n", bucket->value.varVal->name , yylineno);
             symbolTable_insert(symbolTable, bucket);
 
-            // printf("%d\n",symbolTable_insert(symbolTable, bucket));
             *lvalue = bucket;
         }
     }
@@ -243,7 +232,6 @@ void process_local_id(SymbolTable *symbolTable, unsigned int scope, int yylineno
         *lvalue = find_bucket_by_scope_and_name(symbolTable, id_name, scope); //iparxon
         if (lvalue == NULL)
         {
-            //            printf("lala2 ; %s\n",(*lvalue)->value.varVal->name );
         }
     }
 }

@@ -45,12 +45,7 @@ function_stack * functions_stack=NULL;
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
 %type <exprNode> lvalue 
-/*%type <exprNode> funcdef 
-%type <exprNode> call  
-%type <exprNode> member  
 
-%type <num> assignexpr
-%type <num> term*/
 
 %%         
 program: statements {print_to_stream("Program");}  ;
@@ -174,7 +169,7 @@ methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Met
            |Diaeresis ID LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Method Call");}
 elist:   expr   {print_to_stream("Expression List");} 
         | expr COMMA elist {print_to_stream("Expression List");};
-        //|    {print_to_stream("Expression List");};  
+         
             
 objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");}
            |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition");}
@@ -182,7 +177,7 @@ objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definit
 
 indexed:    indexedelem  {print_to_stream("Indexed");}
             | indexedelem COMMA  indexed {print_to_stream("Indexed");};
-           // |  {print_to_stream("Indexed");} ;
+           
 
 indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE {print_to_stream("Index Element");};
 
