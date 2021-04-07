@@ -1,6 +1,7 @@
 
 %{ 
-#include "lib.h"
+#include "general_functions/lib.h"
+
 #define MY_EOF 0   
 #include"y.tab.h"
 %} 
@@ -24,7 +25,7 @@ CONTINUE        continue
 AND             and     
 NOT             not 
 OR              or 
-LOCAl           local 
+LOCALL          local 
 TRUE            true 
 FALSE           false 
 NIL             nil
@@ -32,6 +33,7 @@ NIL             nil
 PLUS            "+"
 ASSIGN          "=" 
 MINUS           "-"
+UMINUS          "-"
 ASTERISK        "*"
 DIVISION        "/"
 PERCENT         "%"
@@ -60,9 +62,12 @@ Diaeresis       ".."
 
 
 ONELINECOMMENTT "//".*         
-/* Rules Section*/
+/* Rules Section*/      
 
 %% 
+{ONELINECOMMENTT} {
+
+}
 {FUNCTION}    {
     //printf("FUNCTION \n");
      yylval.str=yytext;
@@ -70,10 +75,10 @@ ONELINECOMMENTT "//".*
 }
 
 {INT}       {
-        yylval.num=atoi(yytext);  return NUMBER ;
+        yylval.intigerVal =atoi(yytext);  return INTEGER ;
 }
 {REAL}       {
-     yylval.real=atof(yytext); return REAL ;
+     yylval.floatVal=atof(yytext); return FLOAT ;
 }
 {WHILE}       {
       return WHILE ;
@@ -100,8 +105,8 @@ ONELINECOMMENTT "//".*
 {OR}       {
       return OR ;
 }
-{LOCAl}       {
-      return LOCAl ;
+{LOCALL}       {
+      return LOCALL ;
 }
 {TRUE}       {
       return TRUE ;
@@ -127,12 +132,12 @@ ONELINECOMMENTT "//".*
 }
 {LEFT_BRACKETS} {
     //printf("find : ( \n");
-    yylval.str=yytext;
+     yylval.str=(yytext);
     return LEFT_BRACKETS ; 
 }
 {RIGHT_BRACKETS}    {
     //printf("find : ) \n");
-     yylval.str=yytext;
+      yylval.str=(yytext); 
     return RIGHT_BRACKETS ; 
 }
 {RIGHT_SQUARE}  {
@@ -149,10 +154,11 @@ ONELINECOMMENTT "//".*
 }
 {ASSIGN}  {
     return ASSIGN;
-}         
+}  
 {MINUS}  {
     return MINUS;
 }  
+
 {ASTERISK}  {
     //printf("asteri\n");
     return ASTERISK;
@@ -185,7 +191,7 @@ ONELINECOMMENTT "//".*
     return LESS_EQUALS;
 }         
 {LEFT_BRACE}  {
-    yylval.str=yytext;  return LEFT_BRACE;
+   yylval.str=strdup(yytext);  return LEFT_BRACE;
 } 
 {RIGHT_BRACE}  {
     yylval.str=yytext;   return RIGHT_BRACE;
@@ -327,12 +333,92 @@ ONELINECOMMENTT "//".*
 
             }
             
-            //free(str);
         yylval.str = malloc(sizeof(char)* (strlen(str)+1 ))    ;
         memcpy( yylval.str  , str ,strlen(str)+1 );
+        free(str);
         return STRING;
 
 } 
+
+"/*"    {
+    int c;
+    int nested=0;
+    unsigned int opened_comments=1;/*probably don't need this */   
+    alpha_comments_info_t * head;
+    head=(alpha_comments_info_t *)malloc(sizeof(alpha_comments_info_t));
+    head->next=NULL;
+    head->first_line =yylineno;
+    head->is_closed=0;
+    unsigned int counter=0;
+    while((c=input())>MY_EOF )
+    {
+        if(c=='*')
+        {
+            if((c=input())=='/' )
+            {
+                /* mark that the current comment closed */
+                alpha_comments_info_t * curr_node = get_node(head,counter);
+                if(curr_node!=NULL)
+                curr_node->is_closed=1;
+
+                unsigned int first_line= get_first_line(head,counter);
+            //    alpha_token_t * tmp;
+                if(counter==0)
+                {
+            //        tmp = alpha_CreateData("COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
+                else
+                {
+            //        tmp = alpha_CreateData("NESTED COMMENT",yylval,"MULTILINE_COMMENT",first_line);
+
+                }
+            //    alpha_PrintData(tmp ,"<-enumerated" );
+                if(counter==0)break;
+               
+                counter--;
+            //    opened_comments--;  
+            }
+            else
+            {
+                unput(c);
+            }
+        }
+        else if(c=='/')
+        {
+            if((c=input())=='*' )
+            {
+                
+              //  opened_comments++;
+                push_comments_info(head,yylineno,counter);
+                counter++;
+            }
+            else
+            {
+                unput(c);
+            }
+        }
+    }
+     if(c<=MY_EOF) /* comment never closed */
+    {
+        alpha_comments_info_t * tmp=head;
+        print_Red();
+        while(tmp!=NULL)
+        {
+            if(tmp->is_closed==0) /* print all the unclosed comments */
+            {
+                
+                fprintf(stderr , "error comment in line %d didn't close\n" ,tmp->first_line);
+
+            }
+            tmp=tmp->next;
+        
+        }
+        reset_Red();
+
+    }
+    alpha_free_comments_list(head);
+}
 
 
 {ID}        {

@@ -41,6 +41,7 @@ void reset_Yellow()
  * @param node The token that we will print
  * @param extra_type 
  */
+/*
 void alpha_PrintData(alpha_token_t *node, char *extra_type)
 {
   int line_width = 10;
@@ -63,7 +64,7 @@ void alpha_PrintData(alpha_token_t *node, char *extra_type)
     fprintf(out, "\"%s\"\t", node->content);
   }
   fprintf(out, "%s\n", extra_type);
-}
+}*/
 void alpha_free_tokens_list(alpha_token_t *head)
 {
   alpha_token_t *prev = head;
@@ -177,6 +178,7 @@ unsigned int get_first_line(alpha_comments_info_t *head, unsigned int index)
  * 
  * @param head The head of the comment's list
  */
+/*
 void print_comments_info(alpha_comments_info_t *head)
 {
   while (head != NULL)
@@ -184,4 +186,4 @@ void print_comments_info(alpha_comments_info_t *head)
     fprintf(output_file, "from %u to %u \n", head->first_line, head->last_line);
     head = head->next;
   }
-}
+}*/

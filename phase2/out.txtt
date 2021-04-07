@@ -1,19 +1,5 @@
 ID List
-Lvalue
-Integer
-Primary
-Term
-Expression
-Assign expression
-Expression
-Statement
 ID List
-Lvalue
-Primary
-Term
-Expression
-Return Statement
-Statement
 Lvalue
 Normal Call
 Call Suffix
@@ -29,6 +15,45 @@ Statement
 Function Block
 Function Definition
 Statement
+Lvalue
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Return Statement
+Statement
+Statement
+Statement
+Lvalue
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Return Statement
+Statement
+Statement
+Statement
+Block
+Statement
+Block
+Statement
+Block
+Statement
+Integer
+Primary
+Term
+Expression
+Statement
+Return Statement
+Statement
+Block
+Statement
+While Statement
+Statement
 Program
 =============== scope #0=====================
  "print" [library function] (line 0) (scope 0) (active 1)
@@ -43,7 +68,6 @@ Program
  "sqrt" [library function] (line 0) (scope 0) (active 1)
  "cos" [library function] (line 0) (scope 0) (active 1)
  "sin" [library function] (line 0) (scope 0) (active 1)
- "f" [user function] (line 1) (scope 0) (active 1)
+ "G" [user function] (line 3) (scope 0) (active 1)
 =============== scope #1=====================
- "f" [local variable] (line  2) (scope 1) (active 0)
- "h" [user function] (line 3) (scope 1) (active 0)
+ "F" [user function] (line 4) (scope 1) (active 0)
