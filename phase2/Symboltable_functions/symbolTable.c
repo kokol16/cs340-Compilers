@@ -1,6 +1,7 @@
 #include "symbolTable.h"
 #include "../general_functions/lib.h"
 unsigned int SIZE = 10;
+func_loop_stack *root_func_loop_stack=NULL;
 
 SymbolTable *symbolTable_create()
 {
@@ -748,4 +749,49 @@ void print_stack(function_stack *root)
         tmp = tmp->next;
     }
     fprintf(stderr, "\n");
+}
+
+
+
+int push_func_loop(  enum func_loops  entry  )
+{
+    func_loop_stack * stack_entry= malloc(sizeof(func_loop_stack));
+    stack_entry->func_loop=entry;
+    stack_entry->next=NULL;
+    if (root_func_loop_stack == NULL)
+    {
+        root_func_loop_stack = stack_entry;
+        return 1;
+    }
+
+    stack_entry->next = root_func_loop_stack;
+    root_func_loop_stack = stack_entry;
+    return 1;
+}
+
+int pop_func_loop()
+{
+    if (root_func_loop_stack == NULL)
+    {
+        return 0;
+    }
+    root_func_loop_stack = root_func_loop_stack->next;
+    return 1;
+}
+
+enum func_loops top_func_loop()
+{
+    if (root_func_loop_stack != NULL)
+    {
+        return root_func_loop_stack->func_loop;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+void print_stack_func_loop()
+{
+
 }

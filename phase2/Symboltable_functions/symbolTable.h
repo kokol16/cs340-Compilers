@@ -1,9 +1,22 @@
-#include<stdlib.h>
-#include<stdio.h> 
-#include<string.h> 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #define HASH_MULTIPLIER 65599
 #define ERROR_FUNC 2
-#define ERROR_VAR 3 
+#define ERROR_VAR 3
+
+enum func_loops
+{
+    func,
+    for_loop,
+    while_loop
+};
+typedef struct func_loop_stack
+{
+    enum func_loops func_loop;
+    struct func_loop_stack *next;
+} func_loop_stack;
+
 typedef struct Variable
 {
     const char *name;
@@ -14,7 +27,7 @@ typedef struct Function
 {
     const char *name;
 
-    struct SymbolTableEntry * head_arg;
+    struct SymbolTableEntry *head_arg;
 
     unsigned int scope;
     unsigned int line;
@@ -30,16 +43,16 @@ enum SymbolType
 };
 typedef struct SymbolTableEntry
 {
-    short  isActive;
+    short isActive;
     short isScopeListHead;
     struct value
     {
         Variable *varVal;
         Function *funcVal;
     } value;
-    struct SymbolTableEntry * next;
-    struct SymbolTableEntry * next_same_scope;
-    struct SymbolTableEntry * next_arg;
+    struct SymbolTableEntry *next;
+    struct SymbolTableEntry *next_same_scope;
+    struct SymbolTableEntry *next_arg;
 
     enum SymbolType type;
 } SymbolTableEntry;
@@ -51,11 +64,9 @@ typedef struct SymbolTable
 
 typedef struct function_stack
 {
-  SymbolTableEntry * func;
-  struct function_stack * next;
+    SymbolTableEntry *func;
+    struct function_stack *next;
 } function_stack;
-
-
 
 /**
  * @brief  the hash function
@@ -70,7 +81,7 @@ static unsigned int SymTable_hash(const char *pcKey);
  * @note   
  * @retval the symbol table
  */
-SymbolTable  * symbolTable_create();
+SymbolTable *symbolTable_create();
 
 /**
  * @brief  a function that inserts a bucket in symbol table
@@ -79,7 +90,7 @@ SymbolTable  * symbolTable_create();
  * @param  bucket: bucket to be inserted
  * @retval 
  */
-short symbolTable_insert( SymbolTable  *symbolTable , SymbolTableEntry *  bucket );
+short symbolTable_insert(SymbolTable *symbolTable, SymbolTableEntry *bucket);
 
 /**
  * @brief  a function that makes all symbols in scope inactive
@@ -88,7 +99,7 @@ short symbolTable_insert( SymbolTable  *symbolTable , SymbolTableEntry *  bucket
  * @param  scope: the scope to make inactive
  * @retval 
  */
-short symbolTable_hide(  SymbolTable * symbolTable  , unsigned int scope);
+short symbolTable_hide(SymbolTable *symbolTable, unsigned int scope);
 
 /**
  * @brief  lookup in the scope
@@ -97,7 +108,7 @@ short symbolTable_hide(  SymbolTable * symbolTable  , unsigned int scope);
  * @param  scope: the scope to lookup in
  * @retval first bucket in scope
  */
-SymbolTableEntry * symbolTable_lookup_scope( SymbolTable * symbolTable , unsigned int  scope );
+SymbolTableEntry *symbolTable_lookup_scope(SymbolTable *symbolTable, unsigned int scope);
 
 /**
  * @brief lookup for variable with name name 
@@ -106,7 +117,7 @@ SymbolTableEntry * symbolTable_lookup_scope( SymbolTable * symbolTable , unsigne
  * @param  name: the name of variable to lookup
  * @retval the variable-bucket with name name
  */
-SymbolTableEntry *  symbolTable_lookup_scopeless_var( SymbolTable * symbolTable, char *name );
+SymbolTableEntry *symbolTable_lookup_scopeless_var(SymbolTable *symbolTable, char *name);
 
 /**
  * @brief  lookup for the head of the list in given scope
@@ -124,7 +135,7 @@ SymbolTableEntry *symbolTable_lookup_head(SymbolTable *symbolTable, unsigned int
  * @param  *name: 
  * @retval 
  */
-SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable, const  char *name );
+SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, const char *name);
 
 /**
  * @brief  lookup if a symbol with given name exists in scope<=given scope
@@ -134,7 +145,7 @@ SymbolTableEntry *  symbolTable_lookup_scopeless( SymbolTable * symbolTable, con
  * @param  name: given name 
  * @retval 0 if not found , 1 if found
  */
-short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope , const char * name);
+short symbolTable_lookup_exists(SymbolTable *symbolTable, unsigned int scope, const char *name);
 
 /**
  * @brief  function to print the symbol table
@@ -152,7 +163,7 @@ void symbolTable_print(SymbolTable *symbolTable);
  * @param  line: line of variable 
  * @retval return created variable
  */
-Variable * create_var(const char *name,unsigned int scope,unsigned int line);
+Variable *create_var(const char *name, unsigned int scope, unsigned int line);
 
 /**
  * @brief  create a function
@@ -162,7 +173,7 @@ Variable * create_var(const char *name,unsigned int scope,unsigned int line);
  * @param  line: line of function 
  * @retval return created function
  */
-Function * create_func(const char *name , unsigned int scope , unsigned int line  );
+Function *create_func(const char *name, unsigned int scope, unsigned int line);
 
 /**
  * @brief  create a bucket for a variable
@@ -172,7 +183,7 @@ Function * create_func(const char *name , unsigned int scope , unsigned int line
  * @param  type: the type of the variable
  * @retval a variable-bucket
  */
-SymbolTableEntry *  create_bucket_var( short  isActive , Variable  * var  , enum SymbolType type  );
+SymbolTableEntry *create_bucket_var(short isActive, Variable *var, enum SymbolType type);
 
 /**
  * @brief  create a bucket for a function
@@ -182,7 +193,7 @@ SymbolTableEntry *  create_bucket_var( short  isActive , Variable  * var  , enum
  * @param  type: the type of the function
  * @retval a function-bucket
  */
-SymbolTableEntry *  create_bucket_func( short  isActive , Function *  func  , enum SymbolType type  );
+SymbolTableEntry *create_bucket_func(short isActive, Function *func, enum SymbolType type);
 
 /**
  * @brief  a function to print the scope list for a given scope 
@@ -199,8 +210,7 @@ void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope);
  * @param  symtable: the symbol table 
  * @retval 
  */
-static short  load_lib_functions(SymbolTable *symtable);
-
+static short load_lib_functions(SymbolTable *symtable);
 
 //SymbolTableEntry ** create_arguments_buckets(Variable ** arguments , unsigned int size );
 
@@ -212,7 +222,7 @@ static short  load_lib_functions(SymbolTable *symtable);
  * @param  size: size of arg_buckets array 
  * @retval 
  */
-short symbolTable_insert_args(SymbolTable * symTable, SymbolTableEntry ** arg_buckets ,unsigned int size );
+short symbolTable_insert_args(SymbolTable *symTable, SymbolTableEntry **arg_buckets, unsigned int size);
 
 /**
  * @brief  find if a symbol with a given name exists in a given scope
@@ -231,7 +241,7 @@ short symbolTable_lookup_exists_exact_scope(SymbolTable *symbolTable, unsigned i
  * @param  name: given name 
  * @retval 
  */
-short is_library_func(SymbolTable *symTable ,const char *name);
+short is_library_func(SymbolTable *symTable, const char *name);
 
 /**
  * @brief  find if there is a user function in a given scope
@@ -240,8 +250,7 @@ short is_library_func(SymbolTable *symTable ,const char *name);
  * @param  scope: given scope
  * @retval 
  */
-short symbolTable_lookup_function(SymbolTable *symTable ,unsigned int scope);
-
+short symbolTable_lookup_function(SymbolTable *symTable, unsigned int scope);
 
 //char *SymbolType_to_string(enum SymbolType type);
 void symbolTable_print_scopes(SymbolTable *symbolTable, unsigned int scope);
@@ -252,10 +261,9 @@ void symbolTable_print_scopes(SymbolTable *symbolTable, unsigned int scope);
  * @param  fnc: given function-bucket 
  * @retval None
  */
-void print_func_args(SymbolTableEntry * fnc);
+void print_func_args(SymbolTableEntry *fnc);
 
-short  create_arguments(SymbolTable *symtable, char *arguments, unsigned int scope);
-
+short create_arguments(SymbolTable *symtable, char *arguments, unsigned int scope);
 
 SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *name, unsigned int scope);
 
@@ -266,7 +274,7 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
  * @param  scope: given scope 
  * @retval function-bucket
  */
-SymbolTableEntry * last_func_inserted_in_current_scope(SymbolTable *symtable,  unsigned int scope);
+SymbolTableEntry *last_func_inserted_in_current_scope(SymbolTable *symtable, unsigned int scope);
 
 /**
  * @brief  given the name of a symbol find its scope
@@ -275,7 +283,7 @@ SymbolTableEntry * last_func_inserted_in_current_scope(SymbolTable *symtable,  u
  * @param  name: given name
  * @retval the scope
  */
-double  find_bucket_scope( SymbolTable * symbolTable  , char * name);
+double find_bucket_scope(SymbolTable *symbolTable, char *name);
 
 //short is_argument( SymbolTableEntry * func);
 short create_argument(SymbolTable *symtable, char *argument, unsigned int scope);
@@ -286,7 +294,7 @@ short create_argument(SymbolTable *symtable, char *argument, unsigned int scope)
  * @param  lvalue: given bucket
  * @retval 
  */
-short is_function(SymbolTableEntry * lvalue);
+short is_function(SymbolTableEntry *lvalue);
 
 /**
  * @brief  push for the stack of functions inserted in symbol table (insert in the stack)
@@ -295,7 +303,7 @@ short is_function(SymbolTableEntry * lvalue);
  * @param  func: bucket to be pushed
  * @retval 
  */
-int  push(function_stack ** root ,SymbolTableEntry * func);
+int push(function_stack **root, SymbolTableEntry *func);
 
 /**
  * @brief  pop for the stack of functions inserted in symbol table (delete from stack)
@@ -303,7 +311,7 @@ int  push(function_stack ** root ,SymbolTableEntry * func);
  * @param  root: root of the stack
  * @retval 
  */
-int  pop(function_stack ** root  );
+int pop(function_stack **root);
 
 /**
  * @brief  top for the stack of functions inserted in symbol table (return last inserted function)
@@ -311,7 +319,7 @@ int  pop(function_stack ** root  );
  * @param  root: root of the stack
  * @retval last inserted function-bucket
  */
-SymbolTableEntry *  top(function_stack * root );
+SymbolTableEntry *top(function_stack *root);
 
 /**
  * @brief  print the function stack 
@@ -319,4 +327,36 @@ SymbolTableEntry *  top(function_stack * root );
  * @param  root: root of stack
  * @retval None
  */
-void print_stack(function_stack * root);
+void print_stack(function_stack *root);
+
+
+
+
+/**
+ * @brief  push for the stack of opened functions and loops  (insert in the stack)
+ * @note   
+ * @param  entry: entry to be inserted in  the stack
+ * @retval 
+ */
+int push_func_loop(  enum func_loops entry    );
+
+/**
+ * @brief  pop for the stack of opened functions and loops (delete from stack)
+ * @note   
+ * @retval 
+ */
+int pop_func_loop();
+
+/**
+ * @brief  top for the stack  of opened functions and loops  
+ * @note   
+ * @retval last opened loop or function
+ */
+enum func_loops top_func_loop();
+
+/**
+ * @brief  print the function stack 
+ * @note   
+ * @retval None
+ */
+void print_stack_func_loop();

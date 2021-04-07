@@ -554,8 +554,8 @@ static const yytype_uint8 yyrline[] =
      167,   168,   169,   170,   171,   174,   175,   176,   178,   179,
      182,   184,   184,   185,   185,   187,   187,   189,   189,   193,
      195,   193,   197,   200,   197,   203,   204,   205,   206,   207,
-     208,   210,   214,   214,   217,   219,   220,   221,   221,   223,
-     223,   224,   224,   227,   235
+     208,   210,   214,   214,   217,   219,   220,   221,   221,   224,
+     224,   226,   226,   230,   238
 };
 #endif
 
@@ -1628,7 +1628,7 @@ yyreduce:
   case 8:
 #line 57 "parser.y" /* yacc.c:1646  */
     {      {print_to_stream("Statement");}  
-                                   if(iam_in_loop==0)
+                                   if(top_func_loop()!=for_loop && top_func_loop()!=while_loop )
                                     {
                                         print_error(NULL,yylineno, "ERROR : use BREAK not in a loop");
                                     } 
@@ -1641,7 +1641,7 @@ yyreduce:
   case 9:
 #line 65 "parser.y" /* yacc.c:1646  */
     {     {print_to_stream("Statement");}  
-                                    if(iam_in_loop==0)
+                                    if(top_func_loop()!=for_loop && top_func_loop()!=while_loop)
                                     {
                                        print_error(NULL,yylineno, "ERROR : use CONTINUE not in a loop");
                                     } 
@@ -2048,27 +2048,27 @@ yyreduce:
 
   case 75:
 #line 187 "parser.y" /* yacc.c:1646  */
-    {iam_in_function++;}
+    {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}
 #line 2053 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
 #line 187 "parser.y" /* yacc.c:1646  */
-    {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--; iam_in_function--; 
-        pop(&functions_stack);}
+    {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
+ scope--; iam_in_function--;   pop(&functions_stack);    pop_func_loop();   }
 #line 2060 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
 #line 189 "parser.y" /* yacc.c:1646  */
-    {iam_in_function++;}
+    {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}
 #line 2066 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
 #line 189 "parser.y" /* yacc.c:1646  */
     {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
-     pop(&functions_stack);  }
+     pop(&functions_stack);  pop_func_loop();  }
 #line 2073 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -2190,67 +2190,68 @@ yyreduce:
 
   case 97:
 #line 221 "parser.y" /* yacc.c:1646  */
-    {iam_in_loop++;}
+    {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); }
 #line 2195 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 98:
 #line 221 "parser.y" /* yacc.c:1646  */
-    {print_to_stream("While Statement"); iam_in_loop--;}
-#line 2201 "y.tab.c" /* yacc.c:1646  */
+    {print_to_stream("While Statement"); 
+        iam_in_loop--;   pop_func_loop();                                }
+#line 2202 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 223 "parser.y" /* yacc.c:1646  */
-    {iam_in_loop++;}
-#line 2207 "y.tab.c" /* yacc.c:1646  */
+#line 224 "parser.y" /* yacc.c:1646  */
+    {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}
+#line 2208 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 223 "parser.y" /* yacc.c:1646  */
-    { print_to_stream("For Statement"); iam_in_loop--;}
-#line 2213 "y.tab.c" /* yacc.c:1646  */
+#line 225 "parser.y" /* yacc.c:1646  */
+    { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }
+#line 2214 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 101:
-#line 224 "parser.y" /* yacc.c:1646  */
-    {iam_in_loop++;}
-#line 2219 "y.tab.c" /* yacc.c:1646  */
+#line 226 "parser.y" /* yacc.c:1646  */
+    {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}
+#line 2220 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 224 "parser.y" /* yacc.c:1646  */
-    {print_to_stream("For Statement"); iam_in_loop--;}
-#line 2225 "y.tab.c" /* yacc.c:1646  */
+#line 227 "parser.y" /* yacc.c:1646  */
+    {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();}
+#line 2226 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 227 "parser.y" /* yacc.c:1646  */
+#line 230 "parser.y" /* yacc.c:1646  */
     {   print_to_stream("Return Statement");
-                                    if(iam_in_function==0)
+                                    if(iam_in_function <=0)
                                     {
                                        print_error(NULL,yylineno, "ERROR : return out of function");
                                     } 
                                     
                                  }
-#line 2237 "y.tab.c" /* yacc.c:1646  */
+#line 2238 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 104:
-#line 235 "parser.y" /* yacc.c:1646  */
+#line 238 "parser.y" /* yacc.c:1646  */
     {    print_to_stream("Return Statement");
-                                        if(iam_in_function==0)
+                                        if(iam_in_function <=0)
                                         {
                                            print_error(NULL,yylineno, "ERROR : return out of function");
                                         } 
                                         
                                         
                                      }
-#line 2250 "y.tab.c" /* yacc.c:1646  */
+#line 2251 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2254 "y.tab.c" /* yacc.c:1646  */
+#line 2255 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2478,7 +2479,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 245 "parser.y" /* yacc.c:1906  */
+#line 248 "parser.y" /* yacc.c:1906  */
 
 
 int yyerror( char * msg )
@@ -2521,14 +2522,12 @@ int main(int argc , char * argv[])
     }
   
     symbolTable = symbolTable_create();
-    //yylex();
-    //yyin=stdin;
     yyparse() ;
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
-    //if(output_file!=NULL)
-    //fclose(output_file);
-//    fclose(yyin);
+    if(output_file!=NULL)
+    fclose(output_file);
+    fclose(yyin);
 }
 

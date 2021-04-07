@@ -55,7 +55,7 @@ stmt:   expr SEMICOLON   {print_to_stream("Statement");}
         | forstmt        {print_to_stream("Statement");}  
         | returnstmt     {print_to_stream("Statement");}  
         | BREAK SEMICOLON {      {print_to_stream("Statement");}  
-                                   if(iam_in_loop==0)
+                                   if(top_func_loop()!=for_loop && top_func_loop()!=while_loop )
                                     {
                                         print_error(NULL,yylineno, "ERROR : use BREAK not in a loop");
                                     } 
@@ -63,7 +63,7 @@ stmt:   expr SEMICOLON   {print_to_stream("Statement");}
         
                             }
         | CONTINUE SEMICOLON {     {print_to_stream("Statement");}  
-                                    if(iam_in_loop==0)
+                                    if(top_func_loop()!=for_loop && top_func_loop()!=while_loop)
                                     {
                                        print_error(NULL,yylineno, "ERROR : use CONTINUE not in a loop");
                                     } 
@@ -184,10 +184,10 @@ indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE {print_to_stream("Index Elem
 block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;}       
        |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;} ;  
        
-block_func: LEFT_BRACE {iam_in_function++;}  RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--; iam_in_function--; 
-        pop(&functions_stack);}       
-       |LEFT_BRACE {iam_in_function++;}    statements  RIGHT_BRACE {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
-     pop(&functions_stack);  } ;  
+block_func: LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}  RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
+ scope--; iam_in_function--;   pop(&functions_stack);    pop_func_loop();   }       
+       |LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}    statements  RIGHT_BRACE {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
+     pop(&functions_stack);  pop_func_loop();  } ;  
   
 
 funcdef: FUNCTION   ID  { process_function_id(symbolTable,  scope,  yylineno, $2,  &iam_in_function, &functions_stack  );
@@ -218,14 +218,17 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
 
 ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt {print_to_stream("If Statement");} 
         | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt {print_to_stream("If Statement");} 
-whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++;} expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); iam_in_loop--;};
+whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); 
+        iam_in_loop--;   pop_func_loop();                                };
 
-forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt { print_to_stream("For Statement"); iam_in_loop--;}
-        |  FOR LEFT_BRACKETS {iam_in_loop++;}     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   {print_to_stream("For Statement"); iam_in_loop--;};  
+forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt 
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }
+        |  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   
+                            {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();};  
         
             
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
-                                    if(iam_in_function==0)
+                                    if(iam_in_function <=0)
                                     {
                                        print_error(NULL,yylineno, "ERROR : return out of function");
                                     } 
@@ -233,7 +236,7 @@ returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                  } 
                                     
             |  RETURN SEMICOLON    {    print_to_stream("Return Statement");
-                                        if(iam_in_function==0)
+                                        if(iam_in_function <=0)
                                         {
                                            print_error(NULL,yylineno, "ERROR : return out of function");
                                         } 
@@ -284,14 +287,12 @@ int main(int argc , char * argv[])
     }
   
     symbolTable = symbolTable_create();
-    //yylex();
-    //yyin=stdin;
     yyparse() ;
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
-    //if(output_file!=NULL)
-    //fclose(output_file);
-//    fclose(yyin);
+    if(output_file!=NULL)
+    fclose(output_file);
+    fclose(yyin);
 }
 
