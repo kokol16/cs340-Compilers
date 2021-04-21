@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <string.h>
 #define HASH_MULTIPLIER 65599
 #define ERROR_FUNC 2

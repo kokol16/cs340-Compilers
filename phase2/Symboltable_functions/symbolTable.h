@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #define HASH_MULTIPLIER 65599
 #define ERROR_FUNC 2
 #define ERROR_VAR 3
@@ -41,6 +42,12 @@ enum SymbolType
     USERFUNC,
     LIBFUNC
 };
+typedef enum scopespace_t
+{
+    programvar,
+    functionlocal,
+    formalarg
+} scopespace_t;
 typedef struct SymbolTableEntry
 {
     short isActive;
@@ -50,12 +57,26 @@ typedef struct SymbolTableEntry
         Variable *varVal;
         Function *funcVal;
     } value;
+    unsigned offset;
+    scopespace_t space;
     struct SymbolTableEntry *next;
     struct SymbolTableEntry *next_same_scope;
     struct SymbolTableEntry *next_arg;
 
     enum SymbolType type;
 } SymbolTableEntry;
+
+unsigned program_var_offset = 0;
+unsigned function_local_offset = 0;
+unsigned formal_arg_offset = 0;
+unsigned scope_space_counter = 1;
+
+unsigned curr_scope_offset();
+void enter_scope_space();
+void exit_scope_space();
+void in_current_scope_offset(void);
+scopespace_t curr_scope_space();
+
 
 typedef struct SymbolTable
 {
@@ -329,16 +350,13 @@ SymbolTableEntry *top(function_stack *root);
  */
 void print_stack(function_stack *root);
 
-
-
-
 /**
  * @brief  push for the stack of opened functions and loops  (insert in the stack)
  * @note   
  * @param  entry: entry to be inserted in  the stack
  * @retval 
  */
-int push_func_loop(  enum func_loops entry    );
+int push_func_loop(enum func_loops entry);
 
 /**
  * @brief  pop for the stack of opened functions and loops (delete from stack)

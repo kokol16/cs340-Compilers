@@ -2,7 +2,6 @@
 
 void process_id(SymbolTable *symbolTable, char *id_name, SymbolTableEntry **lvalue)
 {
-
     SymbolTableEntry *bucket = symbolTable_lookup_scopeless(symbolTable, id_name);
     if (bucket == NULL)
     {
@@ -15,7 +14,7 @@ void process_id(SymbolTable *symbolTable, char *id_name, SymbolTableEntry **lval
         else
             bucket = create_bucket_var(1, var, GLOBAL);
         symbolTable_insert(symbolTable, bucket);
-    }
+    }    
     *lvalue = bucket;
 }
 

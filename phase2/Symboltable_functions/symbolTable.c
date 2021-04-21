@@ -1,6 +1,58 @@
 #include "symbolTable.h"
 #include "../general_functions/lib.h"
-unsigned int SIZE = 10;
+unsigned int SIZE = 256;
+
+unsigned curr_scope_offset()
+{
+    switch (curr_scope_space())
+    {
+    case programvar:
+        return program_var_offset;
+    case functionlocal:
+        return function_local_offset;
+    case formalarg:
+        return formal_arg_offset;
+    default:
+        assert(0);
+    }
+}
+void enter_scope_space()
+{
+    ++scope_space_counter;
+}
+void exit_scope_space()
+{
+    assert(scope_space_counter > 1);
+    --scope_space_counter;
+}
+
+scopespace_t curr_scope_space()
+{
+    if (scope_space_counter == 1)
+        return programvar;
+    else if (scope_space_counter % 2 == 0)
+        return formalarg;
+    else
+        return functionlocal;
+}
+
+void in_current_scope_offset(void)
+{
+    switch (curr_scope_space())
+    {
+    case programvar:
+        ++program_var_offset;
+        break;
+    case functionlocal:
+        ++function_local_offset;
+        break;
+    case formalarg:
+        ++formal_arg_offset;
+        break;
+    default:
+        assert(0);
+    }
+}
 
 SymbolTable *symbolTable_create()
 {
@@ -534,7 +586,8 @@ short create_arguments(SymbolTable *symtable, char *arguments, unsigned int scop
     unsigned int size = 0;
     SymbolTableEntry *arg = NULL, *func, *tmp;
     char *ptr;
-    if(symtable==NULL) return 0;
+    if (symtable == NULL)
+        return 0;
     func = last_func_inserted_in_current_scope(symtable, scope - 1);
 
     if (func == NULL)
@@ -567,7 +620,8 @@ short create_argument(SymbolTable *symtable, char *argument, unsigned int scope)
 {
     SymbolTableEntry *arg = NULL, *func, *tmp;
     char *ptr;
-    if(symtable==NULL) return 0;
+    if (symtable == NULL)
+        return 0;
     func = last_func_inserted_in_current_scope(symtable, scope - 1);
     if (func == NULL)
     {
@@ -609,7 +663,8 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
 {
     unsigned int index;
     SymbolTableEntry *bucket;
-    if(symtable==NULL) return NULL;
+    if (symtable == NULL)
+        return NULL;
     bucket = symbolTable_lookup_head(symtable, scope);
     while (bucket != NULL)
     {
@@ -630,7 +685,8 @@ SymbolTableEntry *last_func_inserted_in_current_scope(SymbolTable *symtable, uns
 {
     unsigned int index;
     SymbolTableEntry *bucket, *last_func = NULL;
-    if(symtable==NULL) return NULL;
+    if (symtable == NULL)
+        return NULL;
 
     bucket = symbolTable_lookup_head(symtable, scope);
     while (bucket != NULL)
@@ -646,8 +702,9 @@ SymbolTableEntry *last_func_inserted_in_current_scope(SymbolTable *symtable, uns
 }
 double find_bucket_scope(SymbolTable *symbolTable, char *name)
 {
-    SymbolTableEntry * func;
-    if(symbolTable==NULL) return -1;
+    SymbolTableEntry *func;
+    if (symbolTable == NULL)
+        return -1;
     func = symbolTable_lookup_scopeless_var(symbolTable, name);
     if (func != NULL)
     {
@@ -661,7 +718,8 @@ SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, const c
     unsigned int i = 0, index = 0;
     double prev_scope = -1;
     SymbolTableEntry *head, *tmp = NULL;
-    if(symbolTable==NULL || name==NULL) return NULL;
+    if (symbolTable == NULL || name == NULL)
+        return NULL;
     index = SymTable_hash(name);
     head = symbolTable->symboltable[index];
     while (head != NULL)
@@ -683,7 +741,8 @@ SymbolTableEntry *symbolTable_lookup_scopeless(SymbolTable *symbolTable, const c
 
 short is_function(SymbolTableEntry *lvalue)
 {
-    if(lvalue==NULL) return 0;
+    if (lvalue == NULL)
+        return 0;
     if (lvalue->value.funcVal != NULL)
     {
         return 1;
@@ -750,13 +809,11 @@ void print_stack(function_stack *root)
     fprintf(stderr, "\n");
 }
 
-
-
-int push_func_loop(  enum func_loops  entry  )
+int push_func_loop(enum func_loops entry)
 {
-    func_loop_stack * stack_entry= malloc(sizeof(func_loop_stack));
-    stack_entry->func_loop=entry;
-    stack_entry->next=NULL;
+    func_loop_stack *stack_entry = malloc(sizeof(func_loop_stack));
+    stack_entry->func_loop = entry;
+    stack_entry->next = NULL;
     if (root_func_loop_stack == NULL)
     {
         root_func_loop_stack = stack_entry;
@@ -792,5 +849,4 @@ enum func_loops top_func_loop()
 
 void print_stack_func_loop()
 {
-
 }
