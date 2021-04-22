@@ -1,30 +1,29 @@
 #include "bison_functions.h"
 
-void process_id(SymbolTable *symbolTable, char *id_name, SymbolTableEntry **lvalue)
+#define lvalue_ptr (*lvalue)
+void process_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
 {
-    SymbolTableEntry *bucket = symbolTable_lookup_scopeless(symbolTable, id_name);
+    SymbolTableEntry *bucket;
+    Variable *var;
+
+    bucket = symbolTable_lookup_scopeless(symbolTable, id_name);
     if (bucket == NULL)
     {
 
-        Variable *var;
-
-        var = create_var(id_name, scope, yylineno);
-        if (scope != 0)
-            bucket = create_bucket_var(1, var, LOCAL);
-        else
-            bucket = create_bucket_var(1, var, GLOBAL);
         symbolTable_insert(symbolTable, bucket);
-    }    
-    *lvalue = bucket;
+        bucket->space = curr_scope_space();
+        bucket->offset = curr_scope_offset();
+    }
+    lvalue_ptr = lvalue_expr(bucket);
 }
 
-void process_assign(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
+void process_assign(SymbolTable *symbolTable, expr **lvalue)
 {
     if (lvalue == NULL)
     {
         return;
     }
-    if (is_function(*lvalue))
+    if (is_function(lvalue_ptr->sym))
     {
 
         print_error(NULL, yylineno, "ERROR : assign to function");
@@ -32,22 +31,22 @@ void process_assign(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
         *lvalue = NULL;
         return;
     }
-    check_access(symbolTable, lvalue);
+    check_access(symbolTable, &lvalue_ptr->sym);
 }
 
-void process_callsuffix(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
+void process_callsuffix(SymbolTable *symbolTable, expr **lvalue)
 {
-    check_access(symbolTable,  lvalue);
+    check_access(symbolTable, &lvalue_ptr->sym);
 }
-void process_primary(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
+void process_primary(SymbolTable *symbolTable, expr **lvalue)
 {
 
-    check_access(symbolTable,  lvalue);
+    check_access(symbolTable, &lvalue_ptr->sym);
 }
 
-void process_plus_plus(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
+void process_plus_plus(SymbolTable *symbolTable, expr **lvalue)
 {
-    if (is_function(*lvalue))
+    if (is_function(lvalue_ptr->sym))
     {
 
         print_error(NULL, yylineno, "ERROR : ++ to function");
@@ -55,11 +54,11 @@ void process_plus_plus(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
         *lvalue = NULL;
         return;
     }
-    check_access(symbolTable, lvalue);
+    check_access(symbolTable, &lvalue_ptr->sym);
 }
-void process_minus_minus(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
+void process_minus_minus(SymbolTable *symbolTable, expr **lvalue)
 {
-    if (is_function(*lvalue))
+    if (is_function(lvalue_ptr->sym))
     {
 
         print_error(NULL, yylineno, "ERROR : -- to function");
@@ -67,7 +66,7 @@ void process_minus_minus(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
         *lvalue = NULL;
         return;
     }
-    check_access(symbolTable, lvalue);
+    check_access(symbolTable, &lvalue_ptr->sym);
 }
 
 short check_access(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
@@ -144,7 +143,7 @@ void print_to_stream(char *msg)
 
     fprintf(output_file, "%s\n", msg);
 }
-void print_error(const char *name,int line ,  char *msg  )
+void print_error(const char *name, int line, char *msg)
 {
     print_Red();
     fprintf(stderr, "%s", msg);
@@ -185,20 +184,19 @@ void process_function_arguments(SymbolTable *symbolTable, char *arg_name)
         create_argument(symbolTable, arg_name, scope);
     }
 }
-void process_double_colon_id(SymbolTable *symbolTable, char *name, SymbolTableEntry **lvalue)
+void process_double_colon_id(SymbolTable *symbolTable, char *name, expr **lvalue)
 {
     if (symbolTable_lookup_exists_exact_scope(symbolTable, 0, name) == 0)
     {
         print_error(name, yylineno, "ERROR : global variable doesn't exist");
     }
-    (*lvalue) = find_bucket_by_scope_and_name(symbolTable, name, 0);
+    lvalue_ptr->sym = find_bucket_by_scope_and_name(symbolTable, name, 0);
 }
-void process_local_id(SymbolTable *symbolTable, char *id_name, SymbolTableEntry **lvalue)
+void process_local_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
 {
 
     SymbolTableEntry *bucket;
     Variable *var;
-
     var = create_var(id_name, scope, yylineno);
     if (scope != 0)
         bucket = create_bucket_var(1, var, LOCAL);
@@ -206,25 +204,23 @@ void process_local_id(SymbolTable *symbolTable, char *id_name, SymbolTableEntry 
         bucket = create_bucket_var(1, var, GLOBAL);
     if (symbolTable_lookup_exists_exact_scope(symbolTable, scope, (const char *)id_name) == 0)
     {
-
         if (is_library_func(symbolTable, (const char *)id_name))
         {
             print_error(NULL, yylineno, "ERROR : conflict with library function");
-            *lvalue = NULL;
+            //*lvalue = NULL;
         }
         else
         {
             symbolTable_insert(symbolTable, bucket);
-
-            *lvalue = bucket;
+            bucket->space = curr_scope_space();
+            bucket->offset = curr_scope_offset();
         }
     }
     else
     {
-
-        *lvalue = find_bucket_by_scope_and_name(symbolTable, id_name, scope); //iparxon
-        if (lvalue == NULL)
-        {
-        }
+        bucket = find_bucket_by_scope_and_name(symbolTable, id_name, scope);
+        bucket->space = curr_scope_space();
+        bucket->offset = curr_scope_offset();
     }
+    lvalue_ptr = lvalue_expr(bucket);
 }

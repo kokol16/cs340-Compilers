@@ -49,6 +49,12 @@ enum SymbolType
     USERFUNC,
     LIBFUNC
 };
+typedef enum scopespace_t
+{
+    programvar,
+    functionlocal,
+    formalarg
+} scopespace_t;
 typedef struct SymbolTableEntry
 {
     short isActive;
@@ -58,6 +64,8 @@ typedef struct SymbolTableEntry
         Variable *varVal;
         Function *funcVal;
     } value;
+    unsigned offset;
+    scopespace_t space;
     struct SymbolTableEntry *next;
     struct SymbolTableEntry *next_same_scope;
     struct SymbolTableEntry *next_arg;
@@ -75,7 +83,16 @@ typedef struct function_stack
     SymbolTableEntry *func;
     struct function_stack *next;
 } function_stack;
+extern unsigned program_var_offset;
+extern unsigned function_local_offset;
+extern unsigned formal_arg_offset;
+extern unsigned scope_space_counter;
 
+unsigned curr_scope_offset();
+void enter_scope_space();
+void exit_scope_space();
+void in_current_scope_offset(void);
+scopespace_t curr_scope_space();
 /**
  * @brief  the hash function
  * @note   

@@ -14,10 +14,11 @@ extern FILE * yyin;
 
 %}
 %union {
-    struct SymbolTableEntry * exprNode;
+    //struct SymbolTableEntry * exprNode;
 	float floatVal;
     int intigerVal;
     //float real;
+    struct expr * expr_node;
 	char * str;
 }
 %start program
@@ -40,17 +41,17 @@ extern FILE * yyin;
 %left LEFT_SQUARE RIGHT_SQUARE
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
-%type <exprNode> lvalue 
+%type <expr_node> lvalue 
 
 
 %%         
 program: statements {print_to_stream("Program");}  ;
-stmt:   expr SEMICOLON   {print_to_stream("Statement");}  
-        | ifstmt         {print_to_stream("Statement");}  
-        | whilestmt      {print_to_stream("Statement");}  
-        | forstmt        {print_to_stream("Statement");}  
-        | returnstmt     {print_to_stream("Statement");}  
-        | BREAK SEMICOLON {      {print_to_stream("Statement");}  
+stmt:   expr SEMICOLON   {print_to_stream("Statement");resettemp();}  
+        | ifstmt         {print_to_stream("Statement");resettemp();}  
+        | whilestmt      {print_to_stream("Statement");resettemp();}  
+        | forstmt        {print_to_stream("Statement");resettemp();}  
+        | returnstmt     {print_to_stream("Statement");resettemp();}  
+        | BREAK SEMICOLON {     print_to_stream("Statement");resettemp();
                                    if(top_func_loop()!=for_loop && top_func_loop()!=while_loop )
                                     {
                                         print_error(NULL,yylineno, "ERROR : use BREAK not in a loop");
@@ -58,16 +59,16 @@ stmt:   expr SEMICOLON   {print_to_stream("Statement");}
                                     
         
                             }
-        | CONTINUE SEMICOLON {     {print_to_stream("Statement");}  
+        | CONTINUE SEMICOLON {     {print_to_stream("Statement");resettemp();}  
                                     if(top_func_loop()!=for_loop && top_func_loop()!=while_loop)
                                     {
                                        print_error(NULL,yylineno, "ERROR : use CONTINUE not in a loop");
                                     } 
                                     
                             }
-        | block             {print_to_stream("Statement");}  
-        | funcdef           {print_to_stream("Statement");}  
-        |SEMICOLON          {print_to_stream("Statement");}  
+        | block             {print_to_stream("Statement");resettemp();}  
+        | funcdef           {print_to_stream("Statement");resettemp();}  
+        |SEMICOLON          {print_to_stream("Statement");resettemp();}  
         ;
 statements: statements stmt
             |stmt;

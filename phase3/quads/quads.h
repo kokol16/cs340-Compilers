@@ -9,7 +9,8 @@ typedef enum iopcode
     _div,
     mod,
     and,
-    or,
+    or
+    ,
     not,
     if_eq,
     if_noteq,
@@ -39,14 +40,18 @@ typedef struct quad
     unsigned label;
     unsigned line;
 } quad;
-quad *quads = NULL;
-unsigned total = 0;
-unsigned int curr_quad = 0;
+extern quad *quads;
+extern unsigned total;
+extern unsigned int curr_quad;
 #define EXPAND_SIZE 1024
 #define CURR_SIZE (total * sizeof(quad))
 #define NEW_SIZE (EXPAND_SIZE * sizeof(quad) + CURR_SIZE)
 void expand();
 void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line);
+expr *lvalue_expr(SymbolTableEntry *bucket);
+void resettemp();
+int new_temp(SymbolTable *symbolTable);
+char *newtempname();
 
 typedef enum expr_t
 {
@@ -73,3 +78,5 @@ typedef struct expr
     unsigned char boolConst;
     expr *next;
 } expr;
+
+extern int  temp_counter;

@@ -9,7 +9,63 @@ unsigned int iam_in_function = 0;
 unsigned int iam_in_loop = 0;
 func_loop_stack *root_func_loop_stack = NULL;
 function_stack *functions_stack = NULL;
+unsigned program_var_offset = 0;
+unsigned function_local_offset = 0;
+unsigned formal_arg_offset = 0;
+unsigned scope_space_counter = 1;
 
+
+unsigned curr_scope_offset()
+{
+    switch (curr_scope_space())
+    {
+    case programvar:
+        return program_var_offset;
+    case functionlocal:
+        return function_local_offset;
+    case formalarg:
+        return formal_arg_offset;
+    default:
+        assert(0);
+    }
+}
+void enter_scope_space()
+{
+    ++scope_space_counter;
+}
+void exit_scope_space()
+{
+    assert(scope_space_counter > 1);
+    --scope_space_counter;
+}
+
+scopespace_t curr_scope_space()
+{
+    if (scope_space_counter == 1)
+        return programvar;
+    else if (scope_space_counter % 2 == 0)
+        return formalarg;
+    else
+        return functionlocal;
+}
+
+void in_current_scope_offset(void)
+{
+    switch (curr_scope_space())
+    {
+    case programvar:
+        ++program_var_offset;
+        break;
+    case functionlocal:
+        ++function_local_offset;
+        break;
+    case formalarg:
+        ++formal_arg_offset;
+        break;
+    default:
+        assert(0);
+    }
+}
 SymbolTable *symbolTable_create()
 {
     unsigned int i = 0;
