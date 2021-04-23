@@ -1,5 +1,4 @@
 #include "bison_functions.h"
-#include
 void process_id(SymbolTable *symbolTable, unsigned int scope, int yylineno, char *id_name,
                 unsigned int iam_in_function, function_stack **functions_stack, SymbolTableEntry **lvalue)
 {
@@ -84,7 +83,8 @@ short check_access(SymbolTable *symbolTable, unsigned int scope, int yylineno, u
     }
     const char *id_name;
     id_name = ((*lvalue)->value.varVal != NULL) ? (*lvalue)->value.varVal->name : (*lvalue)->value.funcVal->name;
-    if((*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope || (*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope )
+    if((*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope || (*lvalue)->value.varVal != NULL 
+    &&  (*lvalue)->value.varVal->scope==scope )
     {
         //all good
     }

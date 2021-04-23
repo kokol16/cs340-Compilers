@@ -1,4 +1,62 @@
+Lvalue
+Lvalue
+Primary
+Term
+Expression
+Expression List
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Statement
+Lvalue
+Lvalue
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Assign expression
+Expression
+Statement
 ID List
+Lvalue
+String
+Primary
+Term
+Expression
+Assign expression
+Expression
+Statement
+Lvalue
+Lvalue
+Primary
+Term
+Expression
+Lvalue
+Primary
+Term
+Expression
++ expression
+Expression List
+Normal Call
+Call Suffix
+Call
+Primary
+Term
+Expression
+Statement
+Lvalue
+Lvalue
+Primary
+Term
+Expression
+Assign expression
+Expression
+Statement
 Lvalue
 Integer
 Primary
@@ -9,23 +67,34 @@ Expression
 Statement
 ID List
 Lvalue
+Lvalue
 Primary
 Term
 Expression
-Return Statement
-Statement
 Lvalue
+Primary
+Term
+Expression
++ expression
+Expression List
 Normal Call
 Call Suffix
 Call
 Primary
 Term
 Expression
-Return Statement
 Statement
 Function Block
 Function Definition
 Statement
+ID List
+Function Block
+Function Definition
+Statement
+Function Block
+Function Definition
+Statement
+ID List
 Function Block
 Function Definition
 Statement
@@ -43,7 +112,10 @@ Program
  "sqrt" [library function] (line 0) (scope 0) (active 1)
  "cos" [library function] (line 0) (scope 0) (active 1)
  "sin" [library function] (line 0) (scope 0) (active 1)
- "f" [user function] (line 1) (scope 0) (active 1)
+ "ead" [global variable] (line  1) (scope 0) (active 1)
+ "a" [global variable] (line  1) (scope 0) (active 1)
+ "foo" [user function] (line 3) (scope 0) (active 1)
 =============== scope #1=====================
- "f" [local variable] (line  2) (scope 1) (active 0)
- "h" [user function] (line 3) (scope 1) (active 0)
+ "x" [formal argument] (line  3) (scope 1) (active 0)
+ "y" [local variable] (line  5) (scope 1) (active 0)
+ "hello" [local variable] (line  6) (scope 1) (active 0)

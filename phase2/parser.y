@@ -169,7 +169,6 @@ methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Met
            |Diaeresis ID LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Method Call");}
 elist:   expr   {print_to_stream("Expression List");} 
         | expr COMMA elist {print_to_stream("Expression List");};
-         
             
 objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");}
            |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition");}
@@ -221,12 +220,15 @@ ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt {print_to_stream("I
 whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); 
         iam_in_loop--;   pop_func_loop();                                };
 
-forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt 
+forstmt: FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt 
                             { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }
         |  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   
                             {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();};  
-        
-            
+        |  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}   elist  SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   
+                            {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();};   
+        |  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}     SEMICOLON  expr SEMICOLON  elist  RIGHT_BRACKETS stmt   
+                            {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();};                           
+
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                     if(iam_in_function <=0)
                                     {
