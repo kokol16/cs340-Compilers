@@ -14,9 +14,10 @@ extern FILE * yyin;
 
 %}
 %union {
-    //struct SymbolTableEntry * exprNode;
+    struct SymbolTableEntry * symboltable_Node;
 	float floatVal;
     int intigerVal;
+    unsigned curr_scope_offset;
     //float real;
     struct expr * expr_node;
 	char * str;
@@ -42,6 +43,10 @@ extern FILE * yyin;
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
 %type <expr_node> lvalue 
+%type<curr_scope_offset> block_func
+%type<str> funcname
+
+%type<expr_node> funcprefix funcdef 
 
 
 %%         
@@ -176,20 +181,25 @@ block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTabl
        |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;} ;  
        
 block_func: LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}  RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
- scope--; iam_in_function--;   pop(functions_stack);    pop_func_loop();   }       
+ scope--; iam_in_function--;   pop(functions_stack);    pop_func_loop(); $$=curr_scope_offset(); exit_scope_space();  }       
        |LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}    statements  RIGHT_BRACE {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
-     pop(functions_stack);  pop_func_loop();  } ;  
+     pop(functions_stack);  pop_func_loop(); $$=curr_scope_offset(); exit_scope_space();  } ;  
   
 
-funcdef: FUNCTION   ID  { process_function_id(symbolTable,   $2  );
+funcdef: funcprefix  LEFT_BRACKETS {scope++;}  
+                        idlist   RIGHT_BRACKETS {enter_scope_space(); reset_function_locals_offset(); }
+                      block_func {print_to_stream("Function Definition");   }
+                      {
+                          $$ = process_funcdef($1, $7);
+                      };
 
-                        } LEFT_BRACKETS {scope++;}  idlist   RIGHT_BRACKETS  block_func {print_to_stream("Function Definition");} 
                                                                 
-         |FUNCTION {   process_anonymous_function(symbolTable); 
-
-                            }
-                            LEFT_BRACKETS {scope++;} idlist RIGHT_BRACKETS block_func {print_to_stream("Function Definition");}; 
+        
                                                                   
+funcprefix: FUNCTION funcname {  $$=process_function_prefix(symbolTable,   $2  ); };
+funcname: ID {$$=$1; }
+|  {$$=new_func_name();};
+
 
 const:  INTEGER {print_to_stream("Integer");}
         |FLOAT  {print_to_stream("Float");}
@@ -278,6 +288,8 @@ int main(int argc , char * argv[])
     }
   
     symbolTable = symbolTable_create();
+    FILE *quad_file = fopen("quads.txt", "w+");
+
     yyparse() ;
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);

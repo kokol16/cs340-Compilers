@@ -36,7 +36,8 @@ typedef struct Function
     const char *name;
 
     struct SymbolTableEntry *head_arg;
-
+    unsigned iadress;
+    unsigned total_locals;
     unsigned int scope;
     unsigned int line;
 } Function;
@@ -77,7 +78,11 @@ typedef struct SymbolTable
 {
     SymbolTableEntry **symboltable;
 } SymbolTable;
-
+typedef struct scope_offset_stack
+{
+    unsigned scope_offset;
+    struct scope_offset_stack *next;
+} scope_offset_stack;
 typedef struct function_stack
 {
     SymbolTableEntry *func;
@@ -92,7 +97,10 @@ unsigned curr_scope_offset();
 void enter_scope_space();
 void exit_scope_space();
 void in_current_scope_offset(void);
+void reset_function_locals_offset();
 scopespace_t curr_scope_space();
+void restore_curr_scope_offset(unsigned n);
+
 /**
  * @brief  the hash function
  * @note   
@@ -386,3 +394,11 @@ void print_stack_func_loop();
 extern func_loop_stack *root_func_loop_stack;
 
 extern function_stack *functions_stack;
+extern scope_offset_stack *scope_offset_stack_root;
+
+unsigned  pop_scope_offset_stack();
+int   push_scope_offset_stack(unsigned scope_offset);
+unsigned top_scope_offset_stack();
+
+
+

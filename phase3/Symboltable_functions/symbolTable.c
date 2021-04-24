@@ -9,12 +9,35 @@ unsigned int iam_in_function = 0;
 unsigned int iam_in_loop = 0;
 func_loop_stack *root_func_loop_stack = NULL;
 function_stack *functions_stack = NULL;
+scope_offset_stack *scope_offset_stack_root = NULL;
+
 unsigned program_var_offset = 0;
 unsigned function_local_offset = 0;
 unsigned formal_arg_offset = 0;
 unsigned scope_space_counter = 1;
 
+void restore_curr_scope_offset(unsigned n)
+{
+    switch (curr_scope_offset())
+    {
+    case programvar:
+        program_var_offset = n;
+        break;
+    case functionlocal:
+        function_local_offset = n;
+        break;
+    case formalarg:
+        formal_arg_offset = n;
+        break;
+    default:
+        assert(0);
+    }
+}
 
+void reset_function_locals_offset()
+{
+    function_local_offset = 0;
+}
 unsigned curr_scope_offset()
 {
     switch (curr_scope_space())
@@ -148,9 +171,20 @@ Variable *create_var(const char *name, unsigned int scope, unsigned int line)
 
     return var;
 }
-Function *create_func(const char *name, unsigned int scope, unsigned int line)
+char *new_func_name()
 {
     static unsigned int counter = 1;
+    int counter_str_size;
+    char *anon_name;
+    counter_str_size = snprintf(NULL, 0, "%u", counter);
+    anon_name = malloc(sizeof(char) * (counter_str_size + 6));
+    memcpy(anon_name, "$func", 5);
+    snprintf(anon_name + 5, counter_str_size + 1, "%u", counter);
+    counter++;
+    return anon_name;
+}
+Function *create_func(const char *name, unsigned int scope, unsigned int line)
+{
     unsigned int index = 0;
     int counter_str_size;
     Variable *tmp;
@@ -163,13 +197,8 @@ Function *create_func(const char *name, unsigned int scope, unsigned int line)
     }
     if (name == NULL)
     {
-        char *anon_name;
-        counter_str_size = snprintf(NULL, 0, "%u", counter);
-        anon_name = malloc(sizeof(char) * (counter_str_size + 6));
-        memcpy(anon_name, "$func", 5);
-        snprintf(anon_name + 5, counter_str_size + 1, "%u", counter);
-        func->name = anon_name;
-        counter++;
+        fprintf(stderr, "error null function name\n");
+        return NULL;
     }
     else
     {
@@ -861,4 +890,42 @@ enum func_loops top_func_loop()
 
 void print_stack_func_loop()
 {
+}
+
+unsigned pop_scope_offset_stack()
+{
+    if (scope_offset_stack_root == NULL)
+    {
+        return 0;
+    }
+    scope_offset_stack_root = scope_offset_stack_root->next;
+    return 1;
+}
+
+int push_scope_offset_stack(unsigned scope_offset)
+{
+    scope_offset_stack *stack_entry = malloc(sizeof(scope_offset_stack));
+    stack_entry->scope_offset = scope_offset;
+    stack_entry->next = NULL;
+    if (scope_offset_stack_root == NULL)
+    {
+        scope_offset_stack_root = stack_entry;
+        return 1;
+    }
+
+    stack_entry->next = scope_offset_stack_root;
+    scope_offset_stack_root = stack_entry;
+    return 1;
+}
+
+unsigned top_scope_offset_stack()
+{
+    if (scope_offset_stack_root != NULL)
+    {
+        return scope_offset_stack_root->scope_offset;
+    }
+    else
+    {
+        return -1;
+    }
 }

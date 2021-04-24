@@ -48,10 +48,14 @@ extern unsigned int curr_quad;
 #define NEW_SIZE (EXPAND_SIZE * sizeof(quad) + CURR_SIZE)
 void expand();
 void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line);
+void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line);
 expr *lvalue_expr(SymbolTableEntry *bucket);
 void resettemp();
 int new_temp(SymbolTable *symbolTable);
 char *newtempname();
+unsigned next_quad_label();
+void patch_label(unsigned int quad_no , unsigned label);
+char* opcode_to_string(iopcode);
 
 typedef enum expr_t
 {

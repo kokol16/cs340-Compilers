@@ -101,4 +101,90 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsi
     _quad->result = result;
     _quad->label = label;
     _quad->line = line;
+    print_quad(op, arg1, arg2, result, label, line);
+}
+
+unsigned next_quad_label()
+{
+    return curr_quad;
+}
+void patch_label(unsigned int quad_no, unsigned label)
+{
+    assert(quad_no < curr_quad);
+    quads[quad_no].label = label;
+}
+
+void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line)
+{
+    char *opcode_str;
+    FILE *quad_file = fopen("quads.txt", "a+");
+    if (quad_file == NULL)
+    {
+        perror("Error opening quads file.");
+        return;
+    }
+    fprintf(quad_file, "%u:\t", label);
+    opcode_str = opcode_to_string(op);
+    fprintf(quad_file, "%s ", opcode_str);
+    if (arg1->type == programfunc_e)
+    {
+        fprintf(quad_file, "%s\n", arg1->sym->value.funcVal->name);
+    }
+    fclose(quad_file);
+}
+
+char *opcode_to_string(iopcode op)
+{
+    switch (op)
+    {
+    case funcstart:
+        return "FUNCSTART";
+    case funcend:
+        return "FUNCEND";
+    case add:
+        return "ADD";
+
+    case mul:
+        return "MUL";
+    case uminus:
+        return "UMINUS";
+    case sub:
+        return "SUB";
+    case _div:
+        return "DIV";
+    case mod:
+        return "MOD";
+    case and:
+        return "AND";
+    case or:
+        return "OR";
+    case not:
+        return "NOT";
+    case if_eq:
+        return "IF_EQUALS";
+    case if_noteq:
+        return "IF_NOT_EQUALS";
+    case if_lesseq:
+        return "IF_LESS_OR_EQUAL";
+    case if_greatereq:
+        return "IF_GREATER_OR_EQUAL";
+    case if_less:
+        return "IF_LESS";
+    case if_greater:
+        return "IF_GREATER";
+    case call:
+        return "CALL";
+    case param:
+        return "PARAM";
+    case ret:
+        return "RETURN";
+    case getretval:
+        return "GET_RETURN_VALUE";
+    case tablecreate:
+        return "TABLE_CREATE";
+    case tablegetelem:
+        return "TABLE_GET_ELEMENT";
+    case tablesetelem:
+        return "TABLE_SET_ELEMENT";
+    }
 }
