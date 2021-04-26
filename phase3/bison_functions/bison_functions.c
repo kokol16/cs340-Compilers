@@ -1,6 +1,17 @@
 #include "bison_functions.h"
 
 #define lvalue_ptr (*lvalue)
+
+expr *member_item(expr *lvalue, char *name)
+{
+    expr *_expr;
+    lvalue = emit_if_table_item(lvalue);
+    _expr = new_expr(tableitem_e);
+    //chech lvalue->sym is NULL?
+    _expr->sym = lvalue->sym;
+    _expr->index = new_expr_const_string(name);
+    return _expr;
+}
 void process_local_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
 {
 
@@ -44,6 +55,12 @@ void process_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
     if (bucket == NULL)
     {
 
+        var = create_var(id_name, scope, yylineno);
+        if (scope != 0)
+            bucket = create_bucket_var(1, var, LOCAL);
+        else
+            bucket = create_bucket_var(1, var, GLOBAL);
+
         symbolTable_insert(symbolTable, bucket);
         bucket->space = curr_scope_space();
         bucket->offset = curr_scope_offset();
@@ -52,7 +69,7 @@ void process_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
     lvalue_ptr = lvalue_expr(bucket);
 }
 
-void process_assign(SymbolTable *symbolTable, expr **lvalue)
+void process_assign(SymbolTable *symbolTable, expr **lvalue, expr **assign_expr, expr *_expr)
 {
     if (lvalue == NULL)
     {
@@ -66,7 +83,23 @@ void process_assign(SymbolTable *symbolTable, expr **lvalue)
         *lvalue = NULL;
         return;
     }
-    check_access(symbolTable, &lvalue_ptr->sym);
+
+    if (check_access(symbolTable, &lvalue_ptr->sym))
+    {
+        if (lvalue_ptr->type == tableitem_e)
+        {
+            emit(tablesetelem, lvalue_ptr, lvalue_ptr->index, _expr, curr_quad, yylineno);
+            *assign_expr = emit_if_table_item(lvalue_ptr);
+            (*assign_expr)->type = assignexpr_e;
+        }
+        else
+        {
+            emit(assign, _expr, NULL, lvalue_ptr, curr_quad, yylineno);
+            *assign_expr = new_expr(assignexpr_e);
+            (*assign_expr)->sym = new_temp(symbolTable);
+            emit(assign, lvalue_ptr, NULL, *assign_expr, curr_quad, yylineno);
+        }
+    }
 }
 
 void process_callsuffix(SymbolTable *symbolTable, expr **lvalue)
@@ -76,7 +109,12 @@ void process_callsuffix(SymbolTable *symbolTable, expr **lvalue)
 void process_primary(SymbolTable *symbolTable, expr **lvalue)
 {
 
-    check_access(symbolTable, &lvalue_ptr->sym);
+    if (check_access(symbolTable, &lvalue_ptr->sym))
+    {
+        lvalue_ptr = emit_if_table_item(lvalue_ptr);
+        return;
+    }
+    lvalue_ptr = NULL; //??
 }
 
 void process_plus_plus(SymbolTable *symbolTable, expr **lvalue)

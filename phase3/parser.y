@@ -15,18 +15,20 @@ extern FILE * yyin;
 %}
 %union {
     struct SymbolTableEntry * symboltable_Node;
-	float floatVal;
+	double floatVal;
     int intigerVal;
     unsigned curr_scope_offset;
     //float real;
+    unsigned char bool;
     struct expr * expr_node;
 	char * str;
 }
 %start program
-%token <str> ID
+%token <bool> TRUE  FALSE
+%token <str> ID STRING
 %token <intigerVal> INTEGER
-%token <floatVar> FLOAT
-%token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCALL TRUE FALSE NIL STRING EQUALS PLUS
+%token <floatVal> FLOAT 
+%token    IF ELSE WHILE FOR FUNCTION RETURN  BREAK CONTINUE AND  NOT  OR  LOCALL NIL EQUALS PLUS
 %token ASSIGN MINUS UMINUS ASTERISK DIVISION PERCENT DIFFERENT PLUS_PLUS MINUS_MINUS GREATER LESS GREATER_EQUALS LESS_EQUALS
 %token SEMICOLON COMMA COLON DOUBLE_COLON DOT Diaeresis LEFT_BRACE RIGHT_BRACE LEFT_SQUARE RIGHT_SQUARE LEFT_BRACKETS RIGHT_BRACKETS  
 
@@ -42,7 +44,7 @@ extern FILE * yyin;
 %left LEFT_SQUARE RIGHT_SQUARE
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
-%type <expr_node> lvalue 
+%type <expr_node> lvalue member expr assignexpr const  primary term
 %type<curr_scope_offset> block_func
 %type<str> funcname
 
@@ -92,7 +94,7 @@ expr:   assignexpr  {print_to_stream("Expression");}
         |expr DIFFERENT expr {print_to_stream("!= expression");}
         |expr AND expr {print_to_stream("and expression");}
         |expr OR expr {print_to_stream("or expression");}
-        | term  {print_to_stream("Expression");};
+        | term  {print_to_stream("Expression"); $$=$1;};
 
         
 
@@ -120,12 +122,12 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term");}
                                                 process_minus_minus(symbolTable, &$1);}
                                            
         
-        | primary                             {print_to_stream("Term");};  
+        | primary                             {print_to_stream("Term"); $$=$1;};  
 
 assignexpr: lvalue  ASSIGN  expr    { 
                                         print_to_stream("Assign expression");
-                                         
-                                        process_assign(symbolTable,  &$1);
+                                        //printf("const %d\n",$3->intConst);
+                                        process_assign(symbolTable,  &$1, &$$ , $3 );
                                     }; 
     
                                    
@@ -135,15 +137,20 @@ primary:  lvalue { print_to_stream("Primary");  process_primary(symbolTable,  &$
           | call {print_to_stream("Primary");}
           | objectdef {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary");}
-          | const {print_to_stream("Primary");} ;
+          | const {print_to_stream("Primary"); $$=$1;} ;
 
 lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTable,$1,&$$); }
           | LOCALL ID           {print_to_stream("Lvalue"); process_local_id(symbolTable,  $2, &$$);}
           | DOUBLE_COLON ID     {print_to_stream("Lvalue"); process_double_colon_id(symbolTable,$2,&$$); }             
-          | member {print_to_stream("Lvalue"); $$=NULL;} ; //alliws apaiteitai typos gia to member
+          | member {print_to_stream("Lvalue"); $$=$1;} ; 
 
-member:    lvalue DOT ID {print_to_stream("Member");}
-            | lvalue LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");}
+member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
+            | lvalue LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");  
+                                                    $1=emit_if_table_item($1);
+                                                    $$=new_expr(tableitem_e);
+                                                    $$->sym=$1->sym;
+                                                    $$->index=$3;
+                                                    }
             | call DOT ID {print_to_stream("Member");}
             | call LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");} ;
 
@@ -201,12 +208,12 @@ funcname: ID {$$=$1; }
 |  {$$=new_func_name();};
 
 
-const:  INTEGER {print_to_stream("Integer");}
-        |FLOAT  {print_to_stream("Float");}
-        | STRING  {print_to_stream("String");}
-        | NIL {print_to_stream("NIL");}
-        | TRUE {print_to_stream("TRUE");}
-        | FALSE {print_to_stream("FALSE");};
+const:  INTEGER {print_to_stream("Integer");  $$ = new_expr_const_int($1);}
+        |FLOAT    {print_to_stream("Float"); $$=new_expr_const_double($1);}
+        | STRING  {print_to_stream("String");$$ = new_expr_const_string($1);}
+        | NIL {print_to_stream("NIL");$$ = new_expr_const_nil();}
+        | TRUE {print_to_stream("TRUE");$$ = new_expr_const_bool($1);}
+        | FALSE {print_to_stream("FALSE"); $$ = new_expr_const_bool($1);};
 
 idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTable,$1);                     
 

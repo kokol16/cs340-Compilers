@@ -4,27 +4,41 @@ quad *quads = NULL;
 unsigned total = 0;
 unsigned int curr_quad = 0;
 int temp_counter = 0;
+
+SymbolTable *symbolTable;
+
 char *newtempname()
 {
     char *tmp_name;
     int counter_str_size;
     counter_str_size = snprintf(NULL, 0, "%u", temp_counter);
-    tmp_name = malloc(sizeof(char) * (counter_str_size + 2));
-    memcpy(tmp_name, "t", 1);
-    snprintf(tmp_name + 1, counter_str_size + 1, "%u", temp_counter);
+    tmp_name = malloc(sizeof(char) * (counter_str_size + 3));
+    memcpy(tmp_name, "_t", 2);
+    snprintf(tmp_name + 2, counter_str_size + 1, "%u", temp_counter);
+    return tmp_name;
 }
 void resettemp()
 {
     temp_counter = 0;
 }
-int new_temp(SymbolTable *symbolTable)
+SymbolTableEntry *new_temp(SymbolTable *symbolTable)
 {
-    char *name = newtempname();
+    char *name;
     SymbolTableEntry *bucket;
     Variable *var;
+    name = newtempname();
     if (temp_counter == 0)
     {
-        find_bucket_by_scope_and_name(symbolTable, name, scope);
+        bucket = find_bucket_by_scope_and_name(symbolTable, name, scope);
+        if (bucket == NULL)
+        {
+            var = create_var(name, scope, yylineno);
+            if (scope != 0)
+                bucket = create_bucket_var(1, var, LOCAL);
+            else
+                bucket = create_bucket_var(1, var, GLOBAL);
+            symbolTable_insert(symbolTable, bucket);
+        }
     }
     else
     {
@@ -37,6 +51,7 @@ int new_temp(SymbolTable *symbolTable)
     }
 
     ++temp_counter;
+    return bucket;
 
     /* sym = lookup(name, currscope());
     if sym
@@ -101,6 +116,7 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsi
     _quad->result = result;
     _quad->label = label;
     _quad->line = line;
+
     print_quad(op, arg1, arg2, result, label, line);
 }
 
@@ -130,13 +146,68 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label
     {
         fprintf(quad_file, "%s\n", arg1->sym->value.funcVal->name);
     }
+    else if (arg1->type == tableitem_e)
+    {
+        fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
+        fprintf(quad_file, "%s\t", arg2->strConst);
+        fprintf(quad_file, "%s\n", result->sym->value.varVal->name);
+    }
+    else if (op == assign)
+    {
+
+        //else
+        {
+            if (!print_by_type(arg1, quad_file))
+            {
+                fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
+            }
+            if (!print_by_type(result, quad_file))
+            {
+                fprintf(quad_file, "%s\t", result->sym->value.varVal->name);
+            }
+            fprintf(quad_file, "\n");
+        }
+    }
+
     fclose(quad_file);
+}
+int print_by_type(expr *_expr, FILE *quad_file)
+{
+    if (_expr->type == constbool_e)
+    {
+        fprintf(quad_file, "%u\t", _expr->boolConst);
+        return 1;
+    }
+    else if (_expr->type == constint_e)
+    {
+
+        fprintf(quad_file, "%d\t", _expr->intConst);
+        return 1;
+    }
+    else if (_expr->type == constdouble_e)
+    {
+        fprintf(quad_file, "%f\t", _expr->doubleConst);
+        return 1;
+    }
+    else if (_expr->type == conststring_e)
+    {
+        fprintf(quad_file, "%s\t", _expr->strConst);
+        return 1;
+    }
+    else if (_expr->type == nil_e)
+    {
+        fprintf(quad_file, "%s\t", "nil");
+        return 1;
+    }
+    return 0;
 }
 
 char *opcode_to_string(iopcode op)
 {
     switch (op)
     {
+    case assign:
+        return "ASSIGN";
     case funcstart:
         return "FUNCSTART";
     case funcend:
@@ -187,4 +258,74 @@ char *opcode_to_string(iopcode op)
     case tablesetelem:
         return "TABLE_SET_ELEMENT";
     }
+}
+
+expr *new_expr(expr_t type)
+{
+    expr *e = malloc(sizeof(expr));
+    memset(e, 0, sizeof(expr));
+    e->type = type;
+    e->next = NULL;
+    return e;
+}
+
+expr *new_expr_const_string(char *name)
+{
+    expr *_expr = malloc(sizeof(expr));
+    memset(_expr, 0, sizeof(expr));
+    _expr->next = NULL;
+    _expr->type = conststring_e;
+    _expr->strConst = strdup(name);
+    return _expr;
+}
+
+expr *new_expr_const_int(int intVal)
+{
+    expr *_expr = malloc(sizeof(expr));
+    memset(_expr, 0, sizeof(expr));
+    _expr->next = NULL;
+    _expr->type = constint_e;
+    _expr->intConst = intVal;
+    return _expr;
+}
+
+expr *new_expr_const_double(double doubleVal)
+{
+    expr *_expr = malloc(sizeof(expr));
+    memset(_expr, 0, sizeof(expr));
+    _expr->next = NULL;
+    _expr->type = constdouble_e;
+    _expr->doubleConst = doubleVal;
+    return _expr;
+}
+
+expr *new_expr_const_bool(unsigned char bool)
+{
+    expr *_expr = malloc(sizeof(expr));
+    memset(_expr, 0, sizeof(expr));
+    _expr->next = NULL;
+    _expr->type = constbool_e;
+    _expr->boolConst = bool;
+    return _expr;
+}
+expr *new_expr_const_nil()
+{
+    expr *_expr = malloc(sizeof(expr));
+    memset(_expr, 0, sizeof(expr));
+    _expr->next = NULL;
+    _expr->type = nil_e;
+    return _expr;
+}
+
+expr *emit_if_table_item(expr *_expr)
+{
+    printf("lafslsfda\n");
+
+    if (_expr->type != tableitem_e)
+        return _expr;
+    expr *result;
+    result = new_expr(var_e);
+    result->sym = new_temp(symbolTable);
+    emit(tablegetelem, _expr, _expr->index, result, curr_quad, yylineno);
+    return result;
 }

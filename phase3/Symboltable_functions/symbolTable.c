@@ -251,7 +251,6 @@ short symbolTable_insert(SymbolTable *symbolTable, SymbolTableEntry *bucket)
     unsigned int index = 0;
     SymbolTableEntry *head, *tmp, *tmp2;
 
-    unsigned int scope = (bucket->value.funcVal == NULL) ? bucket->value.varVal->scope : bucket->value.funcVal->scope;
     tmp = symbolTable_lookup_scope(symbolTable, scope); //find bucket on same scope
     tmp2 = tmp;
     if (tmp != NULL)
@@ -704,13 +703,20 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
 {
     unsigned int index;
     SymbolTableEntry *bucket;
+
     if (symtable == NULL)
         return NULL;
+
+    
+
     bucket = symbolTable_lookup_head(symtable, scope);
+
+    printf("%s\n", name);
     while (bucket != NULL)
     {
         if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->isActive)
         {
+
             return bucket;
         }
         else if (bucket->value.funcVal != NULL && strcmp(bucket->value.funcVal->name, name) == 0 && bucket->isActive)
