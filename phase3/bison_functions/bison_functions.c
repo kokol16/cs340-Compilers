@@ -2,6 +2,265 @@
 
 #define lvalue_ptr (*lvalue)
 
+int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, expr *expr2)
+{
+
+    switch (opcode)
+    {
+    case add:
+        _expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) + ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        break;
+    case sub:
+        _expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) - ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        break;
+    case mul:
+        _expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) * ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        break;
+    case _div:
+        _expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) / ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        break;
+    case mod:
+        //should this be on double const????
+        _expr->doubleConst = (int)((int)(expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) % (int)((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        break;
+    default:
+        return 0;
+    }
+    return 1;
+}
+int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *expr2)
+{
+    switch (opcode)
+    {
+    case add:
+        _expr->doubleConst = _expr->intConst = expr1->intConst + expr2->intConst;
+        break;
+    case sub:
+        _expr->doubleConst = _expr->intConst = expr1->intConst - expr2->intConst;
+        break;
+    case mul:
+        _expr->doubleConst = _expr->intConst = expr1->intConst * expr2->intConst;
+        break;
+    case _div:
+        _expr->doubleConst = _expr->intConst = expr1->intConst / expr2->intConst;
+        break;
+    case mod:
+        _expr->doubleConst = _expr->intConst = expr1->intConst % expr2->intConst;
+        break;
+    default:
+        return 0;
+    }
+    return 1;
+}
+
+expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolTable *symboltable)
+{
+    expr *_expr;
+    check_arith(expr1, "arithmetic expression ");
+    check_arith(expr2, "arithmetic expression ");
+
+    if (expr1->type == constdouble_e && expr2->type == constdouble_e || expr1->type == constdouble_e && expr2->type == constint_e || expr2->type == constdouble_e && expr1->type == constint_e)
+        _expr = new_expr(constdouble_e);
+
+    else if (expr1->type == constint_e && expr2->type == constint_e)
+        _expr = new_expr(constint_e);
+    else
+        _expr = new_expr(arithexpr_e);
+
+    if (_expr->type == constdouble_e)
+    {
+        do_the_arith_operations_double(opcode, _expr, expr1, expr2);
+        fprintf(stderr, "%f\n", _expr->doubleConst);
+    }
+    else if (_expr->type == constint_e)
+    {
+        do_the_arith_operations_int(opcode, _expr, expr1, expr2);
+        fprintf(stderr, "%d\n", _expr->intConst);
+    }
+    _expr->sym = new_temp(symboltable);
+    emit(opcode, expr1, expr2, _expr, curr_quad, yylineno);
+
+    return _expr;
+}
+expr *process_term_lvalue_plus_plus(expr *lvalue, expr **term, SymbolTable *symboltable)
+{
+
+    check_arith(lvalue, "lvalue++");
+    *term = new_expr(var_e);
+    (*term)->sym = new_temp(symboltable);
+    if (lvalue->type == tableitem_e)
+    {
+        expr *val = emit_if_table_item(lvalue);
+        emit(assign, val, NULL, *term, curr_quad, yylineno);
+        emit(add, val, new_expr_const_int(1), val, curr_quad, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad, yylineno);
+    }
+    else
+    {
+        emit(assign, lvalue, NULL, *term, curr_quad, yylineno);
+        emit(add, lvalue, new_expr_const_int(1), lvalue, curr_quad, yylineno);
+    }
+}
+expr *process_term_plus_plus_lvalue(expr *lvalue, expr **term, SymbolTable *symboltable)
+{
+    check_arith(lvalue, "++lvalue");
+    if (lvalue->type == tableitem_e)
+    {
+        *term = emit_if_table_item(lvalue);
+        emit(add, *term, new_expr_const_int(1), *term, curr_quad, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad, yylineno);
+    }
+    else
+    {
+        emit(add, lvalue, new_expr_const_int(1), lvalue, curr_quad, yylineno);
+        *term = new_expr(arithexpr_e);
+        (*term)->sym = new_temp(symboltable);
+        emit(assign, lvalue, NULL, *term, curr_quad, yylineno);
+    }
+}
+expr *process_term_lvalue_minus_minus(expr *lvalue, expr **term, SymbolTable *symboltable)
+{
+
+    check_arith(lvalue, "lvalue--");
+    *term = new_expr(var_e);
+    (*term)->sym = new_temp(symboltable);
+    if (lvalue->type == tableitem_e)
+    {
+        expr *val = emit_if_table_item(lvalue);
+        emit(assign, val, NULL, *term, curr_quad, yylineno);
+        emit(sub, val, new_expr_const_int(1), val, curr_quad, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad, yylineno);
+    }
+    else
+    {
+        emit(assign, lvalue, NULL, *term, curr_quad, yylineno);
+        emit(sub, lvalue, new_expr_const_int(1), lvalue, curr_quad, yylineno);
+    }
+}
+expr *process_term_minus_minus_lvalue(expr *lvalue, expr **term, SymbolTable *symboltable)
+{
+
+    check_arith(lvalue, "--lvalue");
+    if (lvalue->type == tableitem_e)
+    {
+        *term = emit_if_table_item(lvalue);
+        emit(sub, *term, new_expr_const_int(1), *term, curr_quad, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad, yylineno);
+    }
+    else
+    {
+        emit(sub, lvalue, new_expr_const_int(1), lvalue, curr_quad, yylineno);
+        *term = new_expr(arithexpr_e);
+        (*term)->sym = new_temp(symboltable);
+        emit(assign, lvalue, NULL, *term, curr_quad, yylineno);
+    }
+}
+expr *process_table_indexed(indexed *objects_list, SymbolTable *symboltable)
+{
+    expr *_expr;
+    indexed *tmp;
+    _expr = new_expr(newtable_e);
+    _expr->sym = new_temp(symboltable);
+    emit(tablecreate, _expr, NULL, NULL, curr_quad, yylineno);
+    fprintf(stderr, "lalal\n");
+    tmp = objects_list;
+    while (tmp != NULL)
+    {
+        emit(tablesetelem, _expr, tmp->left, tmp->right, curr_quad, yylineno);
+        tmp = tmp->next;
+    }
+    print_indexed_list(objects_list);
+    return _expr;
+}
+
+expr *process_array_elist(expr *head, SymbolTable *symboltable)
+{
+    expr *tmp = head;
+    expr *t = new_expr(newtable_e);
+    int i = 0;
+    t->sym = new_temp(symboltable);
+    emit(tablecreate, t, NULL, NULL, curr_quad, yylineno);
+    while (tmp != NULL)
+    {
+        emit(tablesetelem, t, new_expr_const_int(i++), tmp, curr_quad, yylineno);
+        tmp = tmp->next;
+    }
+    return t;
+}
+void link_list(expr *head)
+{
+    expr *tmp = head, *prev = NULL;
+    if (head == NULL)
+        return;
+    head->prev = NULL;
+    tmp->prev = NULL;
+    while (tmp->next != NULL)
+    {
+        prev = tmp;
+        tmp = tmp->next;
+        tmp->prev = prev;
+    }
+    head->tail = tmp;
+}
+
+void print_reverse(expr *head)
+{
+    if (head == NULL)
+        return;
+    expr *tmp = head->tail;
+    while (tmp != NULL)
+    {
+        fprintf(stderr, "%s\n", tmp->sym->value.varVal->name);
+        tmp = tmp->prev;
+    }
+}
+void print_expr_list(expr *head)
+{
+    if (head == NULL)
+        return;
+    expr *tmp = head;
+    while (tmp != NULL)
+    {
+        fprintf(stderr, "%s\n", tmp->sym->value.varVal->name);
+        tmp = tmp->next;
+    }
+}
+expr *make_call(expr *lvalue, expr *reverse_list, SymbolTable *symboltable)
+{
+    expr *tmp = reverse_list, *res;
+    expr *func = emit_if_table_item(lvalue);
+    print_expr_list(reverse_list);
+
+    link_list(reverse_list);
+
+    //print_reverse(tmp);
+    if (reverse_list != NULL)
+        tmp = reverse_list->tail;
+    while (tmp != NULL)
+    {
+        emit(param, tmp, NULL, NULL, curr_quad, yylineno);
+        tmp = tmp->prev;
+    }
+    emit(call, func, NULL, NULL, curr_quad, yylineno);
+    res = new_expr(var_e);
+    res->sym = new_temp(symboltable);
+    emit(getretval, NULL, NULL, res, curr_quad, yylineno);
+    return res;
+}
+expr *process_elist_element(expr **head, expr *new_elist)
+{
+    //fprintf(stderr, "process_elist_element\n");
+
+    //push_elist(head, NULL);
+}
+expr *process_elists_element(expr **head, expr *new_elist)
+{
+    //fprintf(stderr, "process_elists_element\n");
+
+    //push_elist(head, new_elist);
+    //print_elist(new_elist);
+}
+
 expr *member_item(expr *lvalue, char *name)
 {
     expr *_expr;

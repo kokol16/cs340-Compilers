@@ -7,6 +7,36 @@ int temp_counter = 0;
 
 SymbolTable *symbolTable;
 
+void check_arith(expr *e, const char *context)
+{
+    if (e->type == constbool_e ||
+        e->type == conststring_e ||
+        e->type == nil_e ||
+        e->type == newtable_e ||
+        e->type == programfunc_e ||
+        e->type == libraryfunc_e ||
+        e->type == boolexpr_e)
+        fprintf(stderr, "Illegal expr used in %s! ", context);
+        
+}
+void print_indexed_list(indexed *head)
+{
+    indexed *tmp = head;
+    while (tmp != NULL)
+    {
+        if (!print_by_type(tmp->left, stderr))
+        {
+            fprintf(stderr, "%s", tmp->left->sym->value.varVal->name);
+        }
+        if (!print_by_type(tmp->right, stderr))
+        {
+            fprintf(stderr, " : %s\n", tmp->right->sym->value.varVal->name);
+        }
+
+        tmp = tmp->next;
+    }
+}
+
 char *newtempname()
 {
     char *tmp_name;
@@ -66,6 +96,7 @@ expr *lvalue_expr(SymbolTableEntry *bucket)
     expr *_expr = malloc(sizeof(expr));
     memset(_expr, 0, sizeof(expr));
     _expr->next = NULL;
+
     _expr->sym = bucket;
     switch (bucket->type)
     {
@@ -139,20 +170,56 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label
         perror("Error opening quads file.");
         return;
     }
+
     fprintf(quad_file, "%u:\t", label);
     opcode_str = opcode_to_string(op);
+
     fprintf(quad_file, "%s ", opcode_str);
-    if (arg1->type == programfunc_e)
+    if (arg1 != NULL)
     {
-        fprintf(quad_file, "%s\n", arg1->sym->value.funcVal->name);
+        if (!print_by_type(arg1, quad_file))
+        {
+            if (arg1->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
+            }
+            else
+            {
+                fprintf(quad_file, "%s\t", arg1->sym->value.funcVal->name);
+            }
+        }
     }
-    else if (arg1->type == tableitem_e)
+    if (arg2 != NULL)
     {
-        fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
-        fprintf(quad_file, "%s\t", arg2->strConst);
-        fprintf(quad_file, "%s\n", result->sym->value.varVal->name);
+        if (!print_by_type(arg2, quad_file))
+        {
+            if (arg2->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%s\t", arg2->sym->value.varVal->name);
+            }
+            else
+            {
+                fprintf(quad_file, "%s\t", arg2->sym->value.funcVal->name);
+            }
+        }
     }
-    else if (op == assign)
+    if (result != NULL)
+    {
+        if (!print_by_type(result, quad_file))
+        {
+            if (result->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%s\t", result->sym->value.varVal->name);
+            }
+            else
+            {
+                fprintf(quad_file, "%s\t", result->sym->value.funcVal->name);
+            }
+        }
+    }
+    fprintf(quad_file, "\n");
+
+    /* if (op == assign)
     {
 
         //else
@@ -168,6 +235,40 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label
             fprintf(quad_file, "\n");
         }
     }
+    else if (op == param)
+    {
+        fprintf(quad_file, "%s\n", arg1->sym->value.varVal->name);
+    }
+    else if (op == call)
+    {
+        fprintf(quad_file, "%s\n", arg1->sym->value.varVal->name);
+    }
+    else if (op == getretval)
+    {
+        fprintf(quad_file, "%s\n", result->sym->value.varVal->name);
+    }
+    else if (op == tablecreate)
+    {
+        if (!print_by_type(arg1, quad_file))
+        {
+            fprintf(quad_file, "%s\n", arg1->sym->value.varVal->name);
+        }
+    }
+    else if (op == tablesetelem)
+    {
+        fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
+        if (!print_by_type(arg2, quad_file))
+        {
+
+            fprintf(quad_file, "%s\t", arg2->sym->value.varVal->name);
+        }
+
+        if (!print_by_type(result, quad_file))
+        {
+            fprintf(quad_file, "%s\t", result->sym->value.varVal->name);
+        }
+        fprintf(quad_file, "\n");
+    }*/
 
     fclose(quad_file);
 }
@@ -319,13 +420,65 @@ expr *new_expr_const_nil()
 
 expr *emit_if_table_item(expr *_expr)
 {
-    printf("lafslsfda\n");
+    //printf("lafslsfda\n");
 
     if (_expr->type != tableitem_e)
         return _expr;
+
     expr *result;
     result = new_expr(var_e);
     result->sym = new_temp(symbolTable);
     emit(tablegetelem, _expr, _expr->index, result, curr_quad, yylineno);
     return result;
 }
+
+#define elist_ptr (*elist_entry)
+
+unsigned pop_elist(expr **elist_entry)
+{
+    if (elist_entry == NULL || *elist_entry == NULL)
+    {
+        return 0;
+    }
+    elist_ptr = elist_ptr->next;
+    return 1;
+}
+
+int push_elist(expr **elist_entry, expr *entry)
+{
+    // if(entry==NULL) {return 0;}
+    /*entry->next = NULL;
+    if (  entry==NULL )
+    {
+        fprintf(stderr, "create head\n");
+        elist_ptr = entry;
+
+        print_elist(*elist_entry);
+        return 1;
+    }*/
+
+    // entry->next = elist_ptr;
+    //elist_ptr = entry;
+
+    return 1;
+}
+void print_elist(expr *head)
+{
+    expr *tmp = head;
+    while (tmp != NULL)
+    {
+        fprintf(stderr, "%s\n", tmp->sym->value.varVal->name);
+        tmp = tmp->next;
+    }
+}
+/*expr *  top_elist(expr * elist_head)
+{
+    if (elist_head != NULL)
+    {
+        return elist_head;
+    }
+    else
+    {
+        return -1;
+    }
+}*/

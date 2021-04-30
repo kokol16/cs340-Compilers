@@ -32,6 +32,14 @@ typedef enum iopcode
 typedef struct expr expr;
 typedef enum expr_t expr_t;
 
+typedef struct indexed
+{
+    expr * left ;
+    expr * right;
+    struct indexed * next;
+}indexed;
+
+
 typedef struct quad
 {
     iopcode op;
@@ -52,25 +60,30 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsi
 void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line);
 expr *lvalue_expr(SymbolTableEntry *bucket);
 void resettemp();
-SymbolTableEntry *  new_temp(SymbolTable *symbolTable);
+SymbolTableEntry *new_temp(SymbolTable *symbolTable);
 
 char *newtempname();
 unsigned next_quad_label();
-void patch_label(unsigned int quad_no , unsigned label);
-char* opcode_to_string(iopcode);
-
+void patch_label(unsigned int quad_no, unsigned label);
+char *opcode_to_string(iopcode);
 
 expr *new_expr_const_string(char *name);
-expr *new_expr( expr_t type);
+expr *new_expr(expr_t type);
 expr *new_expr_const_nil();
 
-expr *new_expr_const_bool( unsigned char bool);
+expr *new_expr_const_bool(unsigned char bool);
 expr *new_expr_const_double(double doubleVal);
 expr *new_expr_const_int(int intVal);
 
-expr * emit_if_table_item(expr * _expr);
+expr *emit_if_table_item(expr *_expr);
+unsigned pop_elist(expr **elist_entry);
+int push_elist(expr ** elist_entry , expr * entry);
+void print_elist(expr * head);
 
-int  print_by_type(expr *_expr, FILE * fp);
+void print_indexed_list(indexed *head);
+
+void check_arith(expr *e, const char *context);
+int print_by_type(expr *_expr, FILE *fp);
 typedef enum expr_t
 {
     var_e,
@@ -87,6 +100,8 @@ typedef enum expr_t
     conststring_e,
     nil_e
 } expr_t;
+
+
 typedef struct expr
 {
     expr_t type;
@@ -97,6 +112,16 @@ typedef struct expr
     char *strConst;
     unsigned char boolConst;
     expr *next;
+    expr * prev;
+    expr * tail;
+
 } expr;
 
-extern int  temp_counter;
+typedef struct call_info
+{
+    struct expr* elist;
+    unsigned char method;
+    char *name;
+} call_info;
+
+extern int temp_counter;

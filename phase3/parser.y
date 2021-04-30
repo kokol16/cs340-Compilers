@@ -20,8 +20,10 @@ extern FILE * yyin;
     unsigned curr_scope_offset;
     //float real;
     unsigned char bool;
+    struct indexed *  _indexed;
     struct expr * expr_node;
 	char * str;
+    struct call_info* call_type;
 }
 %start program
 %token <bool> TRUE  FALSE
@@ -44,12 +46,13 @@ extern FILE * yyin;
 %left LEFT_SQUARE RIGHT_SQUARE
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
-%type <expr_node> lvalue member expr assignexpr const  primary term
+%type <expr_node> lvalue member expr assignexpr const  primary term elist objectdef
 %type<curr_scope_offset> block_func
 %type<str> funcname
+%type <_indexed> indexedelem indexed 
 
-%type<expr_node> funcprefix funcdef 
-
+%type<expr_node> funcprefix funcdef call
+%type<call_type> methodcall normcall callsuffix 
 
 %%         
 program: statements {print_to_stream("Program");}  ;
@@ -81,11 +84,11 @@ statements: statements stmt
             |stmt;
 
 expr:   assignexpr  {print_to_stream("Expression");}
-        |expr PLUS expr {print_to_stream("+ expression");}
-        |expr MINUS expr {print_to_stream("- expression");}
-        |expr ASTERISK expr {print_to_stream("* expression");}
-        |expr DIVISION expr {print_to_stream("/ expression");}
-        |expr PERCENT expr {print_to_stream("% expression");}
+        |expr PLUS expr {print_to_stream("+ expression");  $$=process_arithm_operation(add,$1,$3,symbolTable);}
+        |expr MINUS expr {print_to_stream("- expression"); $$=process_arithm_operation(sub,$1,$3,symbolTable);}
+        |expr ASTERISK expr {print_to_stream("* expression"); $$=process_arithm_operation(mul,$1,$3,symbolTable);}
+        |expr DIVISION expr {print_to_stream("/ expression"); $$=process_arithm_operation(_div,$1,$3,symbolTable);}
+        |expr PERCENT expr {print_to_stream("% expression"); $$=process_arithm_operation(mod,$1,$3,symbolTable);}
         |expr GREATER expr {print_to_stream("> expression");}
         |expr GREATER_EQUALS expr {print_to_stream(">= expression");}
         |expr LESS  expr {print_to_stream("< expression");}
@@ -98,28 +101,40 @@ expr:   assignexpr  {print_to_stream("Expression");}
 
         
 
-term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term");}
-        | MINUS expr %prec UMINUS   {print_to_stream("Term");}
+term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
+        | MINUS expr %prec UMINUS   {print_to_stream("Term"); check_arith($2,"uminus expression");
+                                                               $$=new_expr(arithexpr_e);
+                                                               $$->sym=new_temp(symbolTable);
+                                                               emit(uminus , $2,NULL,$$,curr_quad,yylineno);                  }
                                   
         
-        | NOT expr        {print_to_stream("Term");}                   
+        | NOT expr        {print_to_stream("Term");     $$ = new_expr(boolexpr_e);
+                                                        $$->sym = new_temp(symbolTable);
+                                                        emit(not,$2, NULL, $$,curr_quad,yylineno);
+                                                        }                   
                                            
         
         | PLUS_PLUS lvalue  {               {print_to_stream("Term");}
                                           process_plus_plus(symbolTable, &$2);
-                                           
+                                          process_term_plus_plus_lvalue($2,&$$,symbolTable);
+                                          
                                             
                             }
         | lvalue PLUS_PLUS  {                {print_to_stream("Term");}
                                             process_plus_plus(symbolTable,  &$1);
+                                            process_term_lvalue_plus_plus($1,&$$,symbolTable);//...
+
+                                            
                             }
         | MINUS_MINUS lvalue{              {print_to_stream("Term");
                                           process_minus_minus(symbolTable, &$2);
+                                          process_term_minus_minus_lvalue($2,&$$,symbolTable);
                                         }
                                           
         }
         | lvalue MINUS_MINUS {               print_to_stream("Term");
-                                                process_minus_minus(symbolTable, &$1);}
+                                                process_minus_minus(symbolTable, &$1);
+                                                process_term_lvalue_minus_minus($1,&$$,symbolTable);}
                                            
         
         | primary                             {print_to_stream("Term"); $$=$1;};  
@@ -136,7 +151,8 @@ assignexpr: lvalue  ASSIGN  expr    {
 primary:  lvalue { print_to_stream("Primary");  process_primary(symbolTable,  &$1);   }
           | call {print_to_stream("Primary");}
           | objectdef {print_to_stream("Primary");}
-          | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary");}
+          | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary"); $$=new_expr(programfunc_e);
+                                                                                $$->sym=$2->sym;             }
           | const {print_to_stream("Primary"); $$=$1;} ;
 
 lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTable,$1,&$$); }
@@ -154,35 +170,99 @@ member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
             | call DOT ID {print_to_stream("Member");}
             | call LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");} ;
 
-call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");} 
-            | lvalue callsuffix { print_to_stream("Call");
-                process_callsuffix(symbolTable, &$1);
+call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$=make_call($1,$3,symbolTable);} 
+            | lvalue callsuffix { print_to_stream("Call5"); 
+                                                            process_callsuffix(symbolTable, &$1);
+                                                            $1=emit_if_table_item($1);
+                                                            if($2->method){
+                                                              expr* e=$1;
+                                                              $1=emit_if_table_item(member_item(e,$2->name));
+                                                              expr * tmp= $2->elist;
+                                                              if(tmp==NULL)
+                                                              {
+                                                                $2->elist=e;
+                                                              }
+                                                              else
+                                                              {
+
+                                                                while(tmp->next!=NULL)
+                                                                {
+                                                                    tmp=tmp->next;
+                                                                }
+                                                                tmp->next=e;
+                                                              }
+
+                                                           }
+                                                           $$=make_call($1,$2->elist,symbolTable);
+                                                            
 
                                 }
-            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call");}
-            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call");}
-            | call LEFT_BRACKETS  RIGHT_BRACKETS;
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call2"); expr* func=new_expr(programfunc_e);
+                                                                                                                 func->sym=$2->sym;
+                                                                                                                 $$=make_call(func,$5,symbolTable);}
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call3");
+                                                                                    expr* func=new_expr(programfunc_e);
+                                                                                    func->sym=$2->sym;
+                                                                                    $$=make_call(func,NULL,symbolTable);
+                                                                                }
+            | call LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call4"); $$=make_call($$,NULL,symbolTable);};
 
-callsuffix: normcall {print_to_stream("Call Suffix");}
-            | methodcall {print_to_stream("Call Suffix");} ;
+callsuffix: normcall {print_to_stream("Call Suffix"); $$=$1;}
+            | methodcall {print_to_stream("Call Suffix"); $$=$1;} ;
 
-normcall: LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Normal Call");}
-          |LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Normal Call");};
-methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Method Call");} /* equivalent to lvalue.ID'('lvalue, elist')';*/
-           |Diaeresis ID LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Method Call");}
-elist:   expr   {print_to_stream("Expression List");} 
-        | expr COMMA elist {print_to_stream("Expression List");};
-         
+normcall: LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Normal Call") ;              $$=malloc(sizeof(struct call_info));
+                                                                                            $$->elist=$2;
+                                                                                            $$->method=0;
+                                                                                            $$->name=NULL;
+
+                                                                                            }
+          
+          |LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Normal Call");                   $$=malloc(sizeof(struct call_info));
+                                                                                            $$->elist=NULL;
+                                                                                            $$->method=0;
+                                                                                            $$->name=NULL;};
+
+methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Method Call");
+                                                                                            $$=malloc(sizeof(struct call_info));
+                                                                                            $$->elist=$4;
+                                                                                            $$->method=1;
+                                                                                            $$->name=strdup($2);} /* equivalent to lvalue->ID'('lvalue, elist')';*/
+           
+           |Diaeresis ID LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Method Call");    
+                                                                                            $$=malloc(sizeof(struct call_info));
+                                                                                            $$->elist=NULL;
+                                                                                            $$->method=1;
+                                                                                            $$->name=strdup($2);}
+
+elist:   expr   {print_to_stream("Expression List");
+                                       
+
+                                        $$=$1;  
+                                         } 
+        | expr COMMA elist {print_to_stream("Expression List Comma");      
+                                                                
+                                                                    
+                                                                    $1->next=$3;
+                                                                    
+                                                                
+                                                                  
+                                                                    
+                                                                       };
             
-objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");}
-           |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition");}
-           |LEFT_SQUARE  RIGHT_SQUARE {print_to_stream("Object Definition");};
+objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");  $$=process_array_elist($2,symbolTable);}
+           |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition"); $$=process_table_indexed($2,symbolTable);}
+           |LEFT_SQUARE  RIGHT_SQUARE {print_to_stream("Object Definition"); $$=process_array_elist(NULL,symbolTable);};
 
-indexed:    indexedelem  {print_to_stream("Indexed");}
-            | indexedelem COMMA  indexed {print_to_stream("Indexed");};
+indexed:    indexedelem  {print_to_stream("Indexed");  $$=$1;    }
+            | indexedelem COMMA  indexed {print_to_stream("Indexed");  $1->next=$3; };
            
 
-indexedelem: LEFT_BRACE expr COLON expr RIGHT_BRACE {print_to_stream("Index Element");};
+indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Element"); $$=malloc(sizeof(indexed));
+                                                                                        $$->left=$2;
+                                                                                        $$->right=$4;
+                                                                                        $$->next=NULL;
+                                                                                        
+                                                                                        };
 
 block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;}       
        |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;} ;  
@@ -229,11 +309,16 @@ ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt {print_to_stream("I
 whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); 
         iam_in_loop--;   pop_func_loop();                                };
 
-forstmt:  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );} elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt 
+forstmt:  forprefix elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt 
                             { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }
-        |  FOR LEFT_BRACKETS {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );}     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   
+         | forprefix elist SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt 
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }                  
+         | forprefix     SEMICOLON  expr SEMICOLON elist  RIGHT_BRACKETS stmt   
+                            {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();}
+         | forprefix     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   
                             {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();};  
-        
+
+forprefix:  FOR LEFT_BRACKETS  {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );};      
             
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                     if(iam_in_function <=0)
