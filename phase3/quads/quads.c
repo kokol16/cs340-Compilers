@@ -6,7 +6,7 @@ unsigned int curr_quad = 0;
 int temp_counter = 0;
 
 SymbolTable *symbolTable;
-
+unsigned next_quad(void) { return curr_quad; }
 void check_arith(expr *e, const char *context)
 {
     if (e->type == constbool_e ||
@@ -17,7 +17,6 @@ void check_arith(expr *e, const char *context)
         e->type == libraryfunc_e ||
         e->type == boolexpr_e)
         fprintf(stderr, "Illegal expr used in %s! ", context);
-        
 }
 void print_indexed_list(indexed *head)
 {
@@ -134,7 +133,7 @@ void expand()
     quads = _quad;
     total += EXPAND_SIZE;
 }
-void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line)
+void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned quad_no, unsigned label, unsigned line)
 {
     quad *_quad;
     if (curr_quad == total)
@@ -145,10 +144,21 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsi
     _quad->arg1 = arg1;
     _quad->arg2 = arg2;
     _quad->result = result;
-    _quad->label = label;
-    _quad->line = line;
+    _quad->quad_no = quad_no + 1;
 
-    print_quad(op, arg1, arg2, result, label, line);
+    if (label == 0 && (op == if_eq || if_greater == op || if_greatereq == op || if_less == op || if_lesseq == op || if_noteq == op || op == jump))
+    {
+        _quad->label = 1;
+    }
+    else
+    {
+        if (label != 0)
+            _quad->label = label + 1;
+    }
+    _quad->line = line;
+    _quad->op = op;
+
+    //print_quad(op, arg1, arg2, result,quad_no, label, line);
 }
 
 unsigned next_quad_label()
@@ -158,22 +168,22 @@ unsigned next_quad_label()
 void patch_label(unsigned int quad_no, unsigned label)
 {
     assert(quad_no < curr_quad);
+    //assert(!quads[quad_no].label);
     quads[quad_no].label = label;
 }
 
-void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line)
+void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file)
 {
     char *opcode_str;
-    FILE *quad_file = fopen("quads.txt", "a+");
+
     if (quad_file == NULL)
     {
         perror("Error opening quads file.");
         return;
     }
 
-    fprintf(quad_file, "%u:\t", label);
+    fprintf(quad_file, "%u:\t", curr_no);
     opcode_str = opcode_to_string(op);
-
     fprintf(quad_file, "%s ", opcode_str);
     if (arg1 != NULL)
     {
@@ -213,10 +223,16 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label
             }
             else
             {
+
                 fprintf(quad_file, "%s\t", result->sym->value.funcVal->name);
             }
         }
     }
+    if (label != 0)
+    {
+        fprintf(quad_file, "%u", label);
+    }
+
     fprintf(quad_file, "\n");
 
     /* if (op == assign)
@@ -269,8 +285,6 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label
         }
         fprintf(quad_file, "\n");
     }*/
-
-    fclose(quad_file);
 }
 int print_by_type(expr *_expr, FILE *quad_file)
 {
@@ -358,6 +372,8 @@ char *opcode_to_string(iopcode op)
         return "TABLE_GET_ELEMENT";
     case tablesetelem:
         return "TABLE_SET_ELEMENT";
+    case jump:
+        return "JUMP";
     }
 }
 
@@ -406,7 +422,7 @@ expr *new_expr_const_bool(unsigned char bool)
     memset(_expr, 0, sizeof(expr));
     _expr->next = NULL;
     _expr->type = constbool_e;
-    _expr->boolConst = bool;
+    _expr->boolConst = !!bool;
     return _expr;
 }
 expr *new_expr_const_nil()
@@ -428,7 +444,7 @@ expr *emit_if_table_item(expr *_expr)
     expr *result;
     result = new_expr(var_e);
     result->sym = new_temp(symbolTable);
-    emit(tablegetelem, _expr, _expr->index, result, curr_quad, yylineno);
+    emit(tablegetelem, _expr, _expr->index, result, curr_quad, 0, yylineno);
     return result;
 }
 

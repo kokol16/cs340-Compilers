@@ -1,15 +1,12 @@
-0:	ADD 4	3	7	
-1:	ASSIGN 7	x	
-2:	ASSIGN x	_t1	
-3:	SUB x	4	_t0	
-4:	ASSIGN _t0	x	
-5:	ASSIGN x	_t1	
-6:	MUL 4	3	12	
-7:	ASSIGN 12	x	
-8:	ASSIGN x	_t1	
-9:	DIV 4	3	1	
-10:	ASSIGN 1	x	
-11:	ASSIGN x	_t1	
-12:	MOD 4	3	1	
-13:	ASSIGN 1	x	
-14:	ASSIGN x	_t1	
+1:	ASSIGN 0	i	
+2:	ASSIGN i	_t0	
+3:	ASSIGN 0	y	
+4:	ASSIGN y	_t1	
+5:	IF_EQUALS 1	1	10
+6:	JUMP 13
+7:	ADD i	1	i	
+8:	ASSIGN i	_t2	
+9:	JUMP 5
+10:	ASSIGN 0	x	
+11:	ASSIGN x	_t3	
+12:	JUMP 7

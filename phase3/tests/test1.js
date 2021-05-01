@@ -6,16 +6,12 @@
 //t =[ {"a" : 1},{1: b} ];
 //x = (function(a,b){ return a; });
 //(function(){})();
-
-x=4+3;
-x=screen;
-x=4*3;
-x=4/3;
-x=4%3;
+for( i=0,y=0; true; ++i )
+{
+    local x=0;
+}
 
 
 
-
-//x=f();
 //y=x;
 //sprite..move(); 

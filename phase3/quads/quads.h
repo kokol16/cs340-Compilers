@@ -26,19 +26,25 @@ typedef enum iopcode
     funcend,
     tablecreate,
     tablegetelem,
-    tablesetelem
+    tablesetelem,
+    jump
 } iopcode;
 
 typedef struct expr expr;
 typedef enum expr_t expr_t;
 
+typedef struct for_struct
+{
+    expr * expr ;
+    unsigned test;
+    unsigned enter;
+}for_struct;
 typedef struct indexed
 {
-    expr * left ;
-    expr * right;
-    struct indexed * next;
-}indexed;
-
+    expr *left;
+    expr *right;
+    struct indexed *next;
+} indexed;
 
 typedef struct quad
 {
@@ -48,6 +54,7 @@ typedef struct quad
     expr *arg2;
     unsigned label;
     unsigned line;
+    unsigned quad_no;
 } quad;
 extern quad *quads;
 extern unsigned total;
@@ -56,10 +63,11 @@ extern unsigned int curr_quad;
 #define CURR_SIZE (total * sizeof(quad))
 #define NEW_SIZE (EXPAND_SIZE * sizeof(quad) + CURR_SIZE)
 void expand();
-void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line);
-void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned label, unsigned line);
+void emit(iopcode op, expr *arg1, expr *arg2, expr *result,unsigned quad_no, unsigned label, unsigned line);
+void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result,unsigned curr_no, unsigned label, unsigned line, FILE *quad_file );
 expr *lvalue_expr(SymbolTableEntry *bucket);
 void resettemp();
+unsigned next_quad(void);
 SymbolTableEntry *new_temp(SymbolTable *symbolTable);
 
 char *newtempname();
@@ -77,8 +85,8 @@ expr *new_expr_const_int(int intVal);
 
 expr *emit_if_table_item(expr *_expr);
 unsigned pop_elist(expr **elist_entry);
-int push_elist(expr ** elist_entry , expr * entry);
-void print_elist(expr * head);
+int push_elist(expr **elist_entry, expr *entry);
+void print_elist(expr *head);
 
 void print_indexed_list(indexed *head);
 
@@ -101,7 +109,6 @@ typedef enum expr_t
     nil_e
 } expr_t;
 
-
 typedef struct expr
 {
     expr_t type;
@@ -112,14 +119,14 @@ typedef struct expr
     char *strConst;
     unsigned char boolConst;
     expr *next;
-    expr * prev;
-    expr * tail;
+    expr *prev;
+    expr *tail;
 
 } expr;
 
 typedef struct call_info
 {
-    struct expr* elist;
+    struct expr *elist;
     unsigned char method;
     char *name;
 } call_info;

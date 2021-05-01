@@ -23,7 +23,9 @@ extern FILE * yyin;
     struct indexed *  _indexed;
     struct expr * expr_node;
 	char * str;
+    struct for_struct  * _for_struct;
     struct call_info* call_type;
+
 }
 %start program
 %token <bool> TRUE  FALSE
@@ -46,8 +48,9 @@ extern FILE * yyin;
 %left LEFT_SQUARE RIGHT_SQUARE
 %left LEFT_BRACKETS RIGHT_BRACKETS
 
+%type<_for_struct>  forprefix_2
 %type <expr_node> lvalue member expr assignexpr const  primary term elist objectdef
-%type<curr_scope_offset> block_func
+%type<curr_scope_offset> block_func ifprefix elseprefix if whilestart whilecond M N
 %type<str> funcname
 %type <_indexed> indexedelem indexed 
 
@@ -105,12 +108,12 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
         | MINUS expr %prec UMINUS   {print_to_stream("Term"); check_arith($2,"uminus expression");
                                                                $$=new_expr(arithexpr_e);
                                                                $$->sym=new_temp(symbolTable);
-                                                               emit(uminus , $2,NULL,$$,curr_quad,yylineno);                  }
+                                                               emit(uminus , $2,NULL,$$,curr_quad,0,yylineno);                  }
                                   
         
         | NOT expr        {print_to_stream("Term");     $$ = new_expr(boolexpr_e);
                                                         $$->sym = new_temp(symbolTable);
-                                                        emit(not,$2, NULL, $$,curr_quad,yylineno);
+                                                        emit(not,$2, NULL, $$,curr_quad,0,yylineno);
                                                         }                   
                                            
         
@@ -304,22 +307,70 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
         
             |    {print_to_stream("ID List");};
 
-ifstmt: IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt  ELSE stmt {print_to_stream("If Statement");} 
-        | IF LEFT_BRACKETS expr RIGHT_BRACKETS stmt {print_to_stream("If Statement");} 
-whilestmt: WHILE LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS stmt {print_to_stream("While Statement"); 
-        iam_in_loop--;   pop_func_loop();                                };
+ifstmt:   if   elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$2+1); patch_label($2,next_quad());} 
+        | if {print_to_stream("If Statement");} 
+whilestmt: whilestart whilecond stmt {
+                                            print_to_stream("While Statement");
+                                            iam_in_loop--;   pop_func_loop();  
+                                            emit(jump, NULL, NULL,NULL,curr_quad, $1,yylineno);
+                                            patch_label($2, next_quad());
+                                    };
 
-forstmt:  forprefix elist SEMICOLON  expr SEMICOLON  elist RIGHT_BRACKETS stmt 
-                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }
-         | forprefix elist SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt 
-                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); }                  
-         | forprefix     SEMICOLON  expr SEMICOLON elist  RIGHT_BRACKETS stmt   
-                            {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();}
-         | forprefix     SEMICOLON  expr SEMICOLON   RIGHT_BRACKETS stmt   
-                            {print_to_stream("For Statement"); iam_in_loop--; pop_func_loop();};  
+whilestart: WHILE {$$=next_quad();};
+whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS
+                                            {
+                                                emit( if_eq, $3, 
+                                                new_expr_const_bool(1),NULL, 
+                                                curr_quad,curr_quad+2,yylineno);
+                                                $$ = next_quad();
+                                                emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);                           
+                                                                                                            
+                                                                                                            
+                                            }
 
-forprefix:  FOR LEFT_BRACKETS  {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );};      
-            
+ifprefix: IF LEFT_BRACKETS expr RIGHT_BRACKETS {
+                                                emit( if_eq, $3, 
+                                                new_expr_const_bool(1),NULL, 
+                                                curr_quad,curr_quad+2,yylineno);
+                                                $$ = next_quad();
+                                                emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);
+} ;
+
+if: ifprefix stmt {patch_label($1,next_quad()); $$=$1;};
+elseprefix: ELSE {$$=next_quad(); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);};
+
+
+forstmt:  forprefix_2 N elist RIGHT_BRACKETS N stmt N 
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); patch_label($1->enter,$5+2);
+                                                                                                  patch_label($2,next_quad()+1);
+                                                                                                  patch_label($5,$1->test+1);
+                                                                                                  patch_label($7,$2+2);
+                            
+                            
+                     
+                             }
+         | forprefix_2 N  RIGHT_BRACKETS N stmt N 
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); patch_label($1->enter,$4+2);
+                                                                                                  patch_label($2,next_quad()+1);
+                                                                                                  patch_label($4,$1->test+1);
+                                                                                                  patch_label($6,$2+2); };                 
+        
+forprefix:  FOR LEFT_BRACKETS  {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );};    
+
+
+N: { $$=next_quad(); fprintf(stderr,"quad : %u\n",next_quad()); emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno); };
+M: {$$=next_quad();};
+
+forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{  $$=malloc(sizeof(for_struct));   $$->test=$4; $$->enter=next_quad();  emit( if_eq, $5, 
+                                                                                           new_expr_const_bool(1),NULL, 
+                                                                                            curr_quad,0,yylineno);}
+            |forprefix  SEMICOLON M expr SEMICOLON{  $$=malloc(sizeof(for_struct));  $$->test=$3; $$->enter=next_quad();  emit( if_eq, $4, 
+                                                                                           new_expr_const_bool(1),NULL, 
+                                                                                            curr_quad,0,yylineno); };
+
+
+
+
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                     if(iam_in_function <=0)
                                     {
@@ -380,12 +431,21 @@ int main(int argc , char * argv[])
     }
   
     symbolTable = symbolTable_create();
-    FILE *quad_file = fopen("quads.txt", "w+");
-
+    
     yyparse() ;
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
+    unsigned i=0;
+    fprintf(stderr, "curr cuad : %u\n",curr_quad);
+    FILE *quad_file = fopen("quads.txt", "w+");
+    while(i<curr_quad)
+    {
+        print_quad(quads[i].op, quads[i].arg1, quads[i].arg2,quads[i].result,quads[i].quad_no,quads[i].label,quads[i].line,quad_file);
+        i++;
+    }
+    fclose(quad_file);
+
     if(output_file!=NULL)
     fclose(output_file);
     fclose(yyin);

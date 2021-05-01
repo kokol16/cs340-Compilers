@@ -109,10 +109,10 @@ ONELINECOMMENTT "//".*
       return LOCALL ;
 }
 {TRUE}       {
-      return TRUE ;
+    yylval.bool=1; return TRUE ;
 }
 {FALSE}       {
-      return FALSE ;
+    yylval.bool=0;  return FALSE ;
 }
 {NIL}       {
       return NIL ;
