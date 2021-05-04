@@ -1,12 +1,11 @@
-1:	ASSIGN 0	i	
-2:	ASSIGN i	_t0	
-3:	ASSIGN 0	y	
-4:	ASSIGN y	_t1	
-5:	IF_EQUALS 1	1	10
-6:	JUMP 13
-7:	ADD i	1	i	
-8:	ASSIGN i	_t2	
-9:	JUMP 5
-10:	ASSIGN 0	x	
-11:	ASSIGN x	_t3	
-12:	JUMP 7
+1:	IF_EQUALS 1	1	3
+2:	JUMP 12
+3:	ASSIGN 5	addEventListener	
+4:	ASSIGN addEventListener	_t0	
+5:	IF_EQUALS 1	1	7
+6:	JUMP 9
+7:	JUMP 11
+8:	JUMP 5
+9:	ASSIGN 5	x	11
+10:	ASSIGN x	_t0	
+11:	JUMP 1

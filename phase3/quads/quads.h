@@ -32,13 +32,18 @@ typedef enum iopcode
 
 typedef struct expr expr;
 typedef enum expr_t expr_t;
+typedef struct stmt_t _stmt_t;
 
+typedef struct stmt_t
+{
+    int breaklist, contlist;
+} stmt_t;
 typedef struct for_struct
 {
-    expr * expr ;
+    expr *expr;
     unsigned test;
     unsigned enter;
-}for_struct;
+} for_struct;
 typedef struct indexed
 {
     expr *left;
@@ -63,8 +68,8 @@ extern unsigned int curr_quad;
 #define CURR_SIZE (total * sizeof(quad))
 #define NEW_SIZE (EXPAND_SIZE * sizeof(quad) + CURR_SIZE)
 void expand();
-void emit(iopcode op, expr *arg1, expr *arg2, expr *result,unsigned quad_no, unsigned label, unsigned line);
-void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result,unsigned curr_no, unsigned label, unsigned line, FILE *quad_file );
+void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned quad_no, unsigned label, unsigned line);
+void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file);
 expr *lvalue_expr(SymbolTableEntry *bucket);
 void resettemp();
 unsigned next_quad(void);
@@ -92,6 +97,13 @@ void print_indexed_list(indexed *head);
 
 void check_arith(expr *e, const char *context);
 int print_by_type(expr *_expr, FILE *fp);
+
+void make_stmt(stmt_t *s);
+int newlist(int i);
+
+int mergelist(int l1, int l2);
+void patchlist(int list, int label);
+
 typedef enum expr_t
 {
     var_e,

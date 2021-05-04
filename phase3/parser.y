@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 int func_line=0;
+int is_break=0,is_continue=0;
+
 SymbolTable *  symbolTable;
 FILE *output_file;
 int yylex(void);
@@ -20,6 +22,7 @@ extern FILE * yyin;
     unsigned curr_scope_offset;
     //float real;
     unsigned char bool;
+    struct stmt_t *   _stmt_t;
     struct indexed *  _indexed;
     struct expr * expr_node;
 	char * str;
@@ -56,35 +59,73 @@ extern FILE * yyin;
 
 %type<expr_node> funcprefix funcdef call
 %type<call_type> methodcall normcall callsuffix 
-
+%type<_stmt_t> stmt statements   BREAK CONTINUE block whilestmt
 %%         
 program: statements {print_to_stream("Program");}  ;
-stmt:   expr SEMICOLON   {print_to_stream("Statement");resettemp();}  
-        | ifstmt         {print_to_stream("Statement");resettemp();}  
-        | whilestmt      {print_to_stream("Statement");resettemp();}  
-        | forstmt        {print_to_stream("Statement");resettemp();}  
-        | returnstmt     {print_to_stream("Statement");resettemp();}  
-        | BREAK SEMICOLON {     print_to_stream("Statement");resettemp();
+stmt:   expr SEMICOLON   {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
+        | ifstmt         {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
+        | whilestmt      {print_to_stream("Statement");resettemp(); $$=NULL; $$->breaklist=0; $$->contlist=0; is_break=0; is_continue=0;}  
+        | forstmt        {print_to_stream("Statement (for)");resettemp(); is_break=0; is_continue=0;}  
+        | returnstmt     {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
+        | BREAK SEMICOLON {     print_to_stream("Statement(break)");resettemp(); is_break=1;
                                    if(top_func_loop()!=for_loop && top_func_loop()!=while_loop )
                                     {
                                         print_error(NULL,yylineno, "ERROR : use BREAK not in a loop");
                                     } 
+                                    else
+                                    {
+                                        $$=malloc(sizeof(stmt_t));
+                                        make_stmt($$);
+                                        $$->breaklist = newlist(next_quad()); 
+                                        
+                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                        fprintf(stderr,"break head %d\n",$$->breaklist);
+                                        fprintf (stderr , "next label %d\n",quads[$$->breaklist].label);
+
+                                    }
                                     
         
                             }
-        | CONTINUE SEMICOLON {     {print_to_stream("Statement");resettemp();}  
+        | CONTINUE SEMICOLON {     {print_to_stream("Statement");resettemp();}  is_continue=1;
                                     if(top_func_loop()!=for_loop && top_func_loop()!=while_loop)
                                     {
                                        print_error(NULL,yylineno, "ERROR : use CONTINUE not in a loop");
                                     } 
+                                    else
+                                    {
+                                        $$=malloc(sizeof(stmt_t));
+                                        make_stmt($$);
+                                        $$->contlist = newlist(next_quad()); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                    }
                                     
                             }
-        | block             {print_to_stream("Statement");resettemp();}  
-        | funcdef           {print_to_stream("Statement");resettemp();}  
-        |SEMICOLON          {print_to_stream("Statement");resettemp();}  
+        | block             {     print_to_stream("Statement(block)");resettemp(); $$=$1; is_break=0; is_continue=0;}  
+        | funcdef           {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
+        |SEMICOLON          {print_to_stream("Statement(semicolon)");resettemp(); is_break=0; is_continue=0;}  
         ;
 statements: statements stmt
-            |stmt;
+            {
+
+                print_to_stream("Statements stmt "); 
+
+                
+                if($1!=NULL && $$!=NULL && $2!=NULL)
+                {
+                    fprintf (stderr , "%d\n",$1->breaklist);
+                    //fprintf (stderr , "%d\n",quads[$2->breaklist].label);
+                    print_to_stream("[merging]"); 
+                    if(is_break)
+                    $$->breaklist = mergelist($1->breaklist, $2->breaklist);
+                    else if(is_continue)
+                    $$->contlist = mergelist($1->contlist, $2->contlist); 
+                   // $$=$2;
+                }
+            }
+            |stmt
+            { 
+                print_to_stream("Statements"); 
+                $$=$1;
+            };
 
 expr:   assignexpr  {print_to_stream("Expression");}
         |expr PLUS expr {print_to_stream("+ expression");  $$=process_arithm_operation(add,$1,$3,symbolTable);}
@@ -267,8 +308,8 @@ indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Ele
                                                                                         
                                                                                         };
 
-block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;}       
-       |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--;} ;  
+block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=NULL;}       
+       |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=$3;} ;  
        
 block_func: LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}  RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
  scope--; iam_in_function--;   pop(functions_stack);    pop_func_loop(); $$=curr_scope_offset(); exit_scope_space();  }       
@@ -313,7 +354,19 @@ whilestmt: whilestart whilecond stmt {
                                             print_to_stream("While Statement");
                                             iam_in_loop--;   pop_func_loop();  
                                             emit(jump, NULL, NULL,NULL,curr_quad, $1,yylineno);
-                                            patch_label($2, next_quad());
+                                            patch_label($2, next_quad()+1);
+                                            if ($3!=NULL )
+                                            {
+                                                fprintf(stderr,"next quad to fill break list:%d\n",next_quad()+1);
+                                                fprintf(stderr,"breaklist : %d\n",$3->breaklist);
+                                                
+                                                patchlist($3->breaklist, next_quad());
+
+                                            }
+                                            if ($3!=NULL)
+                                                patchlist($3->contlist, $1);
+
+                                            
                                     };
 
 whilestart: WHILE {$$=next_quad();};
@@ -350,10 +403,16 @@ forstmt:  forprefix_2 N elist RIGHT_BRACKETS N stmt N
                      
                              }
          | forprefix_2 N  RIGHT_BRACKETS N stmt N 
-                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); patch_label($1->enter,$4+2);
-                                                                                                  patch_label($2,next_quad()+1);
-                                                                                                  patch_label($4,$1->test+1);
-                                                                                                  patch_label($6,$2+2); };                 
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop();    patch_label($1->enter,$4+2);
+                                                                                                    patch_label($2,next_quad()+1);
+                                                                                                    patch_label($4,$1->test+1);
+                                                                                                    patch_label($6,$2+2); 
+                                                                                                  
+                                                                                                    //patchlist($5.breaklist, next_quad());
+                                                                                                    //patchlist($5.contlist, $2+1);
+
+                                                                                                  
+                                                                                                  };                 
         
 forprefix:  FOR LEFT_BRACKETS  {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );};    
 
@@ -441,6 +500,7 @@ int main(int argc , char * argv[])
     FILE *quad_file = fopen("quads.txt", "w+");
     while(i<curr_quad)
     {
+        if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
         print_quad(quads[i].op, quads[i].arg1, quads[i].arg2,quads[i].result,quads[i].quad_no,quads[i].label,quads[i].line,quad_file);
         i++;
     }

@@ -1,6 +1,6 @@
 
 %{ 
-#include "general_functions/lib.h"
+#include "bison_functions/bison_functions.h"
 
 #define MY_EOF 0   
 #include"y.tab.h"
