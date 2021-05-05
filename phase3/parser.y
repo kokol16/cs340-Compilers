@@ -364,7 +364,7 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
         
             |    {print_to_stream("ID List");};
 
-ifstmt:   ifprefix stmt elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$3+1); patch_label($3,next_quad()); $$=$2;} 
+ifstmt:   ifprefix stmt elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$3+2); patch_label($3,next_quad()+1); $$=$2;} 
         | if {print_to_stream("If Statement"); $$=$1; } 
 whilestmt: whilestart whilecond stmt {
                                             print_to_stream("While Statement");

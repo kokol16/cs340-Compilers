@@ -20,25 +20,27 @@
         break;
     }
 }*/
-function f()
-{
-    return ;
-    return local x ;
-    return nil;
-}
+
+   /* a = f(a);
+    if (a)
+    x=5;
+    else
+    y=10;*/
+   
 
 
 
-
-/*while (a) {
+for(i=0; true; i++) {
    a = f(a);
    if (a)
    break;
    else
    continue;
+   for(; true; i++){
    continue;
    break;
-   }*/
+   }
+   }
 
 /*for(i=0; i<5; i++)
 {
