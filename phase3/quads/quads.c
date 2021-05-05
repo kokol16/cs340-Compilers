@@ -14,14 +14,13 @@ void make_stmt(stmt_t *s)
 }
 int newlist(int i)
 {
-    fprintf(stderr,"i:%d\n",i);
     quads[i].label = 0;
     return i;
 }
 
 int mergelist(int l1, int l2)
 {
-    fprintf(stderr,"merge l1:%d l2:%d\n",quads[l1].label,quads[l2].label);
+    fprintf(stderr, "merge l1:%d l2:%d\n", l1, l2);
     //if(l1>=curr_quad ||l2>=curr_quad ) return 0;
     if (!l1)
         return l2;
@@ -32,8 +31,8 @@ int mergelist(int l1, int l2)
         int i = l1;
         while (quads[i].label)
         {
-            //fprintf(stderr, "lala\n");
             i = quads[i].label;
+            fprintf(stderr, "i : %d\n",i);
         }
 
         quads[i].label = l2;
@@ -42,16 +41,16 @@ int mergelist(int l1, int l2)
 }
 void patchlist(int list, int label)
 {
-    //fprintf(stderr, "list: %d\n",list);
-    if (list >= curr_quad)
-        return;
-    while (list)
+    fprintf(stderr, "starting from index : %d\n",list);
+   
+    while (list!=0 && list<curr_quad)
     {
         int next = quads[list].label;
+        fprintf(stderr, "%d-->", list);
         quads[list].label = label;
-        fprintf(stderr, "next:%d\n", next);
         list = next;
     }
+    fprintf(stderr, "\n");
 }
 
 unsigned next_quad(void) { return curr_quad; }
@@ -194,9 +193,9 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned quad_no, un
     _quad->result = result;
     _quad->quad_no = quad_no + 1;
 
-    if (label == 0 && (op == if_eq || if_greater == op || if_greatereq == op || if_less == op || if_lesseq == op || if_noteq == op ))
+    if (label == 0 && (op == if_eq || if_greater == op || if_greatereq == op || if_less == op || if_lesseq == op || if_noteq == op))
     {
-        fprintf(stderr,"making label 1\n");
+        fprintf(stderr, "making label 1\n");
         _quad->label = 1;
     }
     else

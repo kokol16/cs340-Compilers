@@ -3,7 +3,6 @@
 #include <stdio.h>
 
 int func_line=0;
-int is_break=0,is_continue=0;
 
 SymbolTable *  symbolTable;
 FILE *output_file;
@@ -53,81 +52,98 @@ extern FILE * yyin;
 
 %type<_for_struct>  forprefix_2
 %type <expr_node> lvalue member expr assignexpr const  primary term elist objectdef
-%type<curr_scope_offset> block_func ifprefix elseprefix if whilestart whilecond M N
+%type<curr_scope_offset> block_func ifprefix elseprefix  whilestart whilecond M N
 %type<str> funcname
 %type <_indexed> indexedelem indexed 
 
 %type<expr_node> funcprefix funcdef call
 %type<call_type> methodcall normcall callsuffix 
-%type<_stmt_t> stmt statements   BREAK CONTINUE block whilestmt
+%type<_stmt_t> stmt statements   BREAK CONTINUE block whilestmt ifstmt if
 %%         
-program: statements {print_to_stream("Program");}  ;
-stmt:   expr SEMICOLON   {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
-        | ifstmt         {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
-        | whilestmt      {print_to_stream("Statement");resettemp(); $$=NULL; $$->breaklist=0; $$->contlist=0; is_break=0; is_continue=0;}  
-        | forstmt        {print_to_stream("Statement (for)");resettemp(); is_break=0; is_continue=0;}  
-        | returnstmt     {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
-        | BREAK SEMICOLON {     print_to_stream("Statement(break)");resettemp(); is_break=1;
-                                   if(top_func_loop()!=for_loop && top_func_loop()!=while_loop )
+program: statements {print_to_stream("Program"); }  ;
+stmt:   expr SEMICOLON   {print_to_stream("Statement(expression)");resettemp(); $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
+        | ifstmt         {print_to_stream("Statement");resettemp(); $$=$1; }  
+        | whilestmt      {print_to_stream("Statement");resettemp(); $$=malloc(sizeof(stmt_t)); make_stmt($$);  }  
+        | forstmt        {print_to_stream("Statement (for)");resettemp();   $$=malloc(sizeof(stmt_t)); make_stmt($$);}  
+        | returnstmt     {print_to_stream("Statement");resettemp();   $$=malloc(sizeof(stmt_t)); make_stmt($$);}  
+        | BREAK SEMICOLON {     print_to_stream("Statement(break)");resettemp(); $$=malloc(sizeof(stmt_t)); make_stmt($$);
+                                    if(top_func_loop()!=for_loop && top_func_loop()!=while_loop )
                                     {
                                         print_error(NULL,yylineno, "ERROR : use BREAK not in a loop");
                                     } 
                                     else
                                     {
+                                        
+                                        
                                         $$=malloc(sizeof(stmt_t));
                                         make_stmt($$);
                                         $$->breaklist = newlist(next_quad()); 
-                                        
                                         emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                        fprintf(stderr,"break head %d\n",$$->breaklist);
-                                        fprintf (stderr , "next label %d\n",quads[$$->breaklist].label);
+                                        quads[next_quad()-1].label = 0;
+
+                                      
+                                        //fprintf(stderr,"break head %d\n",$$->breaklist);
+                                        //fprintf (stderr , "next label %d\n",quads[$$->breaklist].label);
 
                                     }
                                     
         
                             }
-        | CONTINUE SEMICOLON {     {print_to_stream("Statement");resettemp();}  is_continue=1;
+        | CONTINUE SEMICOLON {     {print_to_stream("Statement");resettemp();}  ;
                                     if(top_func_loop()!=for_loop && top_func_loop()!=while_loop)
                                     {
                                        print_error(NULL,yylineno, "ERROR : use CONTINUE not in a loop");
                                     } 
                                     else
                                     {
+                                        
                                         $$=malloc(sizeof(stmt_t));
                                         make_stmt($$);
                                         $$->contlist = newlist(next_quad()); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                        quads[next_quad()-1].label = 0;
+
                                     }
                                     
                             }
-        | block             {     print_to_stream("Statement(block)");resettemp(); $$=$1; is_break=0; is_continue=0;}  
-        | funcdef           {print_to_stream("Statement");resettemp(); is_break=0; is_continue=0;}  
-        |SEMICOLON          {print_to_stream("Statement(semicolon)");resettemp(); is_break=0; is_continue=0;}  
+        | block             {print_to_stream("Statement(block)");resettemp();  /*$$=malloc(sizeof(stmt_t)); make_stmt($$);*/$$=$1;  }  
+        | funcdef           {print_to_stream("Statement");resettemp();    $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
+        |SEMICOLON          {print_to_stream("Statement(semicolon)");resettemp();    $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
         ;
 statements: statements stmt
             {
 
                 print_to_stream("Statements stmt "); 
 
-                
-                if($1!=NULL && $$!=NULL && $2!=NULL)
+               /* if($1!=NULL && $$!=NULL && $2!=NULL && has_loop_finished )
                 {
-                    fprintf (stderr , "%d\n",$1->breaklist);
-                    //fprintf (stderr , "%d\n",quads[$2->breaklist].label);
-                    print_to_stream("[merging]"); 
-                    if(is_break)
+                    fprintf (stderr , "clear list :%d\n",$1->breaklist);
+                    $1->breaklist=0;
+                    $2->breaklist=0;                    
+                    $1->contlist=0;
+                    $2->contlist=0;
+                    
+                }*/
+                if($1!=NULL && $2!=NULL )
+                {
+                    //fprintf (stderr , "lala:%d\n",$1->breaklist);
+                    //fprintf (stderr , "lala:%d\n",$2->breaklist);
+                    
+                    //fprintf(stderr,"[merging]"); 
                     $$->breaklist = mergelist($1->breaklist, $2->breaklist);
-                    else if(is_continue)
+                    fprintf (stderr , "after merge %d\n",$$->breaklist);
+
                     $$->contlist = mergelist($1->contlist, $2->contlist); 
                    // $$=$2;
                 }
             }
             |stmt
             { 
+
                 print_to_stream("Statements"); 
                 $$=$1;
             };
 
-expr:   assignexpr  {print_to_stream("Expression");}
+expr:   assignexpr  {print_to_stream("Expression");$$=$1;}
         |expr PLUS expr {print_to_stream("+ expression");  $$=process_arithm_operation(add,$1,$3,symbolTable);}
         |expr MINUS expr {print_to_stream("- expression"); $$=process_arithm_operation(sub,$1,$3,symbolTable);}
         |expr ASTERISK expr {print_to_stream("* expression"); $$=process_arithm_operation(mul,$1,$3,symbolTable);}
@@ -348,28 +364,43 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
         
             |    {print_to_stream("ID List");};
 
-ifstmt:   if   elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$2+1); patch_label($2,next_quad());} 
-        | if {print_to_stream("If Statement");} 
+ifstmt:   ifprefix stmt elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$3+1); patch_label($3,next_quad()); $$=$2;} 
+        | if {print_to_stream("If Statement"); $$=$1; } 
 whilestmt: whilestart whilecond stmt {
                                             print_to_stream("While Statement");
                                             iam_in_loop--;   pop_func_loop();  
-                                            emit(jump, NULL, NULL,NULL,curr_quad, $1,yylineno);
-                                            patch_label($2, next_quad()+1);
+
+                                            emit(jump, NULL, NULL,NULL,curr_quad, $1,yylineno);//jump to go up in loop
+                                            patch_label($2, next_quad()+1);//jump if eq failed
+
                                             if ($3!=NULL )
                                             {
-                                                fprintf(stderr,"next quad to fill break list:%d\n",next_quad()+1);
-                                                fprintf(stderr,"breaklist : %d\n",$3->breaklist);
+                                                fprintf(stderr,"patchhh\n");
+                                                //fprintf(stderr,"next quad to fill break list:%d\n",next_quad()+1);
+                                                //fprintf(stderr,"breaklist : %d\n",$3->breaklist);
                                                 
-                                                patchlist($3->breaklist, next_quad());
+                                                patchlist($3->breaklist, next_quad()+1);
+                                                patchlist($3->contlist, $1+1);
+                                                
+
 
                                             }
-                                            if ($3!=NULL)
-                                                patchlist($3->contlist, $1);
+                                            
+                                            //make breaking list fooking 00000000000000
+                                            //fprintf (stderr , "next label %d\n",quads[$$->breaklist].label);
+                                                
+                                            
+                                            
 
                                             
                                     };
 
-whilestart: WHILE {$$=next_quad();};
+whilestart: WHILE   {  
+                        print_to_stream("whilestart");
+                        $$=next_quad(); 
+                        
+
+                    };
 whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS
                                             {
                                                 emit( if_eq, $3, 
@@ -389,7 +420,7 @@ ifprefix: IF LEFT_BRACKETS expr RIGHT_BRACKETS {
                                                 emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);
 } ;
 
-if: ifprefix stmt {patch_label($1,next_quad()); $$=$1;};
+if: ifprefix stmt {patch_label($1,next_quad()); $$=$2;};
 elseprefix: ELSE {$$=next_quad(); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);};
 
 
@@ -398,18 +429,26 @@ forstmt:  forprefix_2 N elist RIGHT_BRACKETS N stmt N
                                                                                                   patch_label($2,next_quad()+1);
                                                                                                   patch_label($5,$1->test+1);
                                                                                                   patch_label($7,$2+2);
-                            
+                                                                                                    if($6!=NULL)
+                                                                                                    {
+                                                                                                        patchlist($6->breaklist, next_quad()+1);
+                                                                                                        patchlist($6->contlist, $2+2);
+                                                                                                    }
                             
                      
                              }
          | forprefix_2 N  RIGHT_BRACKETS N stmt N 
                             { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop();    patch_label($1->enter,$4+2);
+
                                                                                                     patch_label($2,next_quad()+1);
                                                                                                     patch_label($4,$1->test+1);
                                                                                                     patch_label($6,$2+2); 
                                                                                                   
-                                                                                                    //patchlist($5.breaklist, next_quad());
-                                                                                                    //patchlist($5.contlist, $2+1);
+                                                                                                    if($5!=NULL)
+                                                                                                    {
+                                                                                                        patchlist($5->breaklist, next_quad()+1);
+                                                                                                        patchlist($5->contlist, $2+2);
+                                                                                                    }
 
                                                                                                   
                                                                                                   };                 
@@ -434,6 +473,10 @@ returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                     if(iam_in_function <=0)
                                     {
                                        print_error(NULL,yylineno, "ERROR : return out of function");
+                                    }
+                                    else
+                                    {
+                                        emit(ret,$2,NULL,NULL,curr_quad,0,yylineno);
                                     } 
                                     
                                  } 
@@ -443,6 +486,11 @@ returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                         {
                                            print_error(NULL,yylineno, "ERROR : return out of function");
                                         } 
+                                        else
+                                        {
+                                            emit(ret,NULL,NULL,NULL,curr_quad,0,yylineno);
+
+                                        }
                                         
                                         
                                      };

@@ -6,22 +6,40 @@
 //t =[ {"a" : 1},{1: b} ];
 //x = (function(a,b){ return a; });
 //(function(){})();
+/*function () {
 
-//THIS IS FOOKING SEG for(    ;true;)
-while (true) {
-    addEventListener=5;
-    while(true)
-    {
+    for (i = 0; true; i++) {
         break;
+        continue;
+        for (y = 0; true; y++) {
+            continue;
+            break;
+            return nil;
 
-     //   continue;
-     //   break;
+        }
+        break;
     }
-    x=5;
-    
-    //break;
-    //continue;
+}*/
+function f()
+{
+    return ;
+    return local x ;
+    return nil;
 }
+
+
+
+
+/*while (a) {
+   a = f(a);
+   if (a)
+   break;
+   else
+   continue;
+   continue;
+   break;
+   }*/
+
 /*for(i=0; i<5; i++)
 {
     i++;
