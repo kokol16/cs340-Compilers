@@ -29,7 +29,7 @@
    
 
 
-
+/*
 for(i=0; true; i++) {
    a = f(a);
    if (a)
@@ -40,7 +40,7 @@ for(i=0; true; i++) {
    continue;
    break;
    }
-   }
+   */
 
 /*for(i=0; i<5; i++)
 {
@@ -50,3 +50,6 @@ for(i=0; true; i++) {
 
 //y=x;
 //sprite..move(); 
+
+//y=x>5;
+x=not a;

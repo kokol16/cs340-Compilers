@@ -34,6 +34,12 @@ typedef struct expr expr;
 typedef enum expr_t expr_t;
 typedef struct stmt_t _stmt_t;
 
+/*
+typedef struct truth_list
+{
+    int truelist, falselist;
+} truth_list;
+*/
 typedef struct stmt_t
 {
     int breaklist, contlist;
@@ -103,7 +109,7 @@ int newlist(int i);
 
 int mergelist(int l1, int l2);
 void patchlist(int list, int label);
-
+void make_truth_list(expr  *s);
 typedef enum expr_t
 {
     var_e,
@@ -133,7 +139,9 @@ typedef struct expr
     expr *next;
     expr *prev;
     expr *tail;
-
+    //truth_list * truth_list;
+    int truelist;
+    int falselist;
 } expr;
 
 typedef struct call_info

@@ -7,6 +7,12 @@ int temp_counter = 0;
 
 SymbolTable *symbolTable;
 
+void make_truth_list(expr *s)
+{
+    s->truelist = 0;
+    s->falselist = 0;
+}
+
 void make_stmt(stmt_t *s)
 {
     s->breaklist = 0;
@@ -15,6 +21,8 @@ void make_stmt(stmt_t *s)
 int newlist(int i)
 {
     quads[i].label = 0;
+    fprintf(stderr, "curr : %d\n", curr_quad);
+    fprintf(stderr, "i : %d\n", i);
     return i;
 }
 
@@ -32,7 +40,7 @@ int mergelist(int l1, int l2)
         while (quads[i].label)
         {
             i = quads[i].label;
-            fprintf(stderr, "i : %d\n",i);
+            fprintf(stderr, "i : %d\n", i);
         }
 
         quads[i].label = l2;
@@ -41,9 +49,9 @@ int mergelist(int l1, int l2)
 }
 void patchlist(int list, int label)
 {
-    fprintf(stderr, "starting from index : %d\n",list);
-   
-    while (list!=0 && list<curr_quad)
+    fprintf(stderr, "starting from index : %d\n", list);
+
+    while (list != 0 && list < curr_quad)
     {
         int next = quads[list].label;
         fprintf(stderr, "%d-->", list);
@@ -171,7 +179,9 @@ void expand()
 {
     assert(total == curr_quad);
     quad *_quad;
+    fprintf(stderr, "expand()\n");
     _quad = malloc(NEW_SIZE);
+    memset(_quad, 0, sizeof(_quad));
     if (_quad)
     {
         memcpy(_quad, quads, CURR_SIZE);
@@ -191,7 +201,7 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned quad_no, un
     _quad->arg1 = arg1;
     _quad->arg2 = arg2;
     _quad->result = result;
-    _quad->quad_no = quad_no + 1;
+    _quad->quad_no = quad_no;
 
     if (label == 0 && (op == if_eq || if_greater == op || if_greatereq == op || if_less == op || if_lesseq == op || if_noteq == op))
     {
@@ -338,7 +348,14 @@ int print_by_type(expr *_expr, FILE *quad_file)
 {
     if (_expr->type == constbool_e)
     {
-        fprintf(quad_file, "%u\t", _expr->boolConst);
+        if (_expr->boolConst == 0)
+        {
+            fprintf(quad_file, "%s\t", "false");
+        }
+        else
+        {
+            fprintf(quad_file, "%s\t", "true");
+        }
         return 1;
     }
     else if (_expr->type == constint_e)

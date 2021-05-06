@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 int func_line=0;
-
+unsigned is_first_time=1;
 SymbolTable *  symbolTable;
 FILE *output_file;
 int yylex(void);
@@ -52,7 +52,7 @@ extern FILE * yyin;
 
 %type<_for_struct>  forprefix_2
 %type <expr_node> lvalue member expr assignexpr const  primary term elist objectdef
-%type<curr_scope_offset> block_func ifprefix elseprefix  whilestart whilecond M N
+%type<curr_scope_offset> block_func ifprefix elseprefix  whilestart whilecond M N T
 %type<str> funcname
 %type <_indexed> indexedelem indexed 
 
@@ -61,7 +61,13 @@ extern FILE * yyin;
 %type<_stmt_t> stmt statements   BREAK CONTINUE block whilestmt ifstmt if
 %%         
 program: statements {print_to_stream("Program"); }  ;
-stmt:   expr SEMICOLON   {print_to_stream("Statement(expression)");resettemp(); $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
+stmt:   expr SEMICOLON   {  is_first_time=1;
+                                        create_assign_after_bool_op(&$1,symbolTable);
+                            /*fprintf ( stderr, "trtue listt :%d\n", $1->truelist);
+                            patchlist($1->truelist, curr_quad); */
+                            
+                            print_to_stream("Statement(expression semicolon)");resettemp(); 
+                            $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
         | ifstmt         {print_to_stream("Statement");resettemp(); $$=$1; }  
         | whilestmt      {print_to_stream("Statement");resettemp(); $$=malloc(sizeof(stmt_t)); make_stmt($$);  }  
         | forstmt        {print_to_stream("Statement (for)");resettemp();   $$=malloc(sizeof(stmt_t)); make_stmt($$);}  
@@ -114,15 +120,7 @@ statements: statements stmt
 
                 print_to_stream("Statements stmt "); 
 
-               /* if($1!=NULL && $$!=NULL && $2!=NULL && has_loop_finished )
-                {
-                    fprintf (stderr , "clear list :%d\n",$1->breaklist);
-                    $1->breaklist=0;
-                    $2->breaklist=0;                    
-                    $1->contlist=0;
-                    $2->contlist=0;
-                    
-                }*/
+              
                 if($1!=NULL && $2!=NULL )
                 {
                     //fprintf (stderr , "lala:%d\n",$1->breaklist);
@@ -143,22 +141,115 @@ statements: statements stmt
                 $$=$1;
             };
 
-expr:   assignexpr  {print_to_stream("Expression");$$=$1;}
+expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr PLUS expr {print_to_stream("+ expression");  $$=process_arithm_operation(add,$1,$3,symbolTable);}
         |expr MINUS expr {print_to_stream("- expression"); $$=process_arithm_operation(sub,$1,$3,symbolTable);}
         |expr ASTERISK expr {print_to_stream("* expression"); $$=process_arithm_operation(mul,$1,$3,symbolTable);}
         |expr DIVISION expr {print_to_stream("/ expression"); $$=process_arithm_operation(_div,$1,$3,symbolTable);}
         |expr PERCENT expr {print_to_stream("% expression"); $$=process_arithm_operation(mod,$1,$3,symbolTable);}
-        |expr GREATER expr {print_to_stream("> expression");}
+        |expr GREATER expr  {
+                                print_to_stream("> expression");
+                                if($$!=NULL)
+                                {
+                                    $$->truelist=newlist(next_quad());
+                                    $$->falselist=newlist(next_quad()+1);
+                                    emit(if_greater,$1,$3,NULL,curr_quad,0,yylineno);
+                                    emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+
+                                }
+                               
+                            }
         |expr GREATER_EQUALS expr {print_to_stream(">= expression");}
         |expr LESS  expr {print_to_stream("< expression");}
         |expr LESS_EQUALS expr {print_to_stream("<= expression");}
         |expr EQUALS expr {print_to_stream("== expression");}
         |expr DIFFERENT expr {print_to_stream("!= expression");}
-        |expr AND expr {print_to_stream("and expression");}
-        |expr OR expr {print_to_stream("or expression");}
-        | term  {print_to_stream("Expression"); $$=$1;};
+        |expr AND T expr    {
 
+                                print_to_stream("and expression");
+                                if(is_first_time)
+                                {
+                                    emit(if_eq,$$,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                                    $1->truelist=newlist(curr_quad-1);
+                                    emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                    $1->falselist=newlist(curr_quad-1);
+                                    is_first_time=0;
+                                }
+                                if($1!=NULL)
+                                    patchlist($1->truelist,curr_quad);
+                              
+
+                                emit(if_eq,$4,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                                $4->truelist=newlist(curr_quad-1);
+                                emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                $4->falselist=newlist(curr_quad-1);
+
+                                if($1!=NULL && $4!=NULL)    
+                                    $$->truelist=$4->truelist;
+                        
+                                if($$!=NULL && $4!=NULL)    
+                                    $$->falselist=mergelist($1->falselist,$4->falselist);
+                        
+                            }
+        |expr OR T expr {
+                           
+                            print_to_stream("or expression");
+                            if(is_first_time)
+                            {
+                                emit(if_eq,$$,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                                $1->truelist=newlist(curr_quad-1);
+                                emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                $1->falselist=newlist(curr_quad-1);
+                                is_first_time=0;
+                            }
+                            
+                            if($1!=NULL)
+                                patchlist($1->falselist,curr_quad);
+                            
+                            emit(if_eq,$4,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                            $4->truelist=newlist(curr_quad-1);
+                            emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                            $4->falselist=newlist(curr_quad-1);
+                            
+                            
+
+                            if($1!=NULL && $4!=NULL)    
+                                $$->truelist=mergelist($1->truelist,$4->truelist);
+                        
+                            if($$!=NULL && $4!=NULL)    
+                                $$->falselist=$4->falselist;
+                            
+                            /*fprintf ( stderr, "%s\n",$$->sym->value.varVal->name );
+                            fprintf ( stderr, "%s\n",$1->sym->value.varVal->name );
+                            fprintf ( stderr, "%s\n",$4->sym->value.varVal->name );*/
+                           
+                           
+                            
+
+                           /* patch_label(next_quad-1, next_quad()+1);//jump if eq failed
+                            $4->truelist=newlist(curr_quad+1);
+                            $$->falselist=newlist(curr_quad + 2);*/
+                            
+                           
+                            //$$=$4;
+                            
+                            
+                        }
+        | term  {print_to_stream("Expression(term)");
+
+                        //fprintf(stderr,"currrrr :%d\n",curr_quad);
+                    //if($1!=NULL && ($1->truelist>0 || $1->falselist>0 )   )
+                    {
+                       
+                    }
+                    //else
+                    {
+                        $$=$1; 
+
+                    }
+                    
+                };
+T:  {$$=next_quad();}
         
 
 term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
@@ -168,9 +259,21 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                                emit(uminus , $2,NULL,$$,curr_quad,0,yylineno);                  }
                                   
         
-        | NOT expr        {print_to_stream("Term");     $$ = new_expr(boolexpr_e);
-                                                        $$->sym = new_temp(symbolTable);
-                                                        emit(not,$2, NULL, $$,curr_quad,0,yylineno);
+        | NOT expr          {                             print_to_stream("Term");     
+                                                        
+                                                        if($$!=NULL && $2!=NULL)
+                                                        {
+                                                            $$->truelist=$2->falselist;
+                                                            $$->falselist=$2->truelist;
+                                                            //$$=$2;
+                                                        }
+                                                        emit(if_eq,$$,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                                                        $2->truelist=newlist(curr_quad-1);
+                                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                                        $2->falselist=newlist(curr_quad-1);
+                                                        
+                                                    //$$=$2;
+                                                        
                                                         }                   
                                            
         
@@ -197,23 +300,26 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                 process_term_lvalue_minus_minus($1,&$$,symbolTable);}
                                            
         
-        | primary                             {print_to_stream("Term"); $$=$1;};  
+        | primary                               {print_to_stream("Term"); $$=$1;
+                                                
+                                                };  
 
 assignexpr: lvalue  ASSIGN  expr    { 
                                         print_to_stream("Assign expression");
-                                        //printf("const %d\n",$3->intConst);
+                                        is_first_time=1;
+                                        create_assign_after_bool_op(&$3,symbolTable);
                                         process_assign(symbolTable,  &$1, &$$ , $3 );
                                     }; 
     
                                    
 
 
-primary:  lvalue { print_to_stream("Primary");  process_primary(symbolTable,  &$1);   }
+primary:  lvalue { print_to_stream("Primary(lvalue)");  process_primary(symbolTable,  &$1);   }
           | call {print_to_stream("Primary");}
           | objectdef {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary"); $$=new_expr(programfunc_e);
                                                                                 $$->sym=$2->sym;             }
-          | const {print_to_stream("Primary"); $$=$1;} ;
+          | const {print_to_stream("Primary(const)"); $$=$1;} ;
 
 lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTable,$1,&$$); }
           | LOCALL ID           {print_to_stream("Lvalue"); process_local_id(symbolTable,  $2, &$$);}
@@ -221,14 +327,20 @@ lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTab
           | member {print_to_stream("Lvalue"); $$=$1;} ; 
 
 member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
-            | lvalue LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");  
+            | lvalue LEFT_SQUARE expr RIGHT_SQUARE {  is_first_time=1;
+                                                 create_assign_after_bool_op(&$3,symbolTable);    
+                                                    print_to_stream("Member");  
                                                     $1=emit_if_table_item($1);
                                                     $$=new_expr(tableitem_e);
                                                     $$->sym=$1->sym;
                                                     $$->index=$3;
                                                     }
             | call DOT ID {print_to_stream("Member");}
-            | call LEFT_SQUARE expr RIGHT_SQUARE {print_to_stream("Member");} ;
+            | call LEFT_SQUARE expr RIGHT_SQUARE {
+                
+                is_first_time=1;
+                create_assign_after_bool_op(&$3,symbolTable);   
+                print_to_stream("Member");} ;
 
 call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$=make_call($1,$3,symbolTable);} 
             | lvalue callsuffix { print_to_stream("Call5"); 
@@ -294,12 +406,14 @@ methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Met
                                                                                             $$->method=1;
                                                                                             $$->name=strdup($2);}
 
-elist:   expr   {print_to_stream("Expression List");
+elist:   expr   {print_to_stream("Expression List"); is_first_time=1;
+                                        create_assign_after_bool_op(&$1,symbolTable);
                                        
 
                                         $$=$1;  
                                          } 
-        | expr COMMA elist {print_to_stream("Expression List Comma");      
+        | expr COMMA elist {print_to_stream("Expression List Comma");  is_first_time=1;
+                                                                  create_assign_after_bool_op(&$1,symbolTable);    
                                                                 
                                                                     
                                                                     $1->next=$3;
@@ -317,7 +431,12 @@ indexed:    indexedelem  {print_to_stream("Indexed");  $$=$1;    }
             | indexedelem COMMA  indexed {print_to_stream("Indexed");  $1->next=$3; };
            
 
-indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Element"); $$=malloc(sizeof(indexed));
+indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Element"); is_first_time=1;
+                                                                               create_assign_after_bool_op(&$2,symbolTable);
+                                                                               is_first_time=1;
+                                                                               create_assign_after_bool_op(&$4,symbolTable);
+
+                                                                                        $$=malloc(sizeof(indexed));
                                                                                         $$->left=$2;
                                                                                         $$->right=$4;
                                                                                         $$->next=NULL;
@@ -364,14 +483,14 @@ idlist: ID  { print_to_stream("ID List");  process_function_arguments(symbolTabl
         
             |    {print_to_stream("ID List");};
 
-ifstmt:   ifprefix stmt elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$3+2); patch_label($3,next_quad()+1); $$=$2;} 
+ifstmt:   ifprefix stmt elseprefix stmt {print_to_stream("If Statement"); patch_label($1,$3+1); patch_label($3,next_quad()); $$=$2;} 
         | if {print_to_stream("If Statement"); $$=$1; } 
 whilestmt: whilestart whilecond stmt {
                                             print_to_stream("While Statement");
                                             iam_in_loop--;   pop_func_loop();  
 
-                                            emit(jump, NULL, NULL,NULL,curr_quad, $1,yylineno);//jump to go up in loop
-                                            patch_label($2, next_quad()+1);//jump if eq failed
+                                            emit(jump, NULL, NULL,NULL,curr_quad, $1-1,yylineno);//jump to go up in loop
+                                            patch_label($2, next_quad());//jump if eq failed
 
                                             if ($3!=NULL )
                                             {
@@ -379,8 +498,8 @@ whilestmt: whilestart whilecond stmt {
                                                 //fprintf(stderr,"next quad to fill break list:%d\n",next_quad()+1);
                                                 //fprintf(stderr,"breaklist : %d\n",$3->breaklist);
                                                 
-                                                patchlist($3->breaklist, next_quad()+1);
-                                                patchlist($3->contlist, $1+1);
+                                                patchlist($3->breaklist, next_quad());
+                                                patchlist($3->contlist, $1);
                                                 
 
 
@@ -402,10 +521,11 @@ whilestart: WHILE   {
 
                     };
 whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS
-                                            {
+                                            { is_first_time=1;
+                                        create_assign_after_bool_op(&$3,symbolTable);
                                                 emit( if_eq, $3, 
                                                 new_expr_const_bool(1),NULL, 
-                                                curr_quad,curr_quad+2,yylineno);
+                                                curr_quad,curr_quad+1,yylineno);
                                                 $$ = next_quad();
                                                 emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);                           
                                                                                                             
@@ -413,11 +533,14 @@ whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; pus
                                             }
 
 ifprefix: IF LEFT_BRACKETS expr RIGHT_BRACKETS {
+                                                is_first_time=1;
+                                                create_assign_after_bool_op(&$3,symbolTable);
                                                 emit( if_eq, $3, 
                                                 new_expr_const_bool(1),NULL, 
-                                                curr_quad,curr_quad+2,yylineno);
+                                                curr_quad,curr_quad+1,yylineno);
                                                 $$ = next_quad();
                                                 emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);
+
 } ;
 
 if: ifprefix stmt {patch_label($1,next_quad()); $$=$2;};
@@ -425,29 +548,29 @@ elseprefix: ELSE {$$=next_quad(); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno)
 
 
 forstmt:  forprefix_2 N elist RIGHT_BRACKETS N stmt N 
-                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); patch_label($1->enter,$5+2);
-                                                                                                  patch_label($2,next_quad()+1);
-                                                                                                  patch_label($5,$1->test+1);
-                                                                                                  patch_label($7,$2+2);
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop(); patch_label($1->enter,$5+1);
+                                                                                                  patch_label($2,next_quad());
+                                                                                                  patch_label($5,$1->test);
+                                                                                                  patch_label($7,$2+1);
                                                                                                     if($6!=NULL)
                                                                                                     {
-                                                                                                        patchlist($6->breaklist, next_quad()+1);
-                                                                                                        patchlist($6->contlist, $2+2);
+                                                                                                        patchlist($6->breaklist, next_quad());
+                                                                                                        patchlist($6->contlist, $2+1);
                                                                                                     }
                             
                      
                              }
          | forprefix_2 N  RIGHT_BRACKETS N stmt N 
-                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop();    patch_label($1->enter,$4+2);
+                            { print_to_stream("For Statement"); iam_in_loop--;  pop_func_loop();    patch_label($1->enter,$4+1);
 
-                                                                                                    patch_label($2,next_quad()+1);
-                                                                                                    patch_label($4,$1->test+1);
-                                                                                                    patch_label($6,$2+2); 
+                                                                                                    patch_label($2,next_quad());
+                                                                                                    patch_label($4,$1->test);
+                                                                                                    patch_label($6,$2+1); 
                                                                                                   
                                                                                                     if($5!=NULL)
                                                                                                     {
-                                                                                                        patchlist($5->breaklist, next_quad()+1);
-                                                                                                        patchlist($5->contlist, $2+2);
+                                                                                                        patchlist($5->breaklist, next_quad());
+                                                                                                        patchlist($5->contlist, $2+1);
                                                                                                     }
 
                                                                                                   
@@ -459,10 +582,14 @@ forprefix:  FOR LEFT_BRACKETS  {iam_in_loop++;enum func_loops entry = for_loop; 
 N: { $$=next_quad(); fprintf(stderr,"quad : %u\n",next_quad()); emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno); };
 M: {$$=next_quad();};
 
-forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{  $$=malloc(sizeof(for_struct));   $$->test=$4; $$->enter=next_quad();  emit( if_eq, $5, 
+forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{                   is_first_time=1;
+                                                                          create_assign_after_bool_op(&$5,symbolTable);
+    
+                                                                                       $$=malloc(sizeof(for_struct));   $$->test=$4; $$->enter=next_quad();  emit( if_eq, $5, 
                                                                                            new_expr_const_bool(1),NULL, 
                                                                                             curr_quad,0,yylineno);}
-            |forprefix  SEMICOLON M expr SEMICOLON{  $$=malloc(sizeof(for_struct));  $$->test=$3; $$->enter=next_quad();  emit( if_eq, $4, 
+            |forprefix  SEMICOLON M expr SEMICOLON{  is_first_time=1;
+                                                 create_assign_after_bool_op(&$4,symbolTable);           $$=malloc(sizeof(for_struct));  $$->test=$3; $$->enter=next_quad();  emit( if_eq, $4, 
                                                                                            new_expr_const_bool(1),NULL, 
                                                                                             curr_quad,0,yylineno); };
 
@@ -470,6 +597,8 @@ forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{  $$=malloc(sizeof(for_st
 
 
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
+                                        is_first_time=1;
+                                        create_assign_after_bool_op(&$2,symbolTable);
                                     if(iam_in_function <=0)
                                     {
                                        print_error(NULL,yylineno, "ERROR : return out of function");
@@ -538,19 +667,22 @@ int main(int argc , char * argv[])
     }
   
     symbolTable = symbolTable_create();
-    
+    expand();
+    emit(-1,NULL ,NULL,NULL,0,0,0);
     yyparse() ;
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
-    unsigned i=0;
+    unsigned i=1;
     fprintf(stderr, "curr cuad : %u\n",curr_quad);
     FILE *quad_file = fopen("quads.txt", "w+");
+
     while(i<curr_quad)
     {
-        if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
-        print_quad(quads[i].op, quads[i].arg1, quads[i].arg2,quads[i].result,quads[i].quad_no,quads[i].label,quads[i].line,quad_file);
-        i++;
+            //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
+            print_quad(quads[i].op, quads[i].arg1, quads[i].arg2,quads[i].result,quads[i].quad_no,quads[i].label,quads[i].line,quad_file);
+            i++;
+     
     }
     fclose(quad_file);
 

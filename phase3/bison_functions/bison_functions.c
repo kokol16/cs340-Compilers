@@ -1,6 +1,40 @@
 #include "bison_functions.h"
 
 #define lvalue_ptr (*lvalue)
+int Came_From_OP = 0;
+void create_assign_after_bool_op(expr **$3, SymbolTable *symbolTable)
+{
+
+    if ((*$3)->truelist > 0 || (*$3)->falselist > 0)
+    {
+        int tmp_1, tmp_2;
+        tmp_1 = (*$3)->truelist;
+        tmp_2 = (*$3)->falselist;
+        (*$3) = new_expr(boolexpr_e);
+        (*$3)->sym = new_temp(symbolTable);
+        (*$3)->truelist = tmp_1;
+        (*$3)->falselist = tmp_2;
+
+        //fprintf(stderr, "false list : %d\n", (*$3)->falselist);
+        emit(assign, new_expr_const_bool(1), (*$3), NULL, curr_quad, 0, yylineno);
+        emit(jump, NULL, NULL, NULL, curr_quad, curr_quad + 1, yylineno);
+        emit(assign, new_expr_const_bool(0), (*$3), NULL, curr_quad, 0, yylineno);
+
+        //if (Came_From_OP == OP_OR)
+        {
+            patchlist((*$3)->truelist, curr_quad - 3);
+            patchlist((*$3)->falselist, curr_quad - 1);
+        }
+        //else if(Came_From_OP == OP_AND)
+        {
+          //  fprintf(stderr, "Cccur%d\n",curr_quad);
+          //  patchlist((*$3)->truelist, curr_quad - 3);
+          //      patchlist((*$3)->falselist, curr_quad - 1);
+        }
+
+        Came_From_OP = 0;
+    }
+}
 
 int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, expr *expr2)
 {
@@ -79,7 +113,7 @@ expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolT
     }
     _expr->sym = new_temp(symboltable);
 
-    emit(opcode, expr1, expr2, _expr, curr_quad,0, yylineno);
+    emit(opcode, expr1, expr2, _expr, curr_quad, 0, yylineno);
 
     return _expr;
 }
@@ -92,14 +126,14 @@ expr *process_term_lvalue_plus_plus(expr *lvalue, expr **term, SymbolTable *symb
     if (lvalue->type == tableitem_e)
     {
         expr *val = emit_if_table_item(lvalue);
-        emit(assign, val, NULL, *term, curr_quad,0, yylineno);
-        emit(add, val, new_expr_const_int(1), val, curr_quad,0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad,0, yylineno);
+        emit(assign, val, NULL, *term, curr_quad, 0, yylineno);
+        emit(add, val, new_expr_const_int(1), val, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad, 0, yylineno);
     }
     else
     {
-        emit(assign, lvalue, NULL, *term, curr_quad,0, yylineno);
-        emit(add, lvalue, new_expr_const_int(1), lvalue, curr_quad,0, yylineno);
+        emit(assign, lvalue, NULL, *term, curr_quad, 0, yylineno);
+        emit(add, lvalue, new_expr_const_int(1), lvalue, curr_quad, 0, yylineno);
     }
 }
 expr *process_term_plus_plus_lvalue(expr *lvalue, expr **term, SymbolTable *symboltable)
@@ -108,15 +142,15 @@ expr *process_term_plus_plus_lvalue(expr *lvalue, expr **term, SymbolTable *symb
     if (lvalue->type == tableitem_e)
     {
         *term = emit_if_table_item(lvalue);
-        emit(add, *term, new_expr_const_int(1), *term, curr_quad,0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad,0, yylineno);
+        emit(add, *term, new_expr_const_int(1), *term, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad, 0, yylineno);
     }
     else
     {
-        emit(add, lvalue, new_expr_const_int(1), lvalue, curr_quad,0, yylineno);
+        emit(add, lvalue, new_expr_const_int(1), lvalue, curr_quad, 0, yylineno);
         *term = new_expr(arithexpr_e);
         (*term)->sym = new_temp(symboltable);
-        emit(assign, lvalue, NULL, *term, curr_quad,0, yylineno);
+        emit(assign, lvalue, NULL, *term, curr_quad, 0, yylineno);
     }
 }
 expr *process_term_lvalue_minus_minus(expr *lvalue, expr **term, SymbolTable *symboltable)
@@ -128,14 +162,14 @@ expr *process_term_lvalue_minus_minus(expr *lvalue, expr **term, SymbolTable *sy
     if (lvalue->type == tableitem_e)
     {
         expr *val = emit_if_table_item(lvalue);
-        emit(assign, val, NULL, *term, curr_quad,0, yylineno);
-        emit(sub, val, new_expr_const_int(1), val, curr_quad,0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad,0, yylineno);
+        emit(assign, val, NULL, *term, curr_quad, 0, yylineno);
+        emit(sub, val, new_expr_const_int(1), val, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad, 0, yylineno);
     }
     else
     {
-        emit(assign, lvalue, NULL, *term, curr_quad,0, yylineno);
-        emit(sub, lvalue, new_expr_const_int(1), lvalue, curr_quad,0, yylineno);
+        emit(assign, lvalue, NULL, *term, curr_quad, 0, yylineno);
+        emit(sub, lvalue, new_expr_const_int(1), lvalue, curr_quad, 0, yylineno);
     }
 }
 expr *process_term_minus_minus_lvalue(expr *lvalue, expr **term, SymbolTable *symboltable)
@@ -145,15 +179,15 @@ expr *process_term_minus_minus_lvalue(expr *lvalue, expr **term, SymbolTable *sy
     if (lvalue->type == tableitem_e)
     {
         *term = emit_if_table_item(lvalue);
-        emit(sub, *term, new_expr_const_int(1), *term, curr_quad,0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad,0, yylineno);
+        emit(sub, *term, new_expr_const_int(1), *term, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad, 0, yylineno);
     }
     else
     {
-        emit(sub, lvalue, new_expr_const_int(1), lvalue, curr_quad,0, yylineno);
+        emit(sub, lvalue, new_expr_const_int(1), lvalue, curr_quad, 0, yylineno);
         *term = new_expr(arithexpr_e);
         (*term)->sym = new_temp(symboltable);
-        emit(assign, lvalue, NULL, *term, curr_quad,0, yylineno);
+        emit(assign, lvalue, NULL, *term, curr_quad, 0, yylineno);
     }
 }
 expr *process_table_indexed(indexed *objects_list, SymbolTable *symboltable)
@@ -162,12 +196,12 @@ expr *process_table_indexed(indexed *objects_list, SymbolTable *symboltable)
     indexed *tmp;
     _expr = new_expr(newtable_e);
     _expr->sym = new_temp(symboltable);
-    emit(tablecreate, _expr, NULL, NULL, curr_quad,0, yylineno);
+    emit(tablecreate, _expr, NULL, NULL, curr_quad, 0, yylineno);
     fprintf(stderr, "lalal\n");
     tmp = objects_list;
     while (tmp != NULL)
     {
-        emit(tablesetelem, _expr, tmp->left, tmp->right, curr_quad,0, yylineno);
+        emit(tablesetelem, _expr, tmp->left, tmp->right, curr_quad, 0, yylineno);
         tmp = tmp->next;
     }
     print_indexed_list(objects_list);
@@ -180,10 +214,10 @@ expr *process_array_elist(expr *head, SymbolTable *symboltable)
     expr *t = new_expr(newtable_e);
     int i = 0;
     t->sym = new_temp(symboltable);
-    emit(tablecreate, t, NULL, NULL, curr_quad,0, yylineno);
+    emit(tablecreate, t, NULL, NULL, curr_quad, 0, yylineno);
     while (tmp != NULL)
     {
-        emit(tablesetelem, t, new_expr_const_int(i++), tmp, curr_quad,0, yylineno);
+        emit(tablesetelem, t, new_expr_const_int(i++), tmp, curr_quad, 0, yylineno);
         tmp = tmp->next;
     }
     return t;
@@ -239,13 +273,13 @@ expr *make_call(expr *lvalue, expr *reverse_list, SymbolTable *symboltable)
         tmp = reverse_list->tail;
     while (tmp != NULL)
     {
-        emit(param, tmp, NULL, NULL, curr_quad,0, yylineno);
+        emit(param, tmp, NULL, NULL, curr_quad, 0, yylineno);
         tmp = tmp->prev;
     }
-    emit(call, func, NULL, NULL, curr_quad,0, yylineno);
+    emit(call, func, NULL, NULL, curr_quad, 0, yylineno);
     res = new_expr(var_e);
     res->sym = new_temp(symboltable);
-    emit(getretval, NULL, NULL, res, curr_quad,0, yylineno);
+    emit(getretval, NULL, NULL, res, curr_quad, 0, yylineno);
     return res;
 }
 expr *process_elist_element(expr **head, expr *new_elist)
@@ -348,16 +382,16 @@ void process_assign(SymbolTable *symbolTable, expr **lvalue, expr **assign_expr,
     {
         if (lvalue_ptr->type == tableitem_e)
         {
-            emit(tablesetelem, lvalue_ptr, lvalue_ptr->index, _expr, curr_quad,0, yylineno);
+            emit(tablesetelem, lvalue_ptr, lvalue_ptr->index, _expr, curr_quad, 0, yylineno);
             *assign_expr = emit_if_table_item(lvalue_ptr);
             (*assign_expr)->type = assignexpr_e;
         }
         else
         {
-            emit(assign, _expr, NULL, lvalue_ptr, curr_quad,0, yylineno);
+            emit(assign, _expr, NULL, lvalue_ptr, curr_quad, 0, yylineno);
             *assign_expr = new_expr(assignexpr_e);
             (*assign_expr)->sym = new_temp(symbolTable);
-            emit(assign, lvalue_ptr, NULL, *assign_expr, curr_quad,0, yylineno);
+            emit(assign, lvalue_ptr, NULL, *assign_expr, curr_quad, 0, yylineno);
         }
     }
 }
@@ -452,7 +486,7 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
     unsigned offset = pop_scope_offset_stack();
     //printf("lala2\n");
     restore_curr_scope_offset(offset);
-    emit(funcend, func_prefix, NULL, NULL, curr_quad,0, yylineno);
+    emit(funcend, func_prefix, NULL, NULL, curr_quad, 0, yylineno);
     return func_prefix;
 }
 
@@ -467,7 +501,7 @@ expr *process_function_prefix(SymbolTable *symbolTable, char *func_name)
     if (bucket->value.funcVal != NULL)
         bucket->value.funcVal->iadress = curr_quad;
     _expr = lvalue_expr(bucket);
-    emit(funcstart, _expr, NULL, NULL, curr_quad,0, yylineno);
+    emit(funcstart, _expr, NULL, NULL, curr_quad, 0, yylineno);
     push_scope_offset_stack(curr_scope_offset());
     enter_scope_space();
     reset_formal_arg_offset();

@@ -3,6 +3,12 @@
 #include "../quads/quads.h"
 #include "../general_functions/lib.h"
 
+#define OP_OR 1
+#define OP_AND 2
+#define OP_NOT 3
+
+
+extern  int Came_From_OP;
 
 void process_id(SymbolTable *symbolTable, char *id_name, expr **lvalue);
 void process_local_id(SymbolTable *symbolTable, char *id_name, expr **lvalue);
@@ -35,3 +41,4 @@ expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolT
 int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, expr *expr2);
 int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *expr2);
 
+void  create_assign_after_bool_op(expr **$3, SymbolTable * symbolTable);
