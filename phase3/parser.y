@@ -299,14 +299,20 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                   
         
         | NOT expr              {                             print_to_stream("Term(NOT)");     
+                                                          $$=new_expr(boolexpr_e);
+                                                          $$->sym=new_temp(symbolTable);
+                            
+                           
+                                                         int was_bool =check_if_bool_emit(&$2);
+                            
+                               
+                            
+                                                       //fprintf(stderr,"#:%s\n",$2->sym->value.varVal->name);
                                                         
-                                                        
-                                                       fprintf(stderr,"#:%s\n",$2->sym->value.varVal->name);
-                                                        
-                                                        emit(if_eq,$2,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                                                        $2->truelist=newlist(curr_quad-1);
-                                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                                        $2->falselist=newlist(curr_quad-1);
+                                                       // emit(if_eq,$2,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                                                        //$2->truelist=newlist(curr_quad-1);
+                                                        //emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                                        //$2->falselist=newlist(curr_quad-1);
                                                         if($$!=NULL && $2!=NULL)
                                                         {
                                                             $$->truelist=$2->falselist;
