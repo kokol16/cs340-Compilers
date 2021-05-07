@@ -123,15 +123,12 @@ statements: statements stmt
               
                 if($1!=NULL && $2!=NULL )
                 {
-                    //fprintf (stderr , "lala:%d\n",$1->breaklist);
-                    //fprintf (stderr , "lala:%d\n",$2->breaklist);
                     
-                    //fprintf(stderr,"[merging]"); 
                     $$->breaklist = mergelist($1->breaklist, $2->breaklist);
                     fprintf (stderr , "after merge %d\n",$$->breaklist);
 
                     $$->contlist = mergelist($1->contlist, $2->contlist); 
-                   // $$=$2;
+                   
                 }
             }
             |stmt
@@ -149,6 +146,8 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr PERCENT expr {print_to_stream("% expression"); $$=process_arithm_operation(mod,$1,$3,symbolTable);}
         |expr GREATER expr  {
                                 print_to_stream("> expression");
+                                $$=new_expr(boolexpr_e);
+                                $$->sym=new_temp(symbolTable);
                                 if($$!=NULL)
                                 {
                                     $$->truelist=newlist(next_quad());
@@ -156,97 +155,137 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                     emit(if_greater,$1,$3,NULL,curr_quad,0,yylineno);
                                     emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
 
+
                                 }
                                
                             }
-        |expr GREATER_EQUALS expr {print_to_stream(">= expression");}
-        |expr LESS  expr {print_to_stream("< expression");}
-        |expr LESS_EQUALS expr {print_to_stream("<= expression");}
-        |expr EQUALS expr {print_to_stream("== expression");}
-        |expr DIFFERENT expr {print_to_stream("!= expression");}
-        |expr AND T expr    {
-
-                                print_to_stream("and expression");
-                                if(is_first_time)
+        |expr GREATER_EQUALS expr {
+                                    $$=new_expr(boolexpr_e);
+                                    $$->sym=new_temp(symbolTable);
+                                    print_to_stream(">= expression");
+                                    if($$!=NULL)
+                                    {
+                                        $$->truelist=newlist(next_quad());
+                                        $$->falselist=newlist(next_quad()+1);
+                                        emit(if_greatereq,$1,$3,NULL,curr_quad,0,yylineno);
+                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                    }     
+                                        
+                                  }
+        |expr LESS  expr    {  
+                                $$=new_expr(boolexpr_e);
+                                $$->sym=new_temp(symbolTable);
+                                    print_to_stream("< expression");  
+                                if($$!=NULL)
                                 {
-                                    emit(if_eq,$$,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                                    $1->truelist=newlist(curr_quad-1);
+                                    $$->truelist=newlist(next_quad());
+                                    $$->falselist=newlist(next_quad()+1);
+                                    emit(if_less,$1,$3,NULL,curr_quad,0,yylineno);
                                     emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                    $1->falselist=newlist(curr_quad-1);
-                                    is_first_time=0;
-                                }
+
+
+                                }};
+        |expr LESS_EQUALS expr {print_to_stream("<= expression");  
+                                $$=new_expr(boolexpr_e);
+                                $$->sym=new_temp(symbolTable);
+                                if($$!=NULL)
+                                {
+                                    $$->truelist=newlist(next_quad());
+                                    $$->falselist=newlist(next_quad()+1);
+                                    emit(if_lesseq,$1,$3,NULL,curr_quad,0,yylineno);
+                                    emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+
+
+                                }}
+        |expr EQUALS expr {print_to_stream("== expression");  
+                                $$=new_expr(boolexpr_e);
+                                $$->sym=new_temp(symbolTable);
+                                if($$!=NULL)
+                                {
+                                    $$->truelist=newlist(next_quad());
+                                    $$->falselist=newlist(next_quad()+1);
+                                    emit(if_eq,$1,$3,NULL,curr_quad,0,yylineno);
+                                    emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+
+
+                                }}
+        |expr DIFFERENT expr {print_to_stream("!= expression");  
+                                $$=new_expr(boolexpr_e);
+                                $$->sym=new_temp(symbolTable);
+                                if($$!=NULL)
+                                {
+                                    $$->truelist=newlist(next_quad());
+                                    $$->falselist=newlist(next_quad()+1);
+                                    emit(if_noteq,$1,$3,NULL,curr_quad,0,yylineno);
+                                    emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+
+
+                                }}
+        |expr AND T expr    {
+                                
+                                print_to_stream("and expression");
+                               
+                                print_list($1->truelist);
+                                int was_bool =check_if_bool_emit(&$1);
                                 if($1!=NULL)
-                                    patchlist($1->truelist,curr_quad);
-                              
+                                {
+                                    //fprintf(stderr,"patching %d\n",$3);
+                                    if(was_bool)
+                                    {
+                                        patchlist($1->truelist,curr_quad);
+                                    }
+                                    else
+                                    {
+                                        patchlist($1->truelist,$3);
 
-                                emit(if_eq,$4,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                                $4->truelist=newlist(curr_quad-1);
-                                emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                $4->falselist=newlist(curr_quad-1);
+                                    }
 
+                                }
+                                check_if_bool_emit(&$4);
+                                $$=new_expr(boolexpr_e);
+                                $$->sym=new_temp(symbolTable);
+                            
                                 if($1!=NULL && $4!=NULL)    
                                     $$->truelist=$4->truelist;
+
                         
                                 if($$!=NULL && $4!=NULL)    
                                     $$->falselist=mergelist($1->falselist,$4->falselist);
                         
                             }
         |expr OR T expr {
-                           
+                            $$=new_expr(boolexpr_e);
+                            $$->sym=new_temp(symbolTable);
                             print_to_stream("or expression");
-                            if(is_first_time)
-                            {
-                                emit(if_eq,$$,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                                $1->truelist=newlist(curr_quad-1);
-                                emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                $1->falselist=newlist(curr_quad-1);
-                                is_first_time=0;
-                            }
-                            
+                           
+                            int was_bool =check_if_bool_emit(&$1);
                             if($1!=NULL)
-                                patchlist($1->falselist,curr_quad);
-                            
-                            emit(if_eq,$4,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                            $4->truelist=newlist(curr_quad-1);
-                            emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                            $4->falselist=newlist(curr_quad-1);
-                            
-                            
-
+                            {
+                                if(was_bool)
+                                {
+                                    patchlist($1->falselist,curr_quad);
+                                }
+                                else
+                                {
+                                     patchlist($1->falselist,$3);
+                                }
+                            }
+                            check_if_bool_emit(&$4);
+                               
+                               
                             if($1!=NULL && $4!=NULL)    
                                 $$->truelist=mergelist($1->truelist,$4->truelist);
                         
                             if($$!=NULL && $4!=NULL)    
                                 $$->falselist=$4->falselist;
                             
-                            /*fprintf ( stderr, "%s\n",$$->sym->value.varVal->name );
-                            fprintf ( stderr, "%s\n",$1->sym->value.varVal->name );
-                            fprintf ( stderr, "%s\n",$4->sym->value.varVal->name );*/
-                           
-                           
-                            
-
-                           /* patch_label(next_quad-1, next_quad()+1);//jump if eq failed
-                            $4->truelist=newlist(curr_quad+1);
-                            $$->falselist=newlist(curr_quad + 2);*/
-                            
-                           
-                            //$$=$4;
-                            
+                         
                             
                         }
-        | term  {print_to_stream("Expression(term)");
+        | term  {   print_to_stream("Expression(term)");
 
-                        //fprintf(stderr,"currrrr :%d\n",curr_quad);
-                    //if($1!=NULL && ($1->truelist>0 || $1->falselist>0 )   )
-                    {
-                       
-                    }
-                    //else
-                    {
-                        $$=$1; 
-
-                    }
+                    $$=$1;
+                   
                     
                 };
 T:  {$$=next_quad();}
@@ -259,22 +298,25 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                                emit(uminus , $2,NULL,$$,curr_quad,0,yylineno);                  }
                                   
         
-        | NOT expr          {                             print_to_stream("Term");     
+        | NOT expr              {                             print_to_stream("Term(NOT)");     
                                                         
+                                                        
+                                                       fprintf(stderr,"#:%s\n",$2->sym->value.varVal->name);
+                                                        
+                                                        emit(if_eq,$2,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
+                                                        $2->truelist=newlist(curr_quad-1);
+                                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+                                                        $2->falselist=newlist(curr_quad-1);
                                                         if($$!=NULL && $2!=NULL)
                                                         {
                                                             $$->truelist=$2->falselist;
                                                             $$->falselist=$2->truelist;
                                                             //$$=$2;
                                                         }
-                                                        emit(if_eq,$$,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                                                        $2->truelist=newlist(curr_quad-1);
-                                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                                        $2->falselist=newlist(curr_quad-1);
-                                                        
+                                                       
                                                     //$$=$2;
                                                         
-                                                        }                   
+                                }                   
                                            
         
         | PLUS_PLUS lvalue  {               {print_to_stream("Term");}
@@ -300,7 +342,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                 process_term_lvalue_minus_minus($1,&$$,symbolTable);}
                                            
         
-        | primary                               {print_to_stream("Term"); $$=$1;
+        | primary                               {print_to_stream("Term"); $$=$1; 
                                                 
                                                 };  
 
@@ -314,7 +356,7 @@ assignexpr: lvalue  ASSIGN  expr    {
                                    
 
 
-primary:  lvalue { print_to_stream("Primary(lvalue)");  process_primary(symbolTable,  &$1);   }
+primary:  lvalue { print_to_stream("Primary(lvalue)");  process_primary(symbolTable,  &$1); $$=$1 ;   }
           | call {print_to_stream("Primary");}
           | objectdef {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary"); $$=new_expr(programfunc_e);
@@ -673,17 +715,11 @@ int main(int argc , char * argv[])
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
-    unsigned i=1;
     fprintf(stderr, "curr cuad : %u\n",curr_quad);
     FILE *quad_file = fopen("quads.txt", "w+");
 
-    while(i<curr_quad)
-    {
-            //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
-            print_quad(quads[i].op, quads[i].arg1, quads[i].arg2,quads[i].result,quads[i].quad_no,quads[i].label,quads[i].line,quad_file);
-            i++;
-     
-    }
+    print_quads(quad_file);
+    
     fclose(quad_file);
 
     if(output_file!=NULL)

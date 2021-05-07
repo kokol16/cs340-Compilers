@@ -52,4 +52,6 @@ for(i=0; true; i++) {
 //sprite..move(); 
 
 //y=x>5;
-x=not a;
+//x=a==b and b<d and c>=a and l<=1 ;
+x=a or a>b and c<d ;
+//x=a<b or c<d and  e<f;

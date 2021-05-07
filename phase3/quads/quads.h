@@ -109,7 +109,9 @@ int newlist(int i);
 
 int mergelist(int l1, int l2);
 void patchlist(int list, int label);
-void make_truth_list(expr  *s);
+void make_truth_list(expr *s);
+void print_quads(FILE *quad_file);
+void print_list(int list);
 typedef enum expr_t
 {
     var_e,

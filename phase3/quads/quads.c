@@ -7,6 +7,16 @@ int temp_counter = 0;
 
 SymbolTable *symbolTable;
 
+void print_quads(FILE *quad_file)
+{
+    unsigned i = 1;
+    while (i < curr_quad)
+    {
+        //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
+        print_quad(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+        i++;
+    }
+}
 void make_truth_list(expr *s)
 {
     s->truelist = 0;
@@ -17,6 +27,16 @@ void make_stmt(stmt_t *s)
 {
     s->breaklist = 0;
     s->contlist = 0;
+}
+void print_list(int list)
+{
+    while (list != 0 && list < curr_quad)
+    {
+        int next = quads[list].label;
+        fprintf(stderr, "%d-->", list);
+        list = next;
+    }
+    fprintf(stderr, "\n");
 }
 int newlist(int i)
 {
@@ -203,16 +223,7 @@ void emit(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned quad_no, un
     _quad->result = result;
     _quad->quad_no = quad_no;
 
-    if (label == 0 && (op == if_eq || if_greater == op || if_greatereq == op || if_less == op || if_lesseq == op || if_noteq == op))
-    {
-        fprintf(stderr, "making label 1\n");
-        _quad->label = 1;
-    }
-    else
-    {
-        if (label != 0)
-            _quad->label = label + 1;
-    }
+    _quad->label = label;
     _quad->line = line;
     _quad->op = op;
 
@@ -243,16 +254,21 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_
     fprintf(quad_file, "%u:\t", curr_no);
     opcode_str = opcode_to_string(op);
     fprintf(quad_file, "%s ", opcode_str);
+
+    //fprintf(stderr, "im in print %s\n",opcode_str);
     if (arg1 != NULL)
     {
+
         if (!print_by_type(arg1, quad_file))
         {
-            if (arg1->sym->value.varVal != NULL)
+
+            if (arg1->sym != NULL && arg1->sym->value.varVal != NULL)
             {
                 fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
             }
-            else
+            else if (arg1->sym != NULL)
             {
+
                 fprintf(quad_file, "%s\t", arg1->sym->value.funcVal->name);
             }
         }
@@ -261,11 +277,11 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_
     {
         if (!print_by_type(arg2, quad_file))
         {
-            if (arg2->sym->value.varVal != NULL)
+            if (arg2->sym != NULL && arg2->sym->value.varVal != NULL)
             {
                 fprintf(quad_file, "%s\t", arg2->sym->value.varVal->name);
             }
-            else
+            else if (arg2->sym != NULL)
             {
                 fprintf(quad_file, "%s\t", arg2->sym->value.funcVal->name);
             }
@@ -275,11 +291,11 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_
     {
         if (!print_by_type(result, quad_file))
         {
-            if (result->sym->value.varVal != NULL)
+            if (result->sym != NULL && result->sym->value.varVal != NULL)
             {
                 fprintf(quad_file, "%s\t", result->sym->value.varVal->name);
             }
-            else
+            else if (result->sym != NULL)
             {
 
                 fprintf(quad_file, "%s\t", result->sym->value.funcVal->name);

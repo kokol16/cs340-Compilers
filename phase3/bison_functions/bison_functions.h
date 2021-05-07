@@ -41,4 +41,7 @@ expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolT
 int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, expr *expr2);
 int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *expr2);
 
+int  check_if_bool_emit(expr ** left);
+
+
 void  create_assign_after_bool_op(expr **$3, SymbolTable * symbolTable);
