@@ -3,21 +3,20 @@
 #define lvalue_ptr (*lvalue)
 int Came_From_OP = 0;
 
-int  check_if_bool_emit(expr ** left)
+int check_if_bool_emit(expr **left)
 {
-    if( (*left) ==NULL ) return 0;
-    
-    if((*left)->type!=boolexpr_e)
+    if ((*left) == NULL)
+        return 0;
+
+    if ((*left)->type != boolexpr_e)
     {
-        (*left)->truelist=newlist(curr_quad);
-        (*left)->falselist=newlist(curr_quad+1);
-        emit(if_eq,(*left),new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
+        (*left)->truelist = newlist(curr_quad);
+        (*left)->falselist = newlist(curr_quad + 1);
+        emit(if_eq, (*left), new_expr_const_bool(1), NULL, curr_quad, 0, yylineno);
+        emit(jump, NULL, NULL, NULL, curr_quad, 0, yylineno);
         return 1;
     }
     return 0;
-    
-
 }
 void create_assign_after_bool_op(expr **$3, SymbolTable *symbolTable)
 {
@@ -38,8 +37,8 @@ void create_assign_after_bool_op(expr **$3, SymbolTable *symbolTable)
         emit(assign, new_expr_const_bool(1), (*$3), NULL, curr_quad, 0, yylineno);
         emit(jump, NULL, NULL, NULL, curr_quad, curr_quad + 2, yylineno);
         emit(assign, new_expr_const_bool(0), (*$3), NULL, curr_quad, 0, yylineno);
-
-       
+        //(*$3)->truelist = 0;
+        //(*$3)->falselist = 0;
     }
 }
 

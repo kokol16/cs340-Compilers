@@ -154,8 +154,6 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                     $$->falselist=newlist(next_quad()+1);
                                     emit(if_greater,$1,$3,NULL,curr_quad,0,yylineno);
                                     emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-
-
                                 }
                                
                             }
@@ -175,7 +173,7 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr LESS  expr    {  
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
-                                    print_to_stream("< expression");  
+                                print_to_stream("< expression");  
                                 if($$!=NULL)
                                 {
                                     $$->truelist=newlist(next_quad());
@@ -282,7 +280,8 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                          
                             
                         }
-        | term  {   print_to_stream("Expression(term)");
+        | term  {  
+                 print_to_stream("Expression(term)");
 
                     $$=$1;
                    
@@ -298,15 +297,12 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                                emit(uminus , $2,NULL,$$,curr_quad,0,yylineno);                  }
                                   
         
-        | NOT expr              {                             print_to_stream("Term(NOT)");     
-                                                          $$=new_expr(boolexpr_e);
-                                                          $$->sym=new_temp(symbolTable);
+        | NOT expr              {                       print_to_stream("Term(NOT)");     
+                                                        $$=new_expr(boolexpr_e);
+                                                        $$->sym=new_temp(symbolTable);
                             
                            
-                                                         int was_bool =check_if_bool_emit(&$2);
-                            
-                               
-                            
+                                                        int was_bool =check_if_bool_emit(&$2);
                                                        //fprintf(stderr,"#:%s\n",$2->sym->value.varVal->name);
                                                         
                                                        // emit(if_eq,$2,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);

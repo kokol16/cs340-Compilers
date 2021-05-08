@@ -1,11 +1,15 @@
-1:	IF_GREATER a	b	5
-2:	JUMP 3
-3:	IF_LESS b	c	5
+1:	IF_EQUALS b	true	3
+2:	JUMP 7
+3:	IF_EQUALS g	true	11
 4:	JUMP 7
-5:	IF_EQUALS c	true	7
-6:	JUMP 9
-7:	ASSIGN true	_t6	
-8:	JUMP 10
-9:	ASSIGN false	_t6	
-10:	ASSIGN _t6	x	
-11:	ASSIGN x	_t7	
+5:	IF_EQUALS a	true	11
+6:	JUMP 7
+7:	IF_EQUALS c	true	9
+8:	JUMP 13
+9:	IF_EQUALS debugger	true	11
+10:	JUMP 13
+11:	ASSIGN true	_t4	
+12:	JUMP 14
+13:	ASSIGN false	_t4	
+14:	ASSIGN _t4	x	
+15:	ASSIGN x	_t5	
