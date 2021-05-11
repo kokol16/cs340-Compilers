@@ -18,10 +18,10 @@ int check_if_bool_emit(expr **left)
     }
     return 0;
 }
-void create_assign_after_bool_op(expr **$3, SymbolTable *symbolTable)
+void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
 {
 
-    if ((*$3)->truelist > 0 || (*$3)->falselist > 0)
+    if ((*$3)!=NULL && ( (*$3)->truelist > 0 || (*$3)->falselist > 0 ) )
     {
         int tmp_1, tmp_2;
         tmp_1 = (*$3)->truelist;
@@ -429,7 +429,7 @@ void process_plus_plus(SymbolTable *symbolTable, expr **lvalue)
 
         print_error(NULL, yylineno, "ERROR : ++ to function");
 
-        *lvalue = NULL;
+        //*lvalue = NULL;
         return;
     }
     check_access(symbolTable, &lvalue_ptr->sym);
@@ -441,7 +441,7 @@ void process_minus_minus(SymbolTable *symbolTable, expr **lvalue)
 
         print_error(NULL, yylineno, "ERROR : -- to function");
 
-        *lvalue = NULL;
+        //*lvalue = NULL;
         return;
     }
     check_access(symbolTable, &lvalue_ptr->sym);
@@ -530,7 +530,6 @@ expr *process_function_prefix(SymbolTable *symbolTable, char *func_name)
     else if (status == ERROR_VAR)
     {
         print_error(func_name, yylineno, "ERROR : use variable as function"); //kalo?
-       
     }
     else
     {

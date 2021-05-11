@@ -44,4 +44,4 @@ int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *
 int  check_if_bool_emit(expr ** left);
 
 
-void  create_assign_after_bool_op(expr **$3, SymbolTable * symbolTable);
+void  create_emits_after_bool_op(expr **$3, SymbolTable * symbolTable);

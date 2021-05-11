@@ -62,7 +62,7 @@ extern FILE * yyin;
 %%         
 program: statements {print_to_stream("Program"); }  ;
 stmt:   expr SEMICOLON   {  is_first_time=1;
-                            create_assign_after_bool_op(&$1,symbolTable);
+                            create_emits_after_bool_op(&$1,symbolTable);
                             
                             
                             print_to_stream("Statement(expression semicolon)");resettemp(); 
@@ -110,7 +110,7 @@ stmt:   expr SEMICOLON   {  is_first_time=1;
                                     }
                                     
                             }
-        | block             {print_to_stream("Statement(block)");resettemp();  /*$$=malloc(sizeof(stmt_t)); make_stmt($$);*/$$=$1;  }  
+        | block             {print_to_stream("Statement(block)");resettemp();  $$=malloc(sizeof(stmt_t)); make_stmt($$); /*$$=$1;*/  }  
         | funcdef           {print_to_stream("Statement");resettemp();    $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
         |SEMICOLON          {print_to_stream("Statement(semicolon)");resettemp();    $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
         ;
@@ -349,7 +349,7 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
 assignexpr: lvalue  ASSIGN  expr    { 
                                         print_to_stream("Assign expression");
                                         is_first_time=1;
-                                        create_assign_after_bool_op(&$3,symbolTable);
+                                        create_emits_after_bool_op(&$3,symbolTable);
                                         process_assign(symbolTable,  &$1, &$$ , $3 );
                                     }; 
     
@@ -371,7 +371,7 @@ lvalue:   ID                    {print_to_stream("Lvalue"); process_id(symbolTab
 
 member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
             | lvalue LEFT_SQUARE expr RIGHT_SQUARE {  is_first_time=1;
-                                                 create_assign_after_bool_op(&$3,symbolTable);    
+                                                 create_emits_after_bool_op(&$3,symbolTable);    
                                                     print_to_stream("Member");  
                                                     $1=emit_if_table_item($1);
                                                     $$=new_expr(tableitem_e);
@@ -383,7 +383,7 @@ member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
             | call LEFT_SQUARE expr RIGHT_SQUARE {
                 
                 is_first_time=1;
-                create_assign_after_bool_op(&$3,symbolTable);   
+                create_emits_after_bool_op(&$3,symbolTable);   
                 print_to_stream("Member");} ;
 
 call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$=make_call($1,$3,symbolTable);} 
@@ -453,13 +453,13 @@ methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Met
                                                                                             $$->name=strdup($2);}
 
 elist:   expr   {print_to_stream("Expression List"); is_first_time=1;
-                                        create_assign_after_bool_op(&$1,symbolTable);
+                                        create_emits_after_bool_op(&$1,symbolTable);
                                        
 
                                         $$=$1;  
                                          } 
         | expr COMMA elist {print_to_stream("Expression List Comma");  is_first_time=1;
-                                                                  create_assign_after_bool_op(&$1,symbolTable);    
+                                                                  create_emits_after_bool_op(&$1,symbolTable);    
                                                                 
                                                                     
                                                                     $1->next=$3;
@@ -478,9 +478,9 @@ indexed:    indexedelem  {print_to_stream("Indexed");  $$=$1;    }
            
 
 indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Element"); is_first_time=1;
-                                                                               create_assign_after_bool_op(&$2,symbolTable);
+                                                                               create_emits_after_bool_op(&$2,symbolTable);
                                                                                is_first_time=1;
-                                                                               create_assign_after_bool_op(&$4,symbolTable);
+                                                                               create_emits_after_bool_op(&$4,symbolTable);
 
                                                                                         $$=malloc(sizeof(indexed));
                                                                                         $$->left=$2;
@@ -568,7 +568,7 @@ whilestart: WHILE   {
                     };
 whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS
                                             { is_first_time=1;
-                                        create_assign_after_bool_op(&$3,symbolTable);
+                                        create_emits_after_bool_op(&$3,symbolTable);
                                                 emit( if_eq, $3, 
                                                 new_expr_const_bool(1),NULL, 
                                                 curr_quad,curr_quad+1,yylineno);
@@ -580,7 +580,7 @@ whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; pus
 
 ifprefix: IF LEFT_BRACKETS expr RIGHT_BRACKETS {
                                                 is_first_time=1;
-                                                create_assign_after_bool_op(&$3,symbolTable);
+                                                create_emits_after_bool_op(&$3,symbolTable);
                                                 emit( if_eq, $3, 
                                                 new_expr_const_bool(1),NULL, 
                                                 curr_quad,curr_quad+1,yylineno);
@@ -629,13 +629,13 @@ N: { $$=next_quad(); fprintf(stderr,"quad : %u\n",next_quad()); emit(jump, NULL,
 M: {$$=next_quad();};
 
 forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{                   is_first_time=1;
-                                                                          create_assign_after_bool_op(&$5,symbolTable);
+                                                                          create_emits_after_bool_op(&$5,symbolTable);
     
                                                                                        $$=malloc(sizeof(for_struct));   $$->test=$4; $$->enter=next_quad();  emit( if_eq, $5, 
                                                                                            new_expr_const_bool(1),NULL, 
                                                                                             curr_quad,0,yylineno);}
             |forprefix  SEMICOLON M expr SEMICOLON{  is_first_time=1;
-                                                 create_assign_after_bool_op(&$4,symbolTable);           $$=malloc(sizeof(for_struct));  $$->test=$3; $$->enter=next_quad();  emit( if_eq, $4, 
+                                                 create_emits_after_bool_op(&$4,symbolTable);           $$=malloc(sizeof(for_struct));  $$->test=$3; $$->enter=next_quad();  emit( if_eq, $4, 
                                                                                            new_expr_const_bool(1),NULL, 
                                                                                             curr_quad,0,yylineno); };
 
@@ -644,7 +644,7 @@ forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{                   is_fir
 
 returnstmt: RETURN expr SEMICOLON {   print_to_stream("Return Statement");
                                         is_first_time=1;
-                                        create_assign_after_bool_op(&$2,symbolTable);
+                                        create_emits_after_bool_op(&$2,symbolTable);
                                     if(iam_in_function <=0)
                                     {
                                        print_error(NULL,yylineno, "ERROR : return out of function");
