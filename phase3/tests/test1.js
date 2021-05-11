@@ -52,10 +52,12 @@ for(i=0; true; i++) {
 //sprite..move(); 
 
 //y=x>5;
+
+
 //x=a==b and b<d and c>=a and l<=1 ;
 //x=not a and  b ; //paizei
-x=a or b and g or c and debugger;
-//x=a and not b;
+//x=a or b and g or c and debugger;
+//x=not a or not b;
 //x= (a>c) and not (b>c) ; //den kanei swsto jump kai h seira einai diaforetikh se sxesh me to mhxanhma(mas noiazei telika h proteraiothta?)
 //x=not a;
 //x=not a and b;

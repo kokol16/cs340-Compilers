@@ -4,6 +4,7 @@ quad *quads = NULL;
 unsigned total = 0;
 unsigned int curr_quad = 0;
 int temp_counter = 0;
+int found_compile_error = 0;
 
 SymbolTable *symbolTable;
 
@@ -41,15 +42,11 @@ void print_list(int list)
 int newlist(int i)
 {
     quads[i].label = 0;
-    fprintf(stderr, "curr : %d\n", curr_quad);
-    fprintf(stderr, "i : %d\n", i);
     return i;
 }
 
 int mergelist(int l1, int l2)
 {
-    fprintf(stderr, "merge l1:%d l2:%d\n", l1, l2);
-    //if(l1>=curr_quad ||l2>=curr_quad ) return 0;
     if (!l1)
         return l2;
     else if (!l2)
@@ -60,7 +57,6 @@ int mergelist(int l1, int l2)
         while (quads[i].label)
         {
             i = quads[i].label;
-            fprintf(stderr, "i : %d\n", i);
         }
 
         quads[i].label = l2;
@@ -69,16 +65,12 @@ int mergelist(int l1, int l2)
 }
 void patchlist(int list, int label)
 {
-    fprintf(stderr, "starting from index : %d\n", list);
-
     while (list != 0 && list < curr_quad)
     {
         int next = quads[list].label;
-        fprintf(stderr, "%d-->", list);
         quads[list].label = label;
         list = next;
     }
-    fprintf(stderr, "\n");
 }
 
 unsigned next_quad(void) { return curr_quad; }
@@ -91,7 +83,10 @@ void check_arith(expr *e, const char *context)
         e->type == programfunc_e ||
         e->type == libraryfunc_e ||
         e->type == boolexpr_e)
+    {
         fprintf(stderr, "Illegal expr used in %s! ", context);
+        found_compile_error=1;
+    }
 }
 void print_indexed_list(indexed *head)
 {
@@ -199,7 +194,7 @@ void expand()
 {
     assert(total == curr_quad);
     quad *_quad;
-    fprintf(stderr, "expand()\n");
+    //fprintf(stderr, "expand()\n");
     _quad = malloc(NEW_SIZE);
     memset(_quad, 0, sizeof(_quad));
     if (_quad)
@@ -309,56 +304,7 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_
 
     fprintf(quad_file, "\n");
 
-    /* if (op == assign)
-    {
-
-        //else
-        {
-            if (!print_by_type(arg1, quad_file))
-            {
-                fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
-            }
-            if (!print_by_type(result, quad_file))
-            {
-                fprintf(quad_file, "%s\t", result->sym->value.varVal->name);
-            }
-            fprintf(quad_file, "\n");
-        }
-    }
-    else if (op == param)
-    {
-        fprintf(quad_file, "%s\n", arg1->sym->value.varVal->name);
-    }
-    else if (op == call)
-    {
-        fprintf(quad_file, "%s\n", arg1->sym->value.varVal->name);
-    }
-    else if (op == getretval)
-    {
-        fprintf(quad_file, "%s\n", result->sym->value.varVal->name);
-    }
-    else if (op == tablecreate)
-    {
-        if (!print_by_type(arg1, quad_file))
-        {
-            fprintf(quad_file, "%s\n", arg1->sym->value.varVal->name);
-        }
-    }
-    else if (op == tablesetelem)
-    {
-        fprintf(quad_file, "%s\t", arg1->sym->value.varVal->name);
-        if (!print_by_type(arg2, quad_file))
-        {
-
-            fprintf(quad_file, "%s\t", arg2->sym->value.varVal->name);
-        }
-
-        if (!print_by_type(result, quad_file))
-        {
-            fprintf(quad_file, "%s\t", result->sym->value.varVal->name);
-        }
-        fprintf(quad_file, "\n");
-    }*/
+    
 }
 int print_by_type(expr *_expr, FILE *quad_file)
 {
@@ -541,24 +487,7 @@ unsigned pop_elist(expr **elist_entry)
     return 1;
 }
 
-int push_elist(expr **elist_entry, expr *entry)
-{
-    // if(entry==NULL) {return 0;}
-    /*entry->next = NULL;
-    if (  entry==NULL )
-    {
-        fprintf(stderr, "create head\n");
-        elist_ptr = entry;
 
-        print_elist(*elist_entry);
-        return 1;
-    }*/
-
-    // entry->next = elist_ptr;
-    //elist_ptr = entry;
-
-    return 1;
-}
 void print_elist(expr *head)
 {
     expr *tmp = head;
@@ -568,14 +497,3 @@ void print_elist(expr *head)
         tmp = tmp->next;
     }
 }
-/*expr *  top_elist(expr * elist_head)
-{
-    if (elist_head != NULL)
-    {
-        return elist_head;
-    }
-    else
-    {
-        return -1;
-    }
-}*/

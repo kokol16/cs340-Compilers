@@ -31,6 +31,10 @@ void create_assign_after_bool_op(expr **$3, SymbolTable *symbolTable)
         (*$3)->truelist = tmp_1;
         (*$3)->falselist = tmp_2;
 
+        //fprintf(stderr,"curr quad %d\n",curr_quad);
+        print_list((*$3)->truelist);
+        print_list((*$3)->falselist);
+
         patchlist((*$3)->truelist, curr_quad);
         patchlist((*$3)->falselist, curr_quad + 2);
         //fprintf(stderr, "false list : %d\n", (*$3)->falselist);
@@ -308,7 +312,8 @@ expr *member_item(expr *lvalue, char *name)
     lvalue = emit_if_table_item(lvalue);
     _expr = new_expr(tableitem_e);
     //chech lvalue->sym is NULL?
-    _expr->sym = lvalue->sym;
+    if (lvalue->sym != NULL)
+        _expr->sym = lvalue->sym;
     _expr->index = new_expr_const_string(name);
     return _expr;
 }
@@ -488,7 +493,8 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
     exit_scope_space();
     printf("scope space : %u\n", curr_scope_space());
     printf("total locals  : %u\n", total_locals);
-    func_prefix->sym->value.funcVal->total_locals = total_locals;
+    if (func_prefix->sym != NULL)
+        func_prefix->sym->value.funcVal->total_locals = total_locals;
     unsigned offset = pop_scope_offset_stack();
     //printf("lala2\n");
     restore_curr_scope_offset(offset);
@@ -516,25 +522,19 @@ expr *process_function_prefix(SymbolTable *symbolTable, char *func_name)
     if (is_library_func(symbolTable, func_name))
     {
         print_error(func_name, yylineno, "ERROR : function name shadows libfunc");
-        //(*iam_in_function)--;
     }
     else if (status == ERROR_FUNC)
     {
         print_error(func_name, yylineno, "ERROR : function already exists");
-        //(*iam_in_function)--;
     }
     else if (status == ERROR_VAR)
     {
         print_error(func_name, yylineno, "ERROR : use variable as function"); //kalo?
-        //(*iam_in_function)--;
-
-        // fprintf(stderr, "Error in line %d: %s is variable\n", yylineno, func_name);
+       
     }
     else
     {
-        //fprintf(stderr,"staus : %d\n",status);
         symbolTable_insert(symbolTable, bucket);
-
         push(functions_stack, bucket);
     }
 
@@ -557,6 +557,7 @@ void print_error(const char *name, int line, char *msg)
         fprintf(stderr, "\n");
 
     reset_Red();
+    found_compile_error = 1;
 }
 void process_anonymous_function(SymbolTable *symbolTable)
 {

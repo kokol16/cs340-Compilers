@@ -10,7 +10,7 @@ int yylex(void);
 int yyerror( char * msg );
 extern FILE * yyin;
 
-
+ int was_bool ;
 
 
 %}
@@ -62,9 +62,8 @@ extern FILE * yyin;
 %%         
 program: statements {print_to_stream("Program"); }  ;
 stmt:   expr SEMICOLON   {  is_first_time=1;
-                                        create_assign_after_bool_op(&$1,symbolTable);
-                            /*fprintf ( stderr, "trtue listt :%d\n", $1->truelist);
-                            patchlist($1->truelist, curr_quad); */
+                            create_assign_after_bool_op(&$1,symbolTable);
+                            
                             
                             print_to_stream("Statement(expression semicolon)");resettemp(); 
                             $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
@@ -219,63 +218,70 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
 
 
                                 }}
-        |expr AND T expr    {
+        |expr AND{was_bool = check_if_bool_emit(&$1);} T expr    {
                                 
                                 print_to_stream("and expression");
                                
                                 print_list($1->truelist);
-                                int was_bool =check_if_bool_emit(&$1);
+                               
                                 if($1!=NULL)
                                 {
-                                    //fprintf(stderr,"patching %d\n",$3);
-                                    if(was_bool)
+                                    //fprintf(stderr,"patching %d\n",$4);
+                                    patchlist($1->truelist,$4);
+                                    
+                                    /*if(was_bool)
                                     {
-                                        patchlist($1->truelist,curr_quad);
+                                        patchlist($1->truelist,$4);
+                                        was_bool=0;
                                     }
                                     else
                                     {
-                                        patchlist($1->truelist,$3);
+                                        patchlist($1->truelist,$4);
 
-                                    }
+                                    }*/
 
                                 }
-                                check_if_bool_emit(&$4);
+                                check_if_bool_emit(&$5);
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
                             
-                                if($1!=NULL && $4!=NULL)    
-                                    $$->truelist=$4->truelist;
+                                if($1!=NULL && $5!=NULL)    
+                                    $$->truelist=$5->truelist;
 
                         
-                                if($$!=NULL && $4!=NULL)    
-                                    $$->falselist=mergelist($1->falselist,$4->falselist);
+                                if($$!=NULL && $5!=NULL)    
+                                    $$->falselist=mergelist($1->falselist,$5->falselist);
                         
                             }
-        |expr OR T expr {
+        |expr OR{
+                           was_bool =check_if_bool_emit(&$1);
+
+        }  T expr {
                             $$=new_expr(boolexpr_e);
                             $$->sym=new_temp(symbolTable);
                             print_to_stream("or expression");
                            
-                            int was_bool =check_if_bool_emit(&$1);
                             if($1!=NULL)
                             {
-                                if(was_bool)
+                                patchlist($1->falselist,$4);
+
+                                /*if(was_bool)
                                 {
                                     patchlist($1->falselist,curr_quad);
                                 }
                                 else
                                 {
-                                     patchlist($1->falselist,$3);
-                                }
+                                    patchlist($1->falselist,$4);
+                                }*/
                             }
-                            check_if_bool_emit(&$4);
+                            check_if_bool_emit(&$5);
                                
                                
-                            if($1!=NULL && $4!=NULL)    
-                                $$->truelist=mergelist($1->truelist,$4->truelist);
+                            if($1!=NULL && $5!=NULL)    
+                                $$->truelist=mergelist($1->truelist,$5->truelist);
                         
-                            if($$!=NULL && $4!=NULL)    
-                                $$->falselist=$4->falselist;
+                            if($$!=NULL && $5!=NULL)    
+                                $$->falselist=$5->falselist;
                             
                          
                             
@@ -301,22 +307,14 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                         $$=new_expr(boolexpr_e);
                                                         $$->sym=new_temp(symbolTable);
                             
-                           
-                                                        int was_bool =check_if_bool_emit(&$2);
-                                                       //fprintf(stderr,"#:%s\n",$2->sym->value.varVal->name);
+                                                        was_bool =check_if_bool_emit(&$2);
                                                         
-                                                       // emit(if_eq,$2,new_expr_const_bool(1),NULL,curr_quad,0,yylineno);
-                                                        //$2->truelist=newlist(curr_quad-1);
-                                                        //emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                                        //$2->falselist=newlist(curr_quad-1);
                                                         if($$!=NULL && $2!=NULL)
                                                         {
-                                                            $$->truelist=$2->falselist;
-                                                            $$->falselist=$2->truelist;
-                                                            //$$=$2;
+                                                                $$->truelist=$2->falselist;
+                                                                $$->falselist=$2->truelist;
                                                         }
                                                        
-                                                    //$$=$2;
                                                         
                                 }                   
                                            
@@ -362,6 +360,7 @@ primary:  lvalue { print_to_stream("Primary(lvalue)");  process_primary(symbolTa
           | call {print_to_stream("Primary");}
           | objectdef {print_to_stream("Primary");}
           | LEFT_BRACKETS funcdef RIGHT_BRACKETS  {print_to_stream("Primary"); $$=new_expr(programfunc_e);
+                                                                                if($2->sym!=NULL)
                                                                                 $$->sym=$2->sym;             }
           | const {print_to_stream("Primary(const)"); $$=$1;} ;
 
@@ -376,6 +375,7 @@ member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
                                                     print_to_stream("Member");  
                                                     $1=emit_if_table_item($1);
                                                     $$=new_expr(tableitem_e);
+                                                    if($1->sym!=NULL)
                                                     $$->sym=$1->sym;
                                                     $$->index=$3;
                                                     }
@@ -414,10 +414,12 @@ call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$
 
                                 }
             | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call2"); expr* func=new_expr(programfunc_e);
+                                                                                                                 if($2->sym!=NULL)
                                                                                                                  func->sym=$2->sym;
                                                                                                                  $$=make_call(func,$5,symbolTable);}
             | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call3");
                                                                                     expr* func=new_expr(programfunc_e);
+                                                                                    if($2->sym!=NULL)
                                                                                     func->sym=$2->sym;
                                                                                     $$=make_call(func,NULL,symbolTable);
                                                                                 }
@@ -720,7 +722,11 @@ int main(int argc , char * argv[])
     fprintf(stderr, "curr cuad : %u\n",curr_quad);
     FILE *quad_file = fopen("quads.txt", "w+");
 
-    print_quads(quad_file);
+    if(! found_compile_error   )
+    {
+        print_quads(quad_file);
+
+    }
     
     fclose(quad_file);
 

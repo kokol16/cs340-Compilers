@@ -67,6 +67,7 @@ typedef struct quad
     unsigned line;
     unsigned quad_no;
 } quad;
+extern int found_compile_error;
 extern quad *quads;
 extern unsigned total;
 extern unsigned int curr_quad;
