@@ -18,7 +18,7 @@ unsigned scope_space_counter = 1;
 
 void restore_curr_scope_offset(unsigned n)
 {
-    switch (curr_scope_offset())
+    switch (curr_scope_space())
     {
     case programvar:
         program_var_offset = n;

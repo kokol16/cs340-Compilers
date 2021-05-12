@@ -21,7 +21,7 @@ int check_if_bool_emit(expr **left)
 void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
 {
 
-    if ((*$3)!=NULL && ( (*$3)->truelist > 0 || (*$3)->falselist > 0 ) )
+    if ((*$3) != NULL && ((*$3)->truelist > 0 || (*$3)->falselist > 0))
     {
         int tmp_1, tmp_2;
         tmp_1 = (*$3)->truelist;
@@ -32,8 +32,8 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
         (*$3)->falselist = tmp_2;
 
         //fprintf(stderr,"curr quad %d\n",curr_quad);
-        print_list((*$3)->truelist);
-        print_list((*$3)->falselist);
+        //print_list((*$3)->truelist);
+        //print_list((*$3)->falselist);
 
         patchlist((*$3)->truelist, curr_quad);
         patchlist((*$3)->falselist, curr_quad + 2);
@@ -114,12 +114,12 @@ expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolT
     if (_expr->type == constdouble_e)
     {
         do_the_arith_operations_double(opcode, _expr, expr1, expr2);
-        fprintf(stderr, "%f\n", _expr->doubleConst);
+        //fprintf(stderr, "%f\n", _expr->doubleConst);
     }
     else if (_expr->type == constint_e)
     {
         do_the_arith_operations_int(opcode, _expr, expr1, expr2);
-        fprintf(stderr, "%d\n", _expr->intConst);
+        //fprintf(stderr, "%d\n", _expr->intConst);
     }
     _expr->sym = new_temp(symboltable);
 
@@ -207,7 +207,6 @@ expr *process_table_indexed(indexed *objects_list, SymbolTable *symboltable)
     _expr = new_expr(newtable_e);
     _expr->sym = new_temp(symboltable);
     emit(tablecreate, _expr, NULL, NULL, curr_quad, 0, yylineno);
-    fprintf(stderr, "lalal\n");
     tmp = objects_list;
     while (tmp != NULL)
     {
@@ -266,15 +265,25 @@ void print_expr_list(expr *head)
     expr *tmp = head;
     while (tmp != NULL)
     {
-        fprintf(stderr, "%s\n", tmp->sym->value.varVal->name);
+        if (is_function(tmp->sym))
+        {
+            fprintf(stderr, "%s\n", tmp->sym->value.funcVal->name);
+        }
+        else
+        {
+            if (tmp->sym != NULL)
+                fprintf(stderr, "%s\n", tmp->sym->value.varVal->name);
+        }
         tmp = tmp->next;
     }
 }
 expr *make_call(expr *lvalue, expr *reverse_list, SymbolTable *symboltable)
 {
+
     expr *tmp = reverse_list, *res;
     expr *func = emit_if_table_item(lvalue);
-    print_expr_list(reverse_list);
+
+    //print_expr_list(reverse_list);
 
     link_list(reverse_list);
 
@@ -292,26 +301,13 @@ expr *make_call(expr *lvalue, expr *reverse_list, SymbolTable *symboltable)
     emit(getretval, NULL, NULL, res, curr_quad, 0, yylineno);
     return res;
 }
-expr *process_elist_element(expr **head, expr *new_elist)
-{
-    //fprintf(stderr, "process_elist_element\n");
 
-    //push_elist(head, NULL);
-}
-expr *process_elists_element(expr **head, expr *new_elist)
-{
-    //fprintf(stderr, "process_elists_element\n");
-
-    //push_elist(head, new_elist);
-    //print_elist(new_elist);
-}
 
 expr *member_item(expr *lvalue, char *name)
 {
     expr *_expr;
     lvalue = emit_if_table_item(lvalue);
     _expr = new_expr(tableitem_e);
-    //chech lvalue->sym is NULL?
     if (lvalue->sym != NULL)
         _expr->sym = lvalue->sym;
     _expr->index = new_expr_const_string(name);
@@ -419,7 +415,7 @@ void process_primary(SymbolTable *symbolTable, expr **lvalue)
         lvalue_ptr = emit_if_table_item(lvalue_ptr);
         return;
     }
-    lvalue_ptr = NULL; //??
+    //lvalue_ptr = NULL; //??
 }
 
 void process_plus_plus(SymbolTable *symbolTable, expr **lvalue)

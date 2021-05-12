@@ -1,2 +1,10 @@
-1:	CALL print	
-2:	GET_RETURN_VALUE _t0	
+1:	FUNCSTART $func1	
+2:	FUNCSTART $func2	
+3:	FUNCSTART $func3	
+4:	FUNCEND $func3	
+5:	FUNCSTART $func4	
+6:	FUNCEND $func4	
+7:	FUNCEND $func2	
+8:	FUNCEND $func1	
+9:	FUNCSTART $func5	
+10:	FUNCEND $func5	

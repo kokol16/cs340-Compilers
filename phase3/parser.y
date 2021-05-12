@@ -124,7 +124,7 @@ statements: statements stmt
                 {
                     
                     $$->breaklist = mergelist($1->breaklist, $2->breaklist);
-                    fprintf (stderr , "after merge %d\n",$$->breaklist);
+                    //fprintf (stderr , "after merge %d\n",$$->breaklist);
 
                     $$->contlist = mergelist($1->contlist, $2->contlist); 
                    
@@ -390,8 +390,9 @@ call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$
             | lvalue callsuffix { print_to_stream("Call5"); 
                                                             process_callsuffix(symbolTable, &$1);
                                                             $1=emit_if_table_item($1);
-                                                            if($2->method){
+                                                            if($2!=NULL && $2->method){
                                                               expr* e=$1;
+
                                                               $1=emit_if_table_item(member_item(e,$2->name));
                                                               expr * tmp= $2->elist;
                                                               if(tmp==NULL)
@@ -409,6 +410,7 @@ call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$
                                                               }
 
                                                            }
+
                                                            $$=make_call($1,$2->elist,symbolTable);
                                                             
 
@@ -453,16 +455,19 @@ methodcall:Diaeresis ID LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Met
                                                                                             $$->name=strdup($2);}
 
 elist:   expr   {print_to_stream("Expression List"); is_first_time=1;
-                                        create_emits_after_bool_op(&$1,symbolTable);
-                                       
-
-                                        $$=$1;  
+                                                    create_emits_after_bool_op(&$1,symbolTable);
+                                                    $$=$1;  
                                          } 
-        | expr COMMA elist {print_to_stream("Expression List Comma");  is_first_time=1;
-                                                                  create_emits_after_bool_op(&$1,symbolTable);    
+        | expr COMMA elist {print_to_stream("Expression List Comma");  
+                                                                    is_first_time=1;
+                                                                    if($1!=NULL)
+                                                                    {
+                                                                        create_emits_after_bool_op(&$1,symbolTable);    
+                                                                        $1->next=$3;
+
+                                                                    }
                                                                 
                                                                     
-                                                                    $1->next=$3;
                                                                     
                                                                 
                                                                   
@@ -470,8 +475,8 @@ elist:   expr   {print_to_stream("Expression List"); is_first_time=1;
                                                                        };
             
 objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");  $$=process_array_elist($2,symbolTable);}
-           |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition"); $$=process_table_indexed($2,symbolTable);}
-           |LEFT_SQUARE  RIGHT_SQUARE {print_to_stream("Object Definition"); $$=process_array_elist(NULL,symbolTable);};
+           |LEFT_SQUARE  indexed  RIGHT_SQUARE {print_to_stream("Object Definition"); $$=process_table_indexed($2,symbolTable); }
+           |LEFT_SQUARE  RIGHT_SQUARE {print_to_stream("Object Definition");  $$=process_array_elist(NULL,symbolTable); };
 
 indexed:    indexedelem  {print_to_stream("Indexed");  $$=$1;    }
             | indexedelem COMMA  indexed {print_to_stream("Indexed");  $1->next=$3; };
@@ -540,7 +545,7 @@ whilestmt: whilestart whilecond stmt {
 
                                             if ($3!=NULL )
                                             {
-                                                fprintf(stderr,"patchhh\n");
+                                                
                                                 //fprintf(stderr,"next quad to fill break list:%d\n",next_quad()+1);
                                                 //fprintf(stderr,"breaklist : %d\n",$3->breaklist);
                                                 
@@ -587,10 +592,19 @@ ifprefix: IF LEFT_BRACKETS expr RIGHT_BRACKETS {
                                                 $$ = next_quad();
                                                 emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);
 
+
 } ;
 
-if: ifprefix stmt {patch_label($1,next_quad()); $$=$2;};
-elseprefix: ELSE {$$=next_quad(); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);};
+if: ifprefix stmt {
+                
+                patch_label($1,next_quad()); $$=$2;
+                
+                
+                };
+elseprefix: ELSE {$$=next_quad();
+                                                 emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno); 
+                                                fprintf(stderr,"lalala\n");
+};
 
 
 forstmt:  forprefix_2 N elist RIGHT_BRACKETS N stmt N 
@@ -625,7 +639,7 @@ forstmt:  forprefix_2 N elist RIGHT_BRACKETS N stmt N
 forprefix:  FOR LEFT_BRACKETS  {iam_in_loop++;enum func_loops entry = for_loop; push_func_loop(   entry  );};    
 
 
-N: { $$=next_quad(); fprintf(stderr,"quad : %u\n",next_quad()); emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno); };
+N: { $$=next_quad();  emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno); };
 M: {$$=next_quad();};
 
 forprefix_2:forprefix elist SEMICOLON M expr SEMICOLON{                   is_first_time=1;
@@ -719,7 +733,7 @@ int main(int argc , char * argv[])
     //symbolTable_print(symbolTable);
     //symbolTable_print_scope_list(symbolTable, 1);
     symbolTable_print_scopes(symbolTable,100);
-    fprintf(stderr, "curr cuad : %u\n",curr_quad);
+ 
     FILE *quad_file = fopen("quads.txt", "w+");
 
     if(! found_compile_error   )

@@ -85,7 +85,7 @@ void check_arith(expr *e, const char *context)
         e->type == boolexpr_e)
     {
         fprintf(stderr, "Illegal expr used in %s! ", context);
-        found_compile_error=1;
+        found_compile_error = 1;
     }
 }
 void print_indexed_list(indexed *head)
@@ -93,13 +93,40 @@ void print_indexed_list(indexed *head)
     indexed *tmp = head;
     while (tmp != NULL)
     {
-        if (!print_by_type(tmp->left, stderr))
+        if (tmp->left != NULL)
         {
-            fprintf(stderr, "%s", tmp->left->sym->value.varVal->name);
+
+            if (!print_by_type(tmp->left, stderr))
+            {
+                if (is_function(tmp->left->sym))
+                {
+                    if (tmp->left->sym != NULL && tmp->left->sym->value.varVal != NULL)
+
+                        fprintf(stderr, "%s", tmp->left->sym->value.funcVal->name);
+                }
+                else
+                {
+                    if (tmp->left->sym != NULL && tmp->left->sym->value.varVal != NULL)
+
+                        fprintf(stderr, "%s", tmp->left->sym->value.varVal->name);
+                }
+            }
         }
-        if (!print_by_type(tmp->right, stderr))
+        if (tmp->right != NULL)
         {
-            fprintf(stderr, " : %s\n", tmp->right->sym->value.varVal->name);
+            if (!print_by_type(tmp->right, stderr))
+            {
+                if (is_function(tmp->right->sym))
+                {
+                    if (tmp->right->sym != NULL && tmp->right->sym->value.varVal != NULL)
+                        fprintf(stderr, " : %s\n", tmp->right->sym->value.varVal->name);
+                }
+                else
+                {
+                    if (tmp->right->sym != NULL && tmp->right->sym->value.varVal != NULL)
+                        fprintf(stderr, " : %s\n", tmp->right->sym->value.varVal->name);
+                }
+            }
         }
 
         tmp = tmp->next;
@@ -303,8 +330,6 @@ void print_quad(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_
     }
 
     fprintf(quad_file, "\n");
-
-    
 }
 int print_by_type(expr *_expr, FILE *quad_file)
 {
@@ -486,7 +511,6 @@ unsigned pop_elist(expr **elist_entry)
     elist_ptr = elist_ptr->next;
     return 1;
 }
-
 
 void print_elist(expr *head)
 {
