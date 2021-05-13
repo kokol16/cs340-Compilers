@@ -1,10 +1,13 @@
-1:	FUNCSTART $func1	
-2:	FUNCSTART $func2	
-3:	FUNCSTART $func3	
-4:	FUNCEND $func3	
-5:	FUNCSTART $func4	
-6:	FUNCEND $func4	
-7:	FUNCEND $func2	
-8:	FUNCEND $func1	
-9:	FUNCSTART $func5	
-10:	FUNCEND $func5	
+#QUAD               opcode              result              arg1                arg2                label               line                
+=============================================================================================================================
+1:	IF_GREATER x	y	
+2:	JUMP 
+3:	IF_GREATER x	z	
+4:	JUMP 
+5:	IF_EQUALS _t0	_t1	7
+6:	JUMP 9
+7:	ASSIGN true                	_t3	
+8:	JUMP 10
+9:	ASSIGN false               	_t3	
+10:	ASSIGN _t3	y	
+11:	ASSIGN y	_t4	

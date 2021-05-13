@@ -113,6 +113,9 @@ void patchlist(int list, int label);
 void make_truth_list(expr *s);
 void print_quads(FILE *quad_file);
 void print_list(int list);
+void print_quad_analytic(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file);
+void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq);
+
 typedef enum expr_t
 {
     var_e,
@@ -142,7 +145,6 @@ typedef struct expr
     expr *next;
     expr *prev;
     expr *tail;
-    //truth_list * truth_list;
     int truelist;
     int falselist;
 } expr;

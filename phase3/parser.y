@@ -61,13 +61,13 @@ extern FILE * yyin;
 %type<_stmt_t> stmt statements   BREAK CONTINUE block whilestmt ifstmt if
 %%         
 program: statements {print_to_stream("Program"); }  ;
-stmt:   expr SEMICOLON   {  is_first_time=1;
-                            create_emits_after_bool_op(&$1,symbolTable);
-                            
-                            
-                            print_to_stream("Statement(expression semicolon)");resettemp(); 
-                            $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
-        | ifstmt         {print_to_stream("Statement");resettemp(); $$=$1; }  
+stmt:   expr SEMICOLON      {   
+                                is_first_time=1;
+                                create_emits_after_bool_op(&$1,symbolTable);
+                                print_to_stream("Statement(expression semicolon)");resettemp(); 
+                                $$=malloc(sizeof(stmt_t)); make_stmt($$);
+                            }  
+        | ifstmt         {print_to_stream("Statement");resettemp();  $$=$1;}  
         | whilestmt      {print_to_stream("Statement");resettemp(); $$=malloc(sizeof(stmt_t)); make_stmt($$);  }  
         | forstmt        {print_to_stream("Statement (for)");resettemp();   $$=malloc(sizeof(stmt_t)); make_stmt($$);}  
         | returnstmt     {print_to_stream("Statement");resettemp();   $$=malloc(sizeof(stmt_t)); make_stmt($$);}  
@@ -84,12 +84,8 @@ stmt:   expr SEMICOLON   {  is_first_time=1;
                                         make_stmt($$);
                                         $$->breaklist = newlist(next_quad()); 
                                         emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                        quads[next_quad()-1].label = 0;
 
                                       
-                                        //fprintf(stderr,"break head %d\n",$$->breaklist);
-                                        //fprintf (stderr , "next label %d\n",quads[$$->breaklist].label);
-
                                     }
                                     
         
@@ -104,28 +100,24 @@ stmt:   expr SEMICOLON   {  is_first_time=1;
                                         
                                         $$=malloc(sizeof(stmt_t));
                                         make_stmt($$);
-                                        $$->contlist = newlist(next_quad()); emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
-                                        quads[next_quad()-1].label = 0;
+                                        $$->contlist = newlist(next_quad()); 
+                                        emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
 
                                     }
                                     
                             }
-        | block             {print_to_stream("Statement(block)");resettemp();  $$=malloc(sizeof(stmt_t)); make_stmt($$); /*$$=$1;*/  }  
-        | funcdef           {print_to_stream("Statement");resettemp();    $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
-        |SEMICOLON          {print_to_stream("Statement(semicolon)");resettemp();    $$=malloc(sizeof(stmt_t)); make_stmt($$); }  
+        | block             {print_to_stream("Statement(block)");resettemp();  $$=$1;  }  
+        | funcdef           {print_to_stream("Statement");resettemp();   $$=malloc(sizeof(stmt_t)); make_stmt($$);  }  
+        |SEMICOLON          {print_to_stream("Statement(semicolon)");resettemp();  $$=malloc(sizeof(stmt_t)); make_stmt($$);  }  
         ;
 statements: statements stmt
             {
 
                 print_to_stream("Statements stmt "); 
-
-              
                 if($1!=NULL && $2!=NULL )
                 {
                     
                     $$->breaklist = mergelist($1->breaklist, $2->breaklist);
-                    //fprintf (stderr , "after merge %d\n",$$->breaklist);
-
                     $$->contlist = mergelist($1->contlist, $2->contlist); 
                    
                 }
@@ -144,11 +136,17 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr DIVISION expr {print_to_stream("/ expression"); $$=process_arithm_operation(_div,$1,$3,symbolTable);}
         |expr PERCENT expr {print_to_stream("% expression"); $$=process_arithm_operation(mod,$1,$3,symbolTable);}
         |expr GREATER expr  {
+                                check_arith($1, "> expression");
+                                check_arith($3, "> expression");
+
+
                                 print_to_stream("> expression");
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
+
                                 if($$!=NULL)
                                 {
+
                                     $$->truelist=newlist(next_quad());
                                     $$->falselist=newlist(next_quad()+1);
                                     emit(if_greater,$1,$3,NULL,curr_quad,0,yylineno);
@@ -157,6 +155,8 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                
                             }
         |expr GREATER_EQUALS expr {
+                                    check_arith($1, ">= expression");
+                                    check_arith($3, ">= expression");
                                     $$=new_expr(boolexpr_e);
                                     $$->sym=new_temp(symbolTable);
                                     print_to_stream(">= expression");
@@ -169,9 +169,12 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                     }     
                                         
                                   }
-        |expr LESS  expr    {  
+        |expr LESS  expr    { 
+                                check_arith($1, "< expression");
+                                check_arith($3, "< expression"); 
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
+                                
                                 print_to_stream("< expression");  
                                 if($$!=NULL)
                                 {
@@ -183,6 +186,8 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
 
                                 }};
         |expr LESS_EQUALS expr {print_to_stream("<= expression");  
+                                check_arith($1, "<= expression");
+                                check_arith($3, "<= expression");
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
                                 if($$!=NULL)
@@ -195,8 +200,10 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
 
                                 }}
         |expr EQUALS expr {print_to_stream("== expression");  
+                                
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
+                                $$->boolConst=are_same_type($1,$3);
                                 if($$!=NULL)
                                 {
                                     $$->truelist=newlist(next_quad());
@@ -207,6 +214,7 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
 
                                 }}
         |expr DIFFERENT expr {print_to_stream("!= expression");  
+                                
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
                                 if($$!=NULL)
@@ -226,19 +234,8 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                
                                 if($1!=NULL)
                                 {
-                                    //fprintf(stderr,"patching %d\n",$4);
                                     patchlist($1->truelist,$4);
-                                    
-                                    /*if(was_bool)
-                                    {
-                                        patchlist($1->truelist,$4);
-                                        was_bool=0;
-                                    }
-                                    else
-                                    {
-                                        patchlist($1->truelist,$4);
-
-                                    }*/
+                                     
 
                                 }
                                 check_if_bool_emit(&$5);
@@ -264,15 +261,6 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                             if($1!=NULL)
                             {
                                 patchlist($1->falselist,$4);
-
-                                /*if(was_bool)
-                                {
-                                    patchlist($1->falselist,curr_quad);
-                                }
-                                else
-                                {
-                                    patchlist($1->falselist,$4);
-                                }*/
                             }
                             check_if_bool_emit(&$5);
                                
@@ -287,11 +275,8 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                             
                         }
         | term  {  
-                 print_to_stream("Expression(term)");
-
+                    print_to_stream("Expression(term)");
                     $$=$1;
-                   
-                    
                 };
 T:  {$$=next_quad();}
         
@@ -540,24 +525,17 @@ whilestmt: whilestart whilecond stmt {
                                             print_to_stream("While Statement");
                                             iam_in_loop--;   pop_func_loop();  
 
-                                            emit(jump, NULL, NULL,NULL,curr_quad, $1-1,yylineno);//jump to go up in loop
+                                            emit(jump, NULL, NULL,NULL,curr_quad, $1,yylineno);//jump to go up in loop
                                             patch_label($2, next_quad());//jump if eq failed
 
                                             if ($3!=NULL )
                                             {
-                                                
-                                                //fprintf(stderr,"next quad to fill break list:%d\n",next_quad()+1);
-                                                //fprintf(stderr,"breaklist : %d\n",$3->breaklist);
-                                                
+                                                                                                
                                                 patchlist($3->breaklist, next_quad());
                                                 patchlist($3->contlist, $1);
                                                 
-
-
                                             }
                                             
-                                            //make breaking list fooking 00000000000000
-                                            //fprintf (stderr , "next label %d\n",quads[$$->breaklist].label);
                                                 
                                             
                                             
@@ -573,10 +551,10 @@ whilestart: WHILE   {
                     };
 whilecond: LEFT_BRACKETS {iam_in_loop++; enum func_loops entry = while_loop; push_func_loop(   entry  ); } expr RIGHT_BRACKETS
                                             { is_first_time=1;
-                                        create_emits_after_bool_op(&$3,symbolTable);
+                                                create_emits_after_bool_op(&$3,symbolTable);
                                                 emit( if_eq, $3, 
                                                 new_expr_const_bool(1),NULL, 
-                                                curr_quad,curr_quad+1,yylineno);
+                                                curr_quad,curr_quad+2,yylineno);
                                                 $$ = next_quad();
                                                 emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);                           
                                                                                                             
@@ -588,7 +566,7 @@ ifprefix: IF LEFT_BRACKETS expr RIGHT_BRACKETS {
                                                 create_emits_after_bool_op(&$3,symbolTable);
                                                 emit( if_eq, $3, 
                                                 new_expr_const_bool(1),NULL, 
-                                                curr_quad,curr_quad+1,yylineno);
+                                                curr_quad,curr_quad+2,yylineno);
                                                 $$ = next_quad();
                                                 emit(jump, NULL, NULL, NULL,curr_quad,0,yylineno);
 
@@ -603,7 +581,6 @@ if: ifprefix stmt {
                 };
 elseprefix: ELSE {$$=next_quad();
                                                  emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno); 
-                                                fprintf(stderr,"lalala\n");
 };
 
 
@@ -735,7 +712,7 @@ int main(int argc , char * argv[])
     symbolTable_print_scopes(symbolTable,100);
  
     FILE *quad_file = fopen("quads.txt", "w+");
-
+    fprintf(stderr,"compile error %d\n",found_compile_error);
     if(! found_compile_error   )
     {
         print_quads(quad_file);

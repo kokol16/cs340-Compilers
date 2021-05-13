@@ -3,6 +3,19 @@
 #define lvalue_ptr (*lvalue)
 int Came_From_OP = 0;
 
+int are_same_type(expr *left, expr *right)
+{
+    if (left->type == right->type || left->type == tableitem_e && right->type == nil_e)
+    {
+        return 1;
+    }
+    else
+    {
+        fprintf(stderr, "not same type of expressions\n");
+        //found_compile_error = 1;
+        return 0;
+    }
+}
 int check_if_bool_emit(expr **left)
 {
     if ((*left) == NULL)
@@ -41,8 +54,6 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
         emit(assign, new_expr_const_bool(1), (*$3), NULL, curr_quad, 0, yylineno);
         emit(jump, NULL, NULL, NULL, curr_quad, curr_quad + 2, yylineno);
         emit(assign, new_expr_const_bool(0), (*$3), NULL, curr_quad, 0, yylineno);
-        //(*$3)->truelist = 0;
-        //(*$3)->falselist = 0;
     }
 }
 
@@ -61,11 +72,10 @@ int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, exp
         _expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) * ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     case _div:
-        _expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) / ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        _expr->doubleConst = (double)((double)(expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) / (double)((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     case mod:
-        //should this be on double const????
-        _expr->doubleConst = (int)((int)(expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) % (int)((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
+        _expr->doubleConst = ((int)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst)) % (int)((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     default:
         return 0;
@@ -100,8 +110,8 @@ int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *
 expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolTable *symboltable)
 {
     expr *_expr;
-    check_arith(expr1, "arithmetic expression ");
-    check_arith(expr2, "arithmetic expression ");
+    check_arith(expr1, opcode_to_string(opcode));
+    check_arith(expr2, opcode_to_string(opcode));
 
     if (expr1->type == constdouble_e && expr2->type == constdouble_e || expr1->type == constdouble_e && expr2->type == constint_e || expr2->type == constdouble_e && expr1->type == constint_e)
         _expr = new_expr(constdouble_e);
@@ -301,7 +311,6 @@ expr *make_call(expr *lvalue, expr *reverse_list, SymbolTable *symboltable)
     emit(getretval, NULL, NULL, res, curr_quad, 0, yylineno);
     return res;
 }
-
 
 expr *member_item(expr *lvalue, char *name)
 {

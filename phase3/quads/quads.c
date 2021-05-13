@@ -5,16 +5,121 @@ unsigned total = 0;
 unsigned int curr_quad = 0;
 int temp_counter = 0;
 int found_compile_error = 0;
+#define width 20
+#define EQUALS_PRINT 125
 
 SymbolTable *symbolTable;
+void print_quad_analytic(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file)
+{
+    char *opcode_str;
 
+    if (quad_file == NULL)
+    {
+        perror("Error opening quads file.");
+        return;
+    }
+
+    fprintf(quad_file, "#%-*u", width, curr_no);
+    opcode_str = opcode_to_string(op);
+    fprintf(quad_file, "%-*s", width, opcode_str);
+
+    if (result != NULL)
+    {
+        if (!print_by_type(result, quad_file))
+        {
+            if (result->sym != NULL && result->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%-*s\t", width, result->sym->value.varVal->name);
+            }
+            else if (result->sym != NULL)
+            {
+
+                fprintf(quad_file, "%-*s\t", width, result->sym->value.funcVal->name);
+            }
+        }
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+    if (arg1 != NULL)
+    {
+
+        if (!print_by_type(arg1, quad_file))
+        {
+
+            if (arg1->sym != NULL && arg1->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%-*s", width, arg1->sym->value.varVal->name);
+            }
+            else if (arg1->sym != NULL)
+            {
+
+                fprintf(quad_file, "%-*s", width, arg1->sym->value.funcVal->name);
+            }
+        }
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+    if (arg2 != NULL)
+    {
+        if (!print_by_type(arg2, quad_file))
+        {
+            if (arg2->sym != NULL && arg2->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%-*s", width, arg2->sym->value.varVal->name);
+            }
+            else if (arg2->sym != NULL)
+            {
+                fprintf(quad_file, "%-*s\t", width, arg2->sym->value.funcVal->name);
+            }
+        }
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+
+    if (label != 0)
+    {
+        fprintf(quad_file, "%-*u", width, label);
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+    fprintf(quad_file, "%-*d\n", width, yylineno);
+    generate_eq_eq(quad_file, EQUALS_PRINT);
+}
+void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq)
+{
+    unsigned i = 0;
+    for (i = 0; i < numb_of_eq; i++)
+    {
+        fprintf(quad_file, "=");
+    }
+    fprintf(quad_file, "\n");
+}
 void print_quads(FILE *quad_file)
 {
     unsigned i = 1;
+    fprintf(quad_file, "%-*s", width, "#QUAD");
+    fprintf(quad_file, "%-*s", width, "opcode");
+    fprintf(quad_file, "%-*s", width, "result");
+    fprintf(quad_file, "%-*s", width, "arg1");
+    fprintf(quad_file, "%-*s", width, "arg2");
+    fprintf(quad_file, "%-*s", width, "label");
+    fprintf(quad_file, "%-*s\n", width, "line");
+    generate_eq_eq(quad_file, EQUALS_PRINT);
+
     while (i < curr_quad)
     {
         //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
         print_quad(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+        //print_quad_analytic(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+
         i++;
     }
 }
@@ -65,12 +170,16 @@ int mergelist(int l1, int l2)
 }
 void patchlist(int list, int label)
 {
+    fprintf(stderr, "starting from %d\n", list);
+
     while (list != 0 && list < curr_quad)
     {
         int next = quads[list].label;
         quads[list].label = label;
+        fprintf(stderr, "%d-->", list);
         list = next;
     }
+    fprintf(stderr, "\n");
 }
 
 unsigned next_quad(void) { return curr_quad; }
@@ -84,7 +193,7 @@ void check_arith(expr *e, const char *context)
         e->type == libraryfunc_e ||
         e->type == boolexpr_e)
     {
-        fprintf(stderr, "Illegal expr used in %s! ", context);
+        fprintf(stderr, "Illegal expr used in %s\n", context);
         found_compile_error = 1;
     }
 }
@@ -337,33 +446,33 @@ int print_by_type(expr *_expr, FILE *quad_file)
     {
         if (_expr->boolConst == 0)
         {
-            fprintf(quad_file, "%s\t", "false");
+            fprintf(quad_file, "%-*s\t", width, "false");
         }
         else
         {
-            fprintf(quad_file, "%s\t", "true");
+            fprintf(quad_file, "%-*s\t", width, "true");
         }
         return 1;
     }
     else if (_expr->type == constint_e)
     {
 
-        fprintf(quad_file, "%d\t", _expr->intConst);
+        fprintf(quad_file, "%-*d\t", width, _expr->intConst);
         return 1;
     }
     else if (_expr->type == constdouble_e)
     {
-        fprintf(quad_file, "%f\t", _expr->doubleConst);
+        fprintf(quad_file, "%-*f\t", width, _expr->doubleConst);
         return 1;
     }
     else if (_expr->type == conststring_e)
     {
-        fprintf(quad_file, "%s\t", _expr->strConst);
+        fprintf(quad_file, "%-*s\t", width, _expr->strConst);
         return 1;
     }
     else if (_expr->type == nil_e)
     {
-        fprintf(quad_file, "%s\t", "nil");
+        fprintf(quad_file, "%-*s\t", width, "nil");
         return 1;
     }
     return 0;
@@ -417,13 +526,13 @@ char *opcode_to_string(iopcode op)
     case ret:
         return "RETURN";
     case getretval:
-        return "GET_RETURN_VALUE";
+        return "GET_RET_VAL";
     case tablecreate:
         return "TABLE_CREATE";
     case tablegetelem:
-        return "TABLE_GET_ELEMENT";
+        return "TABLE_GET_ELEM";
     case tablesetelem:
-        return "TABLE_SET_ELEMENT";
+        return "TABLE_SET_ELEM";
     case jump:
         return "JUMP";
     }

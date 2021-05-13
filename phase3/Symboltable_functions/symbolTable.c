@@ -711,7 +711,7 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
 
     bucket = symbolTable_lookup_head(symtable, scope);
 
-    printf("%s\n", name);
+    //printf("%s\n", name);
     while (bucket != NULL)
     {
         if (bucket->value.varVal != NULL && strcmp(bucket->value.varVal->name, name) == 0 && bucket->isActive)

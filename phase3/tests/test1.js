@@ -1,6 +1,12 @@
 //blur(x,y,z);
 //x=f()();
 
+
+//"a"+blur;
+//true/5;
+//true>"lala";
+//x=a and not b; //trexei
+//x=a or not b; //trexei
 //(function f(x){})();
 //x = [-4, 13, 12.34, a+b];
 //t =[ {"a" : 1},{1: b} ];
@@ -21,12 +27,12 @@
     }
 }*/
 
-   /* a = f(a);
-    if (a)
-    x=5;
-    else
-    y=10;*/
-   
+/* a = f(a);
+ if (a)
+ x=5;
+ else
+ y=10;*/
+
 
 
 /*
@@ -58,7 +64,8 @@ for(i=0; true; i++) {
 //x=not a and  b ; //paizei
 //x=a or b and g or c and debugger;
 //x=not a or not b;
-//x= (a>c) and not (b>c) ; //den kanei swsto jump kai h seira einai diaforetikh se sxesh me to mhxanhma(mas noiazei telika h proteraiothta?)
+//x= (a>c) and not (b>c) ; //paizeiii
+//x= (a>c) and not (b>c) or not g ; //paizeiii
 //x=not a;
 //x=not a and b;
 //x=not a and not b ; //paizei
@@ -67,3 +74,50 @@ for(i=0; true; i++) {
 
 
 //x=a<b or c<d and  e<f;
+
+//1
+//f(a(1), b(2, 3));
+//for (local i = 0; i < 5 and a; ++i) {
+//if (true) 
+//{
+/*x = 1;
+while (x > 0) {
+    if (x = 512541512) {
+        while (x > 0) {
+            if (x == 5) {
+                break;
+            }
+        }
+
+        break;
+    }
+    x = x - 1;
+}*/
+function() {
+
+    while (true) {
+        break;
+        //;
+        //if(true){}
+        function(){}
+        continue;
+        break;
+    }
+}
+//}
+
+
+
+//2
+//test().x = 1;
+//print(y.z.x, "-");
+
+
+//3
+//if (1>2)
+  // x = 1;
+
+//4
+//while(1) { 
+  //  x = 1; 
+ //}

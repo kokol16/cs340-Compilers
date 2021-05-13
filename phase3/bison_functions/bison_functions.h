@@ -45,3 +45,5 @@ int  check_if_bool_emit(expr ** left);
 
 
 void  create_emits_after_bool_op(expr **$3, SymbolTable * symbolTable);
+
+int are_same_type(expr *left, expr *right);
