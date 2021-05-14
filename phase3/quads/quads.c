@@ -117,8 +117,8 @@ void print_quads(FILE *quad_file)
     while (i < curr_quad)
     {
         //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
-        print_quad(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
-        //print_quad_analytic(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+        //print_quad(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+        print_quad_analytic(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
 
         i++;
     }
