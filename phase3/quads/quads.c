@@ -534,33 +534,33 @@ int print_by_type(expr *_expr, FILE *quad_file)
     {
         if (_expr->boolConst == 0)
         {
-            fprintf(quad_file, "%-*s\t", width, "false");
+            fprintf(quad_file, "%-*s", width, "false");
         }
         else
         {
-            fprintf(quad_file, "%-*s\t", width, "true");
+            fprintf(quad_file, "%-*s", width, "true");
         }
         return 1;
     }
     else if (_expr->type == constint_e)
     {
 
-        fprintf(quad_file, "%-*d\t", width, _expr->intConst);
+        fprintf(quad_file, "%-*d", width, _expr->intConst);
         return 1;
     }
     else if (_expr->type == constdouble_e)
     {
-        fprintf(quad_file, "%-*f\t", width, _expr->doubleConst);
+        fprintf(quad_file, "%-*f", width, _expr->doubleConst);
         return 1;
     }
     else if (_expr->type == conststring_e)
     {
-        fprintf(quad_file, "%-*s\t", width, _expr->strConst);
+        fprintf(quad_file, "\"%-*s\"", width, _expr->strConst);
         return 1;
     }
     else if (_expr->type == nil_e)
     {
-        fprintf(quad_file, "%-*s\t", width, "nil");
+        fprintf(quad_file, "%-*s", width, "nil");
         return 1;
     }
     return 0;

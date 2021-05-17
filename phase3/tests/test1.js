@@ -72,7 +72,8 @@ for(i=0; true; i++) {
 //x=not a and not b or not c; //paizei
 //x=not (a>b) and not (b<c) or c;
 
-
+//not i==j;
+5+6==4+2;
 //x=a<b or c<d and  e<f;
 
 //1
@@ -105,7 +106,6 @@ while (x > 0) {
     }
 }*/
 //}
- not i==j;
 
 
 //2

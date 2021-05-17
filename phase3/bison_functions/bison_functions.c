@@ -44,7 +44,7 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
         (*$3)->truelist = tmp_1;
         (*$3)->falselist = tmp_2;
 
-        //fprintf(stderr,"curr quad %d\n",curr_quad);
+        fprintf(stderr,"im in emitt after bool \n" );
         //print_list((*$3)->truelist);
         //print_list((*$3)->falselist);
 

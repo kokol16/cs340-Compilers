@@ -138,8 +138,6 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr GREATER expr  {
                                 check_arith($1, "> expression");
                                 check_arith($3, "> expression");
-
-
                                 print_to_stream("> expression");
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
@@ -152,11 +150,13 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                     emit(if_greater,$1,$3,NULL,curr_quad,0,yylineno);
                                     emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
                                 }
+
                                
                             }
         |expr GREATER_EQUALS expr {
                                     check_arith($1, ">= expression");
                                     check_arith($3, ">= expression");
+
                                     $$=new_expr(boolexpr_e);
                                     $$->sym=new_temp(symbolTable);
                                     print_to_stream(">= expression");
@@ -172,6 +172,7 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr LESS  expr    { 
                                 check_arith($1, "< expression");
                                 check_arith($3, "< expression"); 
+
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
                                 
@@ -188,6 +189,7 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
         |expr LESS_EQUALS expr {print_to_stream("<= expression");  
                                 check_arith($1, "<= expression");
                                 check_arith($3, "<= expression");
+                               
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
                                 if($$!=NULL)
@@ -199,29 +201,46 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
 
 
                                 }}
-        |expr EQUALS expr {print_to_stream("== expression");  
-                                
+        |expr EQUALS {  create_emits_after_bool_op(&$1,symbolTable);}
+                                expr {print_to_stream("== expression");  
+                               
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
-                                $$->boolConst=are_same_type($1,$3);
+                                $$->boolConst=are_same_type($1,$4);
+                                fprintf(stderr, ": %d\n",curr_quad);
+                                create_emits_after_bool_op(&$4,symbolTable);
+
+                              
+
                                 if($$!=NULL)
                                 {
                                     $$->truelist=newlist(next_quad());
                                     $$->falselist=newlist(next_quad()+1);
-                                    emit(if_eq,$1,$3,NULL,curr_quad,0,yylineno);
+                                   
+                                    emit(if_eq,$1,$4,NULL,curr_quad,0,yylineno);
                                     emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
 
 
-                                }}
-        |expr DIFFERENT expr {print_to_stream("!= expression");  
+                                }
+
+
+                                
+
+                                
+                                }
+        |expr DIFFERENT{create_emits_after_bool_op(&$1,symbolTable);} expr {print_to_stream("!= expression");  
                                 
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
+                                create_emits_after_bool_op(&$4,symbolTable);
+
                                 if($$!=NULL)
                                 {
                                     $$->truelist=newlist(next_quad());
                                     $$->falselist=newlist(next_quad()+1);
-                                    emit(if_noteq,$1,$3,NULL,curr_quad,0,yylineno);
+                                  
+
+                                    emit(if_noteq,$1,$4,NULL,curr_quad,0,yylineno);
                                     emit(jump,NULL,NULL,NULL,curr_quad,0,yylineno);
 
 
@@ -288,7 +307,8 @@ term:   LEFT_BRACKETS expr RIGHT_BRACKETS {print_to_stream("Term"); $$=$2;}
                                                                emit(uminus , $2,NULL,$$,curr_quad,0,yylineno);                  }
                                   
         
-        | NOT expr              {                       print_to_stream("Term(NOT)");     
+        | NOT expr              {                       
+                                                        print_to_stream("Term(NOT)");     
                                                         $$=new_expr(boolexpr_e);
                                                         $$->sym=new_temp(symbolTable);
                             
