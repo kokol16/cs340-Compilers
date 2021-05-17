@@ -115,6 +115,7 @@ void print_quads(FILE *quad_file);
 void print_list(int list);
 void print_quad_analytic(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file);
 void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq);
+void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file);
 
 typedef enum expr_t
 {

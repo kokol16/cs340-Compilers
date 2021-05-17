@@ -90,9 +90,97 @@ void print_quad_analytic(iopcode op, expr *arg1, expr *arg2, expr *result, unsig
     {
         fprintf(quad_file, "%-*s", width, "");
     }
-    fprintf(quad_file, "%-*d\n", width, yylineno);
+    fprintf(quad_file, "%-*d\n", width, line);
     generate_eq_eq(quad_file, EQUALS_PRINT);
 }
+
+void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file)
+{
+    char *opcode_str;
+
+    if (quad_file == NULL)
+    {
+        perror("Error opening quads file.");
+        return;
+    }
+
+    fprintf(quad_file, "#%-*u", width, curr_no);
+    opcode_str = opcode_to_string(op);
+    fprintf(quad_file, "%-*s", width, opcode_str);
+
+    if (result != NULL)
+    {
+        if (!print_by_type(result, quad_file))
+        {
+            if (result->sym != NULL && result->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%-*s\t", width, result->sym->value.varVal->name);
+            }
+            else if (result->sym != NULL)
+            {
+
+                fprintf(quad_file, "%-*s\t", width, result->sym->value.funcVal->name);
+            }
+        }
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+    if (arg1 != NULL)
+    {
+
+        if (!print_by_type(arg1, quad_file))
+        {
+
+            if (arg1->sym != NULL && arg1->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%-*s", width, arg1->sym->value.varVal->name);
+            }
+            else if (arg1->sym != NULL)
+            {
+
+                fprintf(quad_file, "%-*s", width, arg1->sym->value.funcVal->name);
+            }
+        }
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+    if (arg2 != NULL)
+    {
+        if (!print_by_type(arg2, quad_file))
+        {
+            if (arg2->sym != NULL && arg2->sym->value.varVal != NULL)
+            {
+                fprintf(quad_file, "%-*s", width, arg2->sym->value.varVal->name);
+            }
+            else if (arg2->sym != NULL)
+            {
+                fprintf(quad_file, "%-*s\t", width, arg2->sym->value.funcVal->name);
+            }
+        }
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+
+    if (label != 0)
+    {
+        fprintf(quad_file, "%-*u", width, label);
+    }
+    else
+    {
+        fprintf(quad_file, "%-*s", width, "");
+    }
+    fprintf(quad_file, "%-*d\n", width, line);
+    generate_eq_eq(quad_file, EQUALS_PRINT);
+}
+
+
+
 void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq)
 {
     unsigned i = 0;

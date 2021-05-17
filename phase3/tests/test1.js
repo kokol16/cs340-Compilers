@@ -93,7 +93,7 @@ while (x > 0) {
     }
     x = x - 1;
 }*/
-function() {
+/*function() {
 
     while (true) {
         break;
@@ -103,9 +103,9 @@ function() {
         continue;
         break;
     }
-}
+}*/
 //}
-
+ not i==j;
 
 
 //2

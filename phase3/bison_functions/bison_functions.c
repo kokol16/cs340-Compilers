@@ -148,7 +148,7 @@ expr *process_term_lvalue_plus_plus(expr *lvalue, expr **term, SymbolTable *symb
         expr *val = emit_if_table_item(lvalue);
         emit(assign, val, NULL, *term, curr_quad, 0, yylineno);
         emit(add, val, new_expr_const_int(1), val, curr_quad, 0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue->index, val , lvalue, curr_quad, 0, yylineno);
     }
     else
     {
@@ -163,7 +163,7 @@ expr *process_term_plus_plus_lvalue(expr *lvalue, expr **term, SymbolTable *symb
     {
         *term = emit_if_table_item(lvalue);
         emit(add, *term, new_expr_const_int(1), *term, curr_quad, 0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue->index,*term  , lvalue, curr_quad, 0, yylineno);
     }
     else
     {
@@ -184,7 +184,7 @@ expr *process_term_lvalue_minus_minus(expr *lvalue, expr **term, SymbolTable *sy
         expr *val = emit_if_table_item(lvalue);
         emit(assign, val, NULL, *term, curr_quad, 0, yylineno);
         emit(sub, val, new_expr_const_int(1), val, curr_quad, 0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, val, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue->index,val ,lvalue , curr_quad, 0, yylineno);
     }
     else
     {
@@ -200,7 +200,7 @@ expr *process_term_minus_minus_lvalue(expr *lvalue, expr **term, SymbolTable *sy
     {
         *term = emit_if_table_item(lvalue);
         emit(sub, *term, new_expr_const_int(1), *term, curr_quad, 0, yylineno);
-        emit(tablesetelem, lvalue, lvalue->index, *term, curr_quad, 0, yylineno);
+        emit(tablesetelem, lvalue->index,*term ,lvalue , curr_quad, 0, yylineno);
     }
     else
     {
@@ -220,7 +220,7 @@ expr *process_table_indexed(indexed *objects_list, SymbolTable *symboltable)
     tmp = objects_list;
     while (tmp != NULL)
     {
-        emit(tablesetelem, _expr, tmp->left, tmp->right, curr_quad, 0, yylineno);
+        emit(tablesetelem,tmp->left , tmp->right , _expr, curr_quad, 0, yylineno);
         tmp = tmp->next;
     }
     print_indexed_list(objects_list);
@@ -236,7 +236,7 @@ expr *process_array_elist(expr *head, SymbolTable *symboltable)
     emit(tablecreate, t, NULL, NULL, curr_quad, 0, yylineno);
     while (tmp != NULL)
     {
-        emit(tablesetelem, t, new_expr_const_int(i++), tmp, curr_quad, 0, yylineno);
+        emit(tablesetelem, new_expr_const_int(i++) ,tmp  ,t, curr_quad, 0, yylineno);
         tmp = tmp->next;
     }
     return t;
@@ -398,7 +398,7 @@ void process_assign(SymbolTable *symbolTable, expr **lvalue, expr **assign_expr,
     {
         if (lvalue_ptr->type == tableitem_e)
         {
-            emit(tablesetelem, lvalue_ptr, lvalue_ptr->index, _expr, curr_quad, 0, yylineno);
+            emit(tablesetelem,lvalue_ptr->index ,_expr , lvalue_ptr, curr_quad, 0, yylineno);
             *assign_expr = emit_if_table_item(lvalue_ptr);
             (*assign_expr)->type = assignexpr_e;
         }
