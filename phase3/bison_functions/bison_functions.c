@@ -44,7 +44,7 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
         (*$3)->truelist = tmp_1;
         (*$3)->falselist = tmp_2;
 
-        fprintf(stderr,"im in emitt after bool \n" );
+        //fprintf(stderr,"im in emitt after bool \n" );
         //print_list((*$3)->truelist);
         //print_list((*$3)->falselist);
 
@@ -223,7 +223,7 @@ expr *process_table_indexed(indexed *objects_list, SymbolTable *symboltable)
         emit(tablesetelem,tmp->left , tmp->right , _expr, curr_quad, 0, yylineno);
         tmp = tmp->next;
     }
-    print_indexed_list(objects_list);
+    //print_indexed_list(objects_list);
     return _expr;
 }
 

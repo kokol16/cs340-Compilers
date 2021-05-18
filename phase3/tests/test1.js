@@ -73,6 +73,7 @@ for(i=0; true; i++) {
 //x=not (a>b) and not (b<c) or c;
 
 //not i==j;
+a["ads"];
 5+6==4+2;
 //x=a<b or c<d and  e<f;
 

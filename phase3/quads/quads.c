@@ -104,29 +104,33 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
         return;
     }
 
-    fprintf(quad_file, "#%-*u", width, curr_no);
+    fprintf(quad_file, "#%u\t", curr_no);
     opcode_str = opcode_to_string(op);
-    fprintf(quad_file, "%-*s", width, opcode_str);
+    
+    fprintf(quad_file, "<opcode , ");
+    fprintf(quad_file, "%s>\t", opcode_str);
 
+    fprintf(quad_file, "<result , ");
     if (result != NULL)
     {
         if (!print_by_type(result, quad_file))
         {
             if (result->sym != NULL && result->sym->value.varVal != NULL)
             {
-                fprintf(quad_file, "%-*s\t", width, result->sym->value.varVal->name);
+                fprintf(quad_file, "%s >\t", result->sym->value.varVal->name);
             }
             else if (result->sym != NULL)
             {
 
-                fprintf(quad_file, "%-*s\t", width, result->sym->value.funcVal->name);
+                fprintf(quad_file, "%s >\t", result->sym->value.funcVal->name);
             }
         }
     }
     else
     {
-        fprintf(quad_file, "%-*s", width, "");
+        fprintf(quad_file, "%s", ">\t");
     }
+    fprintf(quad_file, "<arg1 , ");
     if (arg1 != NULL)
     {
 
@@ -135,51 +139,52 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
 
             if (arg1->sym != NULL && arg1->sym->value.varVal != NULL)
             {
-                fprintf(quad_file, "%-*s", width, arg1->sym->value.varVal->name);
+                fprintf(quad_file, "%s >\t", arg1->sym->value.varVal->name);
             }
             else if (arg1->sym != NULL)
             {
 
-                fprintf(quad_file, "%-*s", width, arg1->sym->value.funcVal->name);
+                fprintf(quad_file, "%s >\t", arg1->sym->value.funcVal->name);
             }
         }
     }
     else
     {
-        fprintf(quad_file, "%-*s", width, "");
+        fprintf(quad_file, "%s", ">\t");
     }
+    fprintf(quad_file, "<arg2 , ");
     if (arg2 != NULL)
     {
         if (!print_by_type(arg2, quad_file))
         {
             if (arg2->sym != NULL && arg2->sym->value.varVal != NULL)
             {
-                fprintf(quad_file, "%-*s", width, arg2->sym->value.varVal->name);
+                fprintf(quad_file, "%s>\t", arg2->sym->value.varVal->name);
             }
             else if (arg2->sym != NULL)
             {
-                fprintf(quad_file, "%-*s\t", width, arg2->sym->value.funcVal->name);
+                fprintf(quad_file, "%s>\t", arg2->sym->value.funcVal->name);
             }
         }
     }
     else
     {
-        fprintf(quad_file, "%-*s", width, "");
+        fprintf(quad_file, "%s", ">\t");
     }
+    fprintf(quad_file, "<label , ");
 
     if (label != 0)
-    {
-        fprintf(quad_file, "%-*u", width, label);
+    {    
+        fprintf(quad_file, "%u>\t", label);
     }
     else
     {
-        fprintf(quad_file, "%-*s", width, "");
+        fprintf(quad_file, "%s>\t", "");
     }
-    fprintf(quad_file, "%-*d\n", width, line);
+    fprintf(quad_file, "<line , ");
+    fprintf(quad_file, "%d>\n", line);
     generate_eq_eq(quad_file, EQUALS_PRINT);
 }
-
-
 
 void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq)
 {
@@ -193,20 +198,22 @@ void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq)
 void print_quads(FILE *quad_file)
 {
     unsigned i = 1;
-    fprintf(quad_file, "%-*s", width, "#QUAD");
+    /*fprintf(quad_file, "%-*s", width, "#QUAD");
     fprintf(quad_file, "%-*s", width, "opcode");
     fprintf(quad_file, "%-*s", width, "result");
     fprintf(quad_file, "%-*s", width, "arg1");
     fprintf(quad_file, "%-*s", width, "arg2");
     fprintf(quad_file, "%-*s", width, "label");
     fprintf(quad_file, "%-*s\n", width, "line");
-    generate_eq_eq(quad_file, EQUALS_PRINT);
+    generate_eq_eq(quad_file, EQUALS_PRINT);*/
 
     while (i < curr_quad)
     {
         //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
         //print_quad(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
-        print_quad_analytic(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+
+        //print_quad_analytic(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
+        print_quad_analytic_2nd_try(quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].result, quads[i].quad_no, quads[i].label, quads[i].line, quad_file);
 
         i++;
     }
@@ -227,10 +234,10 @@ void print_list(int list)
     while (list != 0 && list < curr_quad)
     {
         int next = quads[list].label;
-        fprintf(stderr, "%d-->", list);
+        //fprintf(stderr, "%d-->", list);
         list = next;
     }
-    fprintf(stderr, "\n");
+    //fprintf(stderr, "\n");
 }
 int newlist(int i)
 {
@@ -258,16 +265,16 @@ int mergelist(int l1, int l2)
 }
 void patchlist(int list, int label)
 {
-    fprintf(stderr, "starting from %d\n", list);
+    //fprintf(stderr, "starting from %d\n", list);
 
     while (list != 0 && list < curr_quad)
     {
         int next = quads[list].label;
         quads[list].label = label;
-        fprintf(stderr, "%d-->", list);
+        //fprintf(stderr, "%d-->", list);
         list = next;
     }
-    fprintf(stderr, "\n");
+    //fprintf(stderr, "\n");
 }
 
 unsigned next_quad(void) { return curr_quad; }
@@ -534,33 +541,33 @@ int print_by_type(expr *_expr, FILE *quad_file)
     {
         if (_expr->boolConst == 0)
         {
-            fprintf(quad_file, "%-*s", width, "false");
+            fprintf(quad_file, "%s>\t",  "false");
         }
         else
         {
-            fprintf(quad_file, "%-*s", width, "true");
+            fprintf(quad_file, "%s>\t",  "true");
         }
         return 1;
     }
     else if (_expr->type == constint_e)
     {
 
-        fprintf(quad_file, "%-*d", width, _expr->intConst);
+        fprintf(quad_file, "%d>\t",  _expr->intConst);
         return 1;
     }
     else if (_expr->type == constdouble_e)
     {
-        fprintf(quad_file, "%-*f", width, _expr->doubleConst);
+        fprintf(quad_file, "%f>\t",  _expr->doubleConst);
         return 1;
     }
     else if (_expr->type == conststring_e)
     {
-        fprintf(quad_file, "\"%-*s\"", width, _expr->strConst);
+        fprintf(quad_file, "\"%s\">\t",  _expr->strConst);
         return 1;
     }
     else if (_expr->type == nil_e)
     {
-        fprintf(quad_file, "%-*s", width, "nil");
+        fprintf(quad_file, "%s>\t",  "nil");
         return 1;
     }
     return 0;

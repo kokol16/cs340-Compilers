@@ -207,7 +207,7 @@ expr:   assignexpr  {print_to_stream("Expression(assign)");$$=$1;}
                                 $$=new_expr(boolexpr_e);
                                 $$->sym=new_temp(symbolTable);
                                 $$->boolConst=are_same_type($1,$4);
-                                fprintf(stderr, ": %d\n",curr_quad);
+                                //fprintf(stderr, ": %d\n",curr_quad);
                                 create_emits_after_bool_op(&$4,symbolTable);
 
                               
@@ -732,7 +732,7 @@ int main(int argc , char * argv[])
     symbolTable_print_scopes(symbolTable,100);
  
     FILE *quad_file = fopen("quads.txt", "w+");
-    fprintf(stderr,"compile error %d\n",found_compile_error);
+    //fprintf(stderr,"compile error %d\n",found_compile_error);
     if(! found_compile_error   )
     {
         print_quads(quad_file);
