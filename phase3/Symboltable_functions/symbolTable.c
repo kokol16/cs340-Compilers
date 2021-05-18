@@ -248,9 +248,9 @@ SymbolTableEntry *create_bucket_func(short isActive, Function *func, enum Symbol
     bucket->value.funcVal = func;
     bucket->value.funcVal->head_arg = NULL;
 
-    bucket->space = curr_scope_space();
+    /*bucket->space = curr_scope_space();
     bucket->offset = curr_scope_offset();
-    in_current_scope_offset();
+    in_current_scope_offset();*/
     return bucket;
 }
 
