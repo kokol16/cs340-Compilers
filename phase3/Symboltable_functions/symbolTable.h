@@ -235,7 +235,7 @@ SymbolTableEntry *create_bucket_func(short isActive, Function *func, enum Symbol
  * @param  scope: given scope
  * @retval None
  */
-void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope);
+int  symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope);
 
 /**
  * @brief  a function that inserts all library functions in the symbol table

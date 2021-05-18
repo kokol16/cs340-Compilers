@@ -1,11 +1,10 @@
 #include "bison_functions.h"
 
 #define lvalue_ptr (*lvalue)
-int Came_From_OP = 0;
 
 int are_same_type(expr *left, expr *right)
 {
-    if (left->type == right->type || left->type == tableitem_e && right->type == nil_e)
+    /*if (left->type == right->type || left->type == tableitem_e && right->type == nil_e)
     {
         return 1;
     }
@@ -14,7 +13,8 @@ int are_same_type(expr *left, expr *right)
         fprintf(stderr, "not same type of expressions\n");
         //found_compile_error = 1;
         return 0;
-    }
+    }*/
+    return 1;
 }
 int check_if_bool_emit(expr **left)
 {
@@ -342,17 +342,13 @@ void process_local_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
         else
         {
             symbolTable_insert(symbolTable, bucket);
-            bucket->space = curr_scope_space();
-            bucket->offset = curr_scope_offset();
-            in_current_scope_offset();
+         
         }
     }
     else
     {
         bucket = find_bucket_by_scope_and_name(symbolTable, id_name, scope);
-        bucket->space = curr_scope_space();
-        bucket->offset = curr_scope_offset();
-        in_current_scope_offset();
+       
     }
     lvalue_ptr = lvalue_expr(bucket);
 }
@@ -372,9 +368,7 @@ void process_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
             bucket = create_bucket_var(1, var, GLOBAL);
 
         symbolTable_insert(symbolTable, bucket);
-        bucket->space = curr_scope_space();
-        bucket->offset = curr_scope_offset();
-        in_current_scope_offset();
+      
     }
     lvalue_ptr = lvalue_expr(bucket);
 }
@@ -501,6 +495,7 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
     if (func_prefix->sym != NULL)
         func_prefix->sym->value.funcVal->total_locals = total_locals;
     unsigned offset = pop_scope_offset_stack();
+    //fprintf(stderr,"restoring %u\n",offset);
     restore_curr_scope_offset(offset);
     emit(funcend, func_prefix, NULL, NULL, curr_quad, 0, yylineno);
     return func_prefix;
@@ -588,6 +583,7 @@ void process_function_arguments(SymbolTable *symbolTable, char *arg_name)
     else
     {
         symbolTable_insert(symbolTable, bucket);
+       
         create_argument(symbolTable, arg_name, scope);
     }
 }

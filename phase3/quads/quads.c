@@ -8,6 +8,7 @@ int found_compile_error = 0;
 #define width 20
 #define EQUALS_PRINT 125
 
+#define SCOPE_SPACE_INFO 0
 SymbolTable *symbolTable;
 void print_quad_analytic(iopcode op, expr *arg1, expr *arg2, expr *result, unsigned curr_no, unsigned label, unsigned line, FILE *quad_file)
 {
@@ -106,10 +107,15 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
 
     fprintf(quad_file, "#%u\t", curr_no);
     opcode_str = opcode_to_string(op);
-    
+
     fprintf(quad_file, "<opcode , ");
     fprintf(quad_file, "%s>\t", opcode_str);
 
+    if (SCOPE_SPACE_INFO && result && result->sym)
+    {
+
+        fprintf(quad_file, "(offs: %u) ", result->sym->offset);
+    }
     fprintf(quad_file, "<result , ");
     if (result != NULL)
     {
@@ -119,7 +125,7 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
             {
                 fprintf(quad_file, "%s >\t", result->sym->value.varVal->name);
             }
-            else if (result->sym != NULL  && result->sym->value.funcVal != NULL)
+            else if (result->sym != NULL && result->sym->value.funcVal != NULL)
             {
                 fprintf(quad_file, "%s >\t", result->sym->value.funcVal->name);
             }
@@ -128,6 +134,11 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
     else
     {
         fprintf(quad_file, "%s", ">\t");
+    }
+    if (SCOPE_SPACE_INFO && arg1 && arg1->sym)
+    {
+
+        fprintf(quad_file, "(offs: %u) ", arg1->sym->offset);
     }
     fprintf(quad_file, "<arg1 , ");
     if (arg1 != NULL)
@@ -151,6 +162,11 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
     {
         fprintf(quad_file, "%s", ">\t");
     }
+    if (SCOPE_SPACE_INFO && arg2 && arg2->sym)
+    {
+
+        fprintf(quad_file, "(offs: %u) ", arg2->sym->offset);
+    }
     fprintf(quad_file, "<arg2 , ");
     if (arg2 != NULL)
     {
@@ -173,7 +189,7 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
     fprintf(quad_file, "<label , ");
 
     if (label != 0)
-    {    
+    {
         fprintf(quad_file, "%u>\t", label);
     }
     else
@@ -182,7 +198,7 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
     }
     fprintf(quad_file, "<line , ");
     fprintf(quad_file, "%d>\n", line);
-    
+
     generate_eq_eq(quad_file, EQUALS_PRINT);
 }
 
@@ -367,6 +383,8 @@ SymbolTableEntry *new_temp(SymbolTable *symbolTable)
                 bucket = create_bucket_var(1, var, LOCAL);
             else
                 bucket = create_bucket_var(1, var, GLOBAL);
+
+           
             symbolTable_insert(symbolTable, bucket);
         }
     }
@@ -377,6 +395,7 @@ SymbolTableEntry *new_temp(SymbolTable *symbolTable)
             bucket = create_bucket_var(1, var, LOCAL);
         else
             bucket = create_bucket_var(1, var, GLOBAL);
+
         symbolTable_insert(symbolTable, bucket);
     }
 
@@ -541,33 +560,33 @@ int print_by_type(expr *_expr, FILE *quad_file)
     {
         if (_expr->boolConst == 0)
         {
-            fprintf(quad_file, "%s>\t",  "false");
+            fprintf(quad_file, "%s>\t", "false");
         }
         else
         {
-            fprintf(quad_file, "%s>\t",  "true");
+            fprintf(quad_file, "%s>\t", "true");
         }
         return 1;
     }
     else if (_expr->type == constint_e)
     {
 
-        fprintf(quad_file, "%d>\t",  _expr->intConst);
+        fprintf(quad_file, "%d>\t", _expr->intConst);
         return 1;
     }
     else if (_expr->type == constdouble_e)
     {
-        fprintf(quad_file, "%f>\t",  _expr->doubleConst);
+        fprintf(quad_file, "%f>\t", _expr->doubleConst);
         return 1;
     }
     else if (_expr->type == conststring_e)
     {
-        fprintf(quad_file, "\"%s\">\t",  _expr->strConst);
+        fprintf(quad_file, "\"%s\">\t", _expr->strConst);
         return 1;
     }
     else if (_expr->type == nil_e)
     {
-        fprintf(quad_file, "%s>\t",  "nil");
+        fprintf(quad_file, "%s>\t", "nil");
         return 1;
     }
     return 0;

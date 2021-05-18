@@ -1,5 +1,6 @@
 #include "symbolTable.h"
 #include "../general_functions/lib.h"
+#define DEBUG_OFFSET 0
 unsigned int SIZE = 10;
 int yylineno;
 short is_local_id = 0;
@@ -222,6 +223,10 @@ SymbolTableEntry *create_bucket_var(short isActive, Variable *var, enum SymbolTy
     bucket->value.funcVal = NULL;
     bucket->value.varVal = var;
 
+    bucket->space = curr_scope_space();
+    bucket->offset = curr_scope_offset();
+    in_current_scope_offset();
+
     //printf("lala%s\n",bucket->value.funcVal->name);
 
     bucket->isScopeListHead = 0;
@@ -242,6 +247,10 @@ SymbolTableEntry *create_bucket_func(short isActive, Function *func, enum Symbol
     bucket->value.varVal = NULL;
     bucket->value.funcVal = func;
     bucket->value.funcVal->head_arg = NULL;
+
+    bucket->space = curr_scope_space();
+    bucket->offset = curr_scope_offset();
+    in_current_scope_offset();
     return bucket;
 }
 
@@ -332,6 +341,8 @@ void print_var(SymbolTableEntry *var)
     fprintf(output_file, " (line  %d)", var->value.varVal->line);
     fprintf(output_file, " (scope %d)", var->value.varVal->scope);
     fprintf(output_file, " (active %d)", var->isActive);
+    if (DEBUG_OFFSET)
+        fprintf(output_file, " (offset %u)", var->offset);
 }
 void print_func(SymbolTableEntry *func)
 {
@@ -344,6 +355,8 @@ void print_func(SymbolTableEntry *func)
     fprintf(output_file, " (line %d)", func->value.funcVal->line);
     fprintf(output_file, " (scope %d)", func->value.funcVal->scope);
     fprintf(output_file, " (active %d)", func->isActive);
+    if (DEBUG_OFFSET)
+        fprintf(output_file, " (offset %u)", func->offset);
 }
 void symbolTable_print(SymbolTable *symbolTable)
 {
@@ -365,17 +378,19 @@ void symbolTable_print(SymbolTable *symbolTable)
         }
     }
 }
-void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope)
+int symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope)
 {
     unsigned int i = 0;
     SymbolTableEntry *head, *tmp;
     if (symbolTable == NULL)
-        return;
+        return 0;
 
     head = symbolTable_lookup_head(symbolTable, scope);
     tmp = head;
     if (tmp != NULL)
         fprintf(output_file, "=============== scope #%d=====================\n", scope);
+    else
+        return 0;
 
     while (tmp != NULL)
     {
@@ -393,6 +408,7 @@ void symbolTable_print_scope_list(SymbolTable *symbolTable, unsigned int scope)
 
         tmp = tmp->next_same_scope;
     }
+    return 1;
 }
 
 void symbolTable_print_scopes(SymbolTable *symbolTable, unsigned int scope)
@@ -405,7 +421,8 @@ void symbolTable_print_scopes(SymbolTable *symbolTable, unsigned int scope)
 
     while (tmp_scope < scope)
     {
-        symbolTable_print_scope_list(symbolTable, tmp_scope);
+        if (!symbolTable_print_scope_list(symbolTable, tmp_scope))
+            break;
         tmp_scope++;
     }
 }
@@ -707,8 +724,6 @@ SymbolTableEntry *find_bucket_by_scope_and_name(SymbolTable *symtable, char *nam
     if (symtable == NULL)
         return NULL;
 
-    
-
     bucket = symbolTable_lookup_head(symtable, scope);
 
     //printf("%s\n", name);
@@ -900,12 +915,14 @@ void print_stack_func_loop()
 
 unsigned pop_scope_offset_stack()
 {
+    unsigned offset = 0;
     if (scope_offset_stack_root == NULL)
     {
         return 0;
     }
+    offset = scope_offset_stack_root->scope_offset;
     scope_offset_stack_root = scope_offset_stack_root->next;
-    return 1;
+    return offset;
 }
 
 int push_scope_offset_stack(unsigned scope_offset)
