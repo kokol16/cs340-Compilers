@@ -119,9 +119,8 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
             {
                 fprintf(quad_file, "%s >\t", result->sym->value.varVal->name);
             }
-            else if (result->sym != NULL)
+            else if (result->sym != NULL  && result->sym->value.funcVal != NULL)
             {
-
                 fprintf(quad_file, "%s >\t", result->sym->value.funcVal->name);
             }
         }
@@ -183,6 +182,7 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
     }
     fprintf(quad_file, "<line , ");
     fprintf(quad_file, "%d>\n", line);
+    
     generate_eq_eq(quad_file, EQUALS_PRINT);
 }
 

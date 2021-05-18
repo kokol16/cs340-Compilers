@@ -73,8 +73,26 @@ for(i=0; true; i++) {
 //x=not (a>b) and not (b<c) or c;
 
 //not i==j;
-a["ads"];
+/*a["ads"];
 5+6==4+2;
+
+function ( x1 ,x2 ,x3)
+{
+    local a;
+    local blur;
+    this;
+    function (y1,y2,y3)
+    {
+        local k1;
+        k2;
+        local k3;
+    }
+}*/
+x=(
+    -(function(x){
+        return[{"x":x}];
+    })(2).x+2
+) and not false or 2>=2;
 //x=a<b or c<d and  e<f;
 
 //1
