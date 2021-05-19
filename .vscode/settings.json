@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "symboltable.h": "c",
-        "bison_functions.h": "c"
+        "bison_functions.h": "c",
+        "lib.h": "c",
+        "quads.h": "c"
     }
 }

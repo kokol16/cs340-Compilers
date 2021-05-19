@@ -83,7 +83,8 @@ short check_access(SymbolTable *symbolTable, unsigned int scope, int yylineno, u
     }
     const char *id_name;
     id_name = ((*lvalue)->value.varVal != NULL) ? (*lvalue)->value.varVal->name : (*lvalue)->value.funcVal->name;
-    if((*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope || (*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope )
+    if((*lvalue)->value.varVal != NULL &&  (*lvalue)->value.varVal->scope==scope || (*lvalue)->value.varVal != NULL 
+    &&  (*lvalue)->value.varVal->scope==scope )
     {
         //all good
     }
