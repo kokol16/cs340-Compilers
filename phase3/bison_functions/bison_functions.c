@@ -51,9 +51,9 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
         patchlist((*$3)->truelist, curr_quad);
         patchlist((*$3)->falselist, curr_quad + 2);
         //fprintf(stderr, "false list : %d\n", (*$3)->falselist);
-        emit(assign, (*$3), NULL, new_expr_const_bool(1), curr_quad, 0, yylineno);
+        emit(assign,new_expr_const_bool(1), NULL, (*$3) , curr_quad, 0, yylineno);
         emit(jump, NULL, NULL, NULL, curr_quad, curr_quad + 2, yylineno);
-        emit(assign, (*$3), NULL, new_expr_const_bool(0), curr_quad, 0, yylineno);
+        emit(assign, new_expr_const_bool(0), NULL, (*$3), curr_quad, 0, yylineno);
     }
 }
 
