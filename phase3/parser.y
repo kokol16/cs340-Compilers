@@ -384,15 +384,15 @@ member:    lvalue DOT ID {print_to_stream("Member");   $$= member_item($1,$3); }
                                                     $$->sym=$1->sym;
                                                     $$->index=$3;
                                                     }
-            | call DOT ID {print_to_stream("Member");}
+            | call DOT ID {print_to_stream("Member"); $$= member_item($1,$3);}
             | call LEFT_SQUARE expr RIGHT_SQUARE {
                 
                 is_first_time=1;
                 create_emits_after_bool_op(&$3,symbolTable);   
                 print_to_stream("Member");} ;
 
-call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$=make_call($1,$3,symbolTable);} 
-            | lvalue callsuffix { print_to_stream("Call5"); 
+call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call"); $$=make_call($1,$3,symbolTable);} 
+            | lvalue callsuffix { print_to_stream("Call"); 
                                                             process_callsuffix(symbolTable, &$1);
                                                             $1=emit_if_table_item($1);
                                                             if($2!=NULL && $2->method){
@@ -420,17 +420,17 @@ call:      call LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call1"); $$
                                                             
 
                                 }
-            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call2"); expr* func=new_expr(programfunc_e);
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS elist RIGHT_BRACKETS {print_to_stream("Call"); expr* func=new_expr(programfunc_e);
                                                                                                                  if($2->sym!=NULL)
                                                                                                                  func->sym=$2->sym;
                                                                                                                  $$=make_call(func,$5,symbolTable);}
-            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call3");
+            | LEFT_BRACKETS funcdef RIGHT_BRACKETS LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call");
                                                                                     expr* func=new_expr(programfunc_e);
                                                                                     if($2->sym!=NULL)
                                                                                     func->sym=$2->sym;
                                                                                     $$=make_call(func,NULL,symbolTable);
                                                                                 }
-            | call LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call4"); $$=make_call($$,NULL,symbolTable);};
+            | call LEFT_BRACKETS  RIGHT_BRACKETS {print_to_stream("Call"); $$=make_call($$,NULL,symbolTable);};
 
 callsuffix: normcall {print_to_stream("Call Suffix"); $$=$1;}
             | methodcall {print_to_stream("Call Suffix"); $$=$1;} ;
@@ -472,11 +472,6 @@ elist:   expr   {print_to_stream("Expression List"); is_first_time=1;
 
                                                                     }
                                                                 
-                                                                    
-                                                                    
-                                                                
-                                                                  
-                                                                    
                                                                        };
             
 objectdef: LEFT_SQUARE  elist  RIGHT_SQUARE     {print_to_stream("Object Definition");  $$=process_array_elist($2,symbolTable);}
@@ -556,11 +551,7 @@ whilestmt: whilestart whilecond stmt {
                                                 
                                             }
                                             
-                                                
-                                            
-                                            
-
-                                            
+                                     
                                     };
 
 whilestart: WHILE   {  
