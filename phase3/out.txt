@@ -1,0 +1,71 @@
+Lvalue
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Lvalue
+Primary(lvalue)
+Term
+Expression(term)
+Expression List
+Expression List Comma
+Expression List Comma
+Expression List Comma
+Expression List Comma
+Expression List Comma
+Expression List Comma
+Expression List Comma
+Expression List Comma
+Method Call
+Call Suffix
+Call
+Primary
+Term
+Expression(term)
+Statement(expression semicolon)
+Statements
+Program
+=============== scope #0=====================
+ "print" [library function] (line 0) (scope 0) (active 1)
+ "input" [library function] (line 0) (scope 0) (active 1)
+ "objectmemberkeys" [library function] (line 0) (scope 0) (active 1)
+ "objecttotalmembers" [library function] (line 0) (scope 0) (active 1)
+ "objectcopy" [library function] (line 0) (scope 0) (active 1)
+ "totalarguments" [library function] (line 0) (scope 0) (active 1)
+ "argument" [library function] (line 0) (scope 0) (active 1)
+ "typeof" [library function] (line 0) (scope 0) (active 1)
+ "strtonum" [library function] (line 0) (scope 0) (active 1)
+ "sqrt" [library function] (line 0) (scope 0) (active 1)
+ "cos" [library function] (line 0) (scope 0) (active 1)
+ "sin" [library function] (line 0) (scope 0) (active 1)
+ "a" [global variable] (line  1) (scope 0) (active 1)
+ "_t0" [global variable] (line  1) (scope 0) (active 1)
+ "_t1" [global variable] (line  1) (scope 0) (active 1)

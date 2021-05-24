@@ -154,17 +154,4 @@ while (x > 0) {
  */
 
 
- while(1)
-{
-    break;
-    continue;
-
-    while(1)
-    {
-        break;
-        continue;
-
-    }
-    break;
-    continue;
-}
+x=3+4.1+5.2%6 * 8.4 * 4 ;

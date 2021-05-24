@@ -20,5 +20,3 @@
 ./al tests/phase3/test15.asc        out.txt
 ./al tests/phase3/vavouris.asc      out.txt
 ./al tests/phase3/vavouris1.asc     out.txt
-
-
