@@ -3,6 +3,8 @@
         "symboltable.h": "c",
         "bison_functions.h": "c",
         "lib.h": "c",
-        "quads.h": "c"
+        "quads.h": "c",
+        "type_traits": "c",
+        "xtr1common": "c"
     }
 }

@@ -3,9 +3,6 @@
 #include "../quads/quads.h"
 #include "../general_functions/lib.h"
 
-#define OP_OR 1
-#define OP_AND 2
-#define OP_NOT 3
 
 
 extern  int Came_From_OP;
