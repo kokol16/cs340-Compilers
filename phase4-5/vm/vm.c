@@ -83,6 +83,8 @@ double *consts_number;
 unsigned total_numbers;
 char **consts_string;
 unsigned total_strings;
+unsigned total_user_funcs;
+struct userfunc *user_funcs;
 void read_binary_file()
 {
     unsigned magic_number;
@@ -116,6 +118,27 @@ void read_binary_file()
         fread(consts_string[i], sizeof(char), size, fp);
     }
 
+   fread(&total_user_funcs, sizeof( total_user_funcs), 1, fp);
+
+    fprintf(stderr, "total user funcs %u\n", total_user_funcs);
+
+    user_funcs = malloc(sizeof(struct userfunc*) * total_user_funcs );
+    
+    
+
+    //10 5 "lala" 6 "ofsafdf"
+    for (i = 0; i <  total_user_funcs; i++)
+    {
+        fread( &user_funcs[i].address, sizeof(user_funcs[i].address), 1, fp);
+        fread( &user_funcs[i].localSize, sizeof(user_funcs[i].localSize), 1, fp);
+        fread(&size, sizeof(size), 1, fp);
+        user_funcs[i].id = malloc(sizeof(char) * size);
+        fread(user_funcs[i].id, sizeof(char), size, fp);
+    }
+ for (i = 0; i <  total_user_funcs; i++)
+    {
+        fprintf(stderr, "%s\n", user_funcs[i].id);
+    }
   
     for (i = 0; i < total_strings; i++)
     {

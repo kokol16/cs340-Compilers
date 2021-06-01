@@ -638,6 +638,17 @@ void create_binary_file()
         fprintf(stderr,"%s\n", string_consts[i]);
         fwrite((string_consts[i]), sizeof(char), str_length, fp);
     }
-
+     fprintf(stderr,"total user funcs : %u\n",total_user_funcs);
+    fwrite(&total_user_funcs, sizeof(total_user_funcs), 1, fp);
+    
+    for (i = 0; i < total_user_funcs; i++)
+    {
+       
+        fwrite((&user_funcs[i].address), sizeof(user_funcs[i].address), 1, fp);
+        fwrite((&user_funcs[i].localSize), sizeof(user_funcs[i].localSize), 1, fp);
+        int id_length = strlen(user_funcs[i].id) + 1;
+        fwrite(&id_length, sizeof(int), 1, fp);
+        fwrite((user_funcs[i].id), sizeof(char), id_length, fp);
+    }
     fclose(fp);
 }

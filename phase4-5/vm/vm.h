@@ -2,6 +2,12 @@
 #define AVM_STACK_SIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_SIZE 211
+typedef struct userfunc
+{
+    unsigned address;
+    unsigned localSize;
+    char *id;
+} userfunc;
 typedef enum avm_memcell_t
 {
     number_m = 0,

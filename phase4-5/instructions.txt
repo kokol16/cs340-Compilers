@@ -1,6 +1,15 @@
-#1	ASSIGN		 result: type: 1(global_a),  val: 0:a		arg1: type: 5(string_a),  val: 0:"lala"		
-#2	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:a	
-#3	ASSIGN		 result: type: 1(global_a),  val: 0:a		arg1: type: 5(string_a),  val: 1:"xoxo"		
-#4	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:a	
-#5	ASSIGN		 result: type: 1(global_a),  val: 0:a		arg1: type: 4(number_a),  val: 0:1.000000		
-#6	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:a	
+#1	JUMP		 result: type: 0(label_a),  val: 10	
+#2	FUNCENTER		 result: type: 8(userfunc_a),  val: 1:f	
+#3	ASSIGN		 result: type: 3(local_a),  val: 0:a		arg1: type: 5(string_a),  val: 0:"lala"		
+#4	ASSIGN		 result: type: 3(local_a),  val: 1:_t0		arg1: type: 3(local_a),  val: 0:a	
+#5	ASSIGN		 result: type: 3(local_a),  val: 0:a		arg1: type: 5(string_a),  val: 1:"xoxo"		
+#6	ASSIGN		 result: type: 3(local_a),  val: 1:_t0		arg1: type: 3(local_a),  val: 0:a	
+#7	ASSIGN		 result: type: 3(local_a),  val: 0:a		arg1: type: 4(number_a),  val: 0:1.000000		
+#8	ASSIGN		 result: type: 3(local_a),  val: 1:_t0		arg1: type: 3(local_a),  val: 0:a	
+#9	FUNCEXIT		 result: type: 8(userfunc_a),  val: 2:f	
+#10	JUMP		 result: type: 0(label_a),  val: 13	
+#11	FUNCENTER		 result: type: 8(userfunc_a),  val: 4:$func1	
+#12	FUNCEXIT		 result: type: 8(userfunc_a),  val: 5:$func1	
+#13	JUMP		 result: type: 0(label_a),  val: 16	
+#14	FUNCENTER		 result: type: 8(userfunc_a),  val: 7:g	
+#15	FUNCEXIT		 result: type: 8(userfunc_a),  val: 8:g	
