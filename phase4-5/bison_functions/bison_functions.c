@@ -494,9 +494,12 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
 {
     exit_scope_space();
     //printf("scope space : %u\n", curr_scope_space());
-    //printf("total locals  : %u\n", total_locals);
     if (func_prefix->sym != NULL)
+    {
+        fprintf(stderr, "total locals  : %u\n", total_locals);
+
         func_prefix->sym->value.funcVal->total_locals = total_locals;
+    }
     unsigned offset = pop_scope_offset_stack();
     //fprintf(stderr,"restoring %u\n",offset);
     restore_curr_scope_offset(offset);
@@ -628,27 +631,59 @@ void create_binary_file()
     fprintf(stderr, "total numbers : %u\n", total_num_consts);
     fwrite(&total_num_consts, sizeof(total_num_consts), 1, fp);
     fwrite(num_consts, sizeof(double), total_num_consts, fp);
-    fprintf(stderr,"total_string_consts : %u\n",total_string_consts);
+    fprintf(stderr, "total_string_consts : %u\n", total_string_consts);
     fwrite(&total_string_consts, sizeof(total_string_consts), 1, fp);
     int i = 0;
     for (i = 0; i < total_string_consts; i++)
     {
         int str_length = strlen(string_consts[i]) + 1;
         fwrite(&str_length, sizeof(int), 1, fp);
-        fprintf(stderr,"%s\n", string_consts[i]);
+        fprintf(stderr, "%s\n", string_consts[i]);
         fwrite((string_consts[i]), sizeof(char), str_length, fp);
     }
-     fprintf(stderr,"total user funcs : %u\n",total_user_funcs);
+    fprintf(stderr, "total user funcs : %u\n", total_user_funcs);
     fwrite(&total_user_funcs, sizeof(total_user_funcs), 1, fp);
-    
+
     for (i = 0; i < total_user_funcs; i++)
     {
-       
+        /*fprintf(stderr, "=========\n");
+        fprintf(stderr, "id: %s\n", user_funcs[i].id);
+        fprintf(stderr, "localsize: %u\n", user_funcs[i].localSize);
+        fprintf(stderr, "adress: %u\n", user_funcs[i].address);
+        fprintf(stderr, "=========\n");*/
+
         fwrite((&user_funcs[i].address), sizeof(user_funcs[i].address), 1, fp);
         fwrite((&user_funcs[i].localSize), sizeof(user_funcs[i].localSize), 1, fp);
         int id_length = strlen(user_funcs[i].id) + 1;
         fwrite(&id_length, sizeof(int), 1, fp);
         fwrite((user_funcs[i].id), sizeof(char), id_length, fp);
     }
+    //10 5 "lala" 6 "ofsafdf"
+    fprintf(stderr, "total_named_lib_funcs : %u\n", total_named_lib_funcs);
+    fwrite(&total_named_lib_funcs, sizeof(total_named_lib_funcs), 1, fp);
+
+    for (i = 0; i < total_named_lib_funcs; i++)
+    {
+        int str_length = strlen(named_lib_funcs[i]) + 1;
+        fwrite(&str_length, sizeof(int), 1, fp);
+        fprintf(stderr, "%s\n", named_lib_funcs[i]);
+        fwrite((named_lib_funcs[i]), sizeof(char), str_length, fp);
+    }
+    fwrite(&curr_instr, sizeof(unsigned), 1, fp);
+
+    for (i = 1; i < curr_instr; i++)
+    {
+        fwrite(&instructions[i].opcode, sizeof(int), 1, fp);
+
+        fwrite(&instructions[i].result.type, sizeof(int), 1, fp);
+        fwrite(&instructions[i].result.val, sizeof(unsigned), 1, fp);
+
+        fwrite(&instructions[i].arg1.type, sizeof(int), 1, fp);
+        fwrite(&instructions[i].arg1.val, sizeof(unsigned), 1, fp);
+
+        fwrite(&instructions[i].arg2.type, sizeof(int), 1, fp);
+        fwrite(&instructions[i].arg2.val, sizeof(unsigned), 1, fp);
+    }
+
     fclose(fp);
 }

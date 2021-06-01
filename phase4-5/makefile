@@ -5,3 +5,6 @@ run:  scanner.l  parser.y
 
 clean:
 	rm -f *.o  lex.yy.c y.tab.c y.tab.h parser.h parser.c y.output scanner.c 
+
+make avm:
+	gcc "vm/vm.c" -o vm_exec 

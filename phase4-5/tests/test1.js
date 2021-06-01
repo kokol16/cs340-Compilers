@@ -189,5 +189,7 @@ function g(){
     
 }
 
+print();
+x=print();
 
 //a= b and g or not d and e or length;

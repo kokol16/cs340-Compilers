@@ -496,14 +496,17 @@ indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Ele
 block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=NULL;}       
        |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=$3;} ;  
        
-block_func: LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}  RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
- scope--; iam_in_function--;   pop(functions_stack);    pop_func_loop(); $$=curr_scope_offset(); exit_scope_space();  }       
+block_func: LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}  
+                        RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
+                        scope--; iam_in_function--;   pop(functions_stack);    pop_func_loop(); $$=curr_scope_offset(); exit_scope_space();  }     
+
        |LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}    statements  RIGHT_BRACE {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope); scope--;  iam_in_function--;
      pop(functions_stack);  pop_func_loop(); $$=curr_scope_offset(); exit_scope_space();  } ;  
   
 
 funcdef: funcprefix  LEFT_BRACKETS {scope++;}  
-                        idlist   RIGHT_BRACKETS {enter_scope_space(); reset_function_locals_offset(); }
+                        idlist   
+                    RIGHT_BRACKETS {enter_scope_space(); reset_function_locals_offset(); }
                       block_func {print_to_stream("Function Definition");   }
                       {
                           $$ = process_funcdef($1, $7);

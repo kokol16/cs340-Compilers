@@ -108,7 +108,7 @@ void reset_instruction(instruction *t)
 }
 void generate(vmopcode opcode, quad *quad)
 {
-    fprintf(stderr, "generate\n");
+    //fprintf(stderr, "generate\n");
     instruction t = {0};
     reset_instruction(&t);
 
@@ -163,7 +163,7 @@ void generate_TABLESETELEM(quad *quad)
 }
 void generate_ASSIGN(quad *quad)
 {
-    fprintf(stderr, "generate assingn\n");
+    //fprintf(stderr, "generate assingn\n");
     generate(assign_v, quad);
 }
 
@@ -176,7 +176,7 @@ void generate_NOP(quad *quad)
 }
 void generate_relational(vmopcode op, quad *quad)
 {
-    fprintf(stderr, "generate_relational\n");
+    //fprintf(stderr, "generate_relational\n");
     instruction t;
     reset_instruction(&t);
     t.opcode = op;
@@ -449,8 +449,8 @@ void make_operand(expr *e, vmarg *arg)
     case programfunc_e:
     {
         arg->type = userfunc_a;
-        arg->name = e->sym->value.funcVal->name;
-        //fprintf(stderr, "program func\n");
+        arg->name = strdup(e->sym->value.funcVal->name);
+        fprintf(stderr, "program func\n");
         arg->val = userfuncs_new_func(e->sym);
         //fprintf(stderr, "arg->val: %d\n", arg->val);
         break;
@@ -518,19 +518,17 @@ unsigned libfuncs_new_used(const char *s)
 
 unsigned userfuncs_new_func(SymbolTableEntry *sym)
 {
-    if (total_user_funcs == 0)
+   /* if (total_user_funcs == 0)
     {
         user_funcs = malloc(sizeof(userfunc) * EXPAND_SIZE);
     }
     if (total_user_funcs % EXPAND_SIZE == 0)
-        expand_user_funcs();
-    userfunc _user_func;
-    _user_func;
+        expand_user_funcs();*/
+    /*userfunc _user_func;
     memset(&_user_func, 0, sizeof(userfunc));
     _user_func.id = strdup(sym->value.funcVal->name);
-
-    user_funcs[total_user_funcs++] = _user_func;
-    return total_user_funcs - 1;
+    user_funcs[total_user_funcs++] = _user_func;*/
+    return total_user_funcs-1;
 }
 
 void make_retvaloperand(vmarg *arg)
@@ -594,6 +592,9 @@ void generate_funcstart(quad *quad)
     f->taddress = nextinstructionlabel();
     f->value.funcVal->func_enter_jump = nextinstructionlabel() - 1;
     quad->taddress = nextinstructionlabel();
+
+    //fprintf(stderr, "total locals  : %u\n", f->value.funcVal->total_locals);
+
     user_funcs_add(f->value.funcVal->name, f->taddress, f->value.funcVal->total_locals);
     push_func_start_stack(f);
     t.opcode = funcenter_v;
@@ -689,12 +690,19 @@ unsigned user_funcs_add(const char *id, unsigned tadress, unsigned total_locals)
     }
     else if (total_user_funcs % EXPAND_SIZE == 0)
         expand_user_funcs();
-    userfunc _user_func;
-    _user_func.id = strdup(id);
-    _user_func.address = tadress;
-    _user_func.localSize = total_locals;
-    user_funcs[total_user_funcs++] = _user_func;
-    return total_user_funcs - 1;
+    // userfunc _user_func;
+    // _user_func.id = strdup(id);
+    //_user_func.address = tadress;
+    //_user_func.localSize = total_locals;
+    //user_funcs[total_user_funcs++] = _user_func;
+
+    user_funcs[total_user_funcs].id = strdup(id);
+    user_funcs[total_user_funcs].address = tadress;
+    user_funcs[total_user_funcs].localSize = total_locals;
+    total_user_funcs++;
+    //fprintf(stderr, "total locals  : %u\n", user_funcs[total_user_funcs].localSize);
+
+    return total_user_funcs-1;
 }
 
 void patch_incomplete_jumps()
