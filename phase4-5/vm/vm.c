@@ -77,6 +77,7 @@ void avm_table_destroy(avm_table *t)
 
 int main()
 {
+    fprintf(stderr, "===========VM============\n");
     read_binary_file();
 }
 double *consts_number;
@@ -112,7 +113,7 @@ void read_binary_file()
 
     consts_string = malloc(sizeof(char) * total_strings);
     int i = 0;
-    unsigned size = 0;
+    int size = 0;
 
     //10 5 "lala" 6 "ofsafdf"
     for (i = 0; i < total_strings; i++)
@@ -131,16 +132,28 @@ void read_binary_file()
     //functions
     for (i = 0; i < total_user_funcs; i++)
     {
-        fread(&user_funcs[i].address, sizeof(user_funcs[i].address), 1, fp);
-        fread(&user_funcs[i].localSize, sizeof(user_funcs[i].localSize), 1, fp);
+        size = 0;
         fread(&size, sizeof(size), 1, fp);
+
         user_funcs[i].id = malloc(sizeof(char) * size);
         fread(user_funcs[i].id, sizeof(char), size, fp);
+        fread(&user_funcs[i].address, sizeof(user_funcs[i].address), 1, fp);
+        fread(&user_funcs[i].localSize, sizeof(user_funcs[i].localSize), 1, fp);
+        fprintf(stderr, "i=: %d\n", i);
+
+        fprintf(stderr, "id: %s\n", user_funcs[0].id);
+
         /*fprintf(stderr, "=========\n");
         fprintf(stderr, "id: %s\n", user_funcs[i].id);
         fprintf(stderr, "localsize: %u\n", user_funcs[i].localSize);
         fprintf(stderr, "adress: %u\n", user_funcs[i].address);
         fprintf(stderr, "=========\n");*/
+    }
+    fprintf(stderr, "%s\n", user_funcs[0].id);
+
+    for (i = 0; i < total_user_funcs; i++)
+    {
+        fprintf(stderr, "%s\n", user_funcs[i].id);
     }
     //10 5 "lala" 6 "ofsafdf"
 
@@ -156,21 +169,21 @@ void read_binary_file()
     }
 
     //instructions
-    fread(&curr_instr, sizeof(unsigned), 1, fp);
+    fread(&curr_instr, sizeof(curr_instr), 1, fp);
     instructions = malloc(sizeof(instruction) * curr_instr);
     FILE *fp2;
     fp2 = fopen("test_vm_instructions", "w+");
     for (i = 0; i < curr_instr; i++)
     {
-        fread(&instructions[i].opcode, sizeof(int), 1, fp);
+        fread(&instructions[i].opcode, sizeof(vmopcode), 1, fp);
 
-        fread(&instructions[i].result.type, sizeof(int), 1, fp);
+        fread(&instructions[i].result.type, sizeof(vmarg), 1, fp);
         fread(&instructions[i].result.val, sizeof(unsigned), 1, fp);
 
-        fread(&instructions[i].arg1.type, sizeof(int), 1, fp);
+        fread(&instructions[i].arg1.type, sizeof(vmarg), 1, fp);
         fread(&instructions[i].arg1.val, sizeof(unsigned), 1, fp);
 
-        fread(&instructions[i].arg2.type, sizeof(int), 1, fp);
+        fread(&instructions[i].arg2.type, sizeof(vmarg), 1, fp);
         fread(&instructions[i].arg2.val, sizeof(unsigned), 1, fp);
         print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i + 1, fp2);
     }
@@ -190,6 +203,8 @@ void read_binary_file()
     }
 
     fclose(fp);
+    fclose(fp2);
+
 }
 
 char *vm_opcode_to_string(vmopcode op)
@@ -301,7 +316,7 @@ void print_vmarg_text(vmarg *arg1, FILE *instr_file)
             fprintf(stderr, "offset  %u\n", arg1->val);
 
             //if (arg1->val < total_user_funcs)
-                fprintf(instr_file, ":\"%s\"\t", user_funcs[arg1->val].id);
+            fprintf(instr_file, ":\"%s\"\t", user_funcs[arg1->val].id);
         }
         else if (arg1->type == libfunc_a)
         {

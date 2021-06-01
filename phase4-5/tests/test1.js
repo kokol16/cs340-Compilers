@@ -188,6 +188,10 @@ function(){
 function g(){
     
 }
+function c()
+{
+
+}
 
 print();
 x=print();

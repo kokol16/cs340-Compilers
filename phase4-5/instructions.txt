@@ -13,9 +13,12 @@
 #13	JUMP		 result: type: 0(label_a),  val: 16	
 #14	FUNCENTER		 result: type: 8(userfunc_a),  val: 2:g	
 #15	FUNCEXIT		 result: type: 8(userfunc_a),  val: 2:g	
-#16	CALLFUNC		arg1: type: 9(libfunc_a),  val: 0:print	
-#17	ASSIGN		 result: type: 1(global_a),  val: 0:_t0		arg1: type: 10 val: 0:print	
-#18	CALLFUNC		arg1: type: 9(libfunc_a),  val: 1:print	
-#19	ASSIGN		 result: type: 1(global_a),  val: 0:_t0		arg1: type: 10 val: 1:print	
-#20	ASSIGN		 result: type: 1(global_a),  val: 1:x		arg1: type: 1(global_a),  val: 0:_t0	
-#21	ASSIGN		 result: type: 1(global_a),  val: 2:_t1		arg1: type: 1(global_a),  val: 1:x	
+#16	JUMP		 result: type: 0(label_a),  val: 19	
+#17	FUNCENTER		 result: type: 8(userfunc_a),  val: 3:c	
+#18	FUNCEXIT		 result: type: 8(userfunc_a),  val: 3:c	
+#19	CALLFUNC		arg1: type: 9(libfunc_a),  val: 0:print	
+#20	ASSIGN		 result: type: 1(global_a),  val: 0:_t0		arg1: type: 10 val: 0:print	
+#21	CALLFUNC		arg1: type: 9(libfunc_a),  val: 1:print	
+#22	ASSIGN		 result: type: 1(global_a),  val: 0:_t0		arg1: type: 10 val: 1:print	
+#23	ASSIGN		 result: type: 1(global_a),  val: 1:x		arg1: type: 1(global_a),  val: 0:_t0	
+#24	ASSIGN		 result: type: 1(global_a),  val: 2:_t1		arg1: type: 1(global_a),  val: 1:x	

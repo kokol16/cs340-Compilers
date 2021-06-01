@@ -641,22 +641,22 @@ void create_binary_file()
         fprintf(stderr, "%s\n", string_consts[i]);
         fwrite((string_consts[i]), sizeof(char), str_length, fp);
     }
+
     fprintf(stderr, "total user funcs : %u\n", total_user_funcs);
     fwrite(&total_user_funcs, sizeof(total_user_funcs), 1, fp);
 
     for (i = 0; i < total_user_funcs; i++)
     {
-        /*fprintf(stderr, "=========\n");
+        /* fprintf(stderr, "=========\n");
         fprintf(stderr, "id: %s\n", user_funcs[i].id);
         fprintf(stderr, "localsize: %u\n", user_funcs[i].localSize);
         fprintf(stderr, "adress: %u\n", user_funcs[i].address);
         fprintf(stderr, "=========\n");*/
-
-        fwrite((&user_funcs[i].address), sizeof(user_funcs[i].address), 1, fp);
-        fwrite((&user_funcs[i].localSize), sizeof(user_funcs[i].localSize), 1, fp);
         int id_length = strlen(user_funcs[i].id) + 1;
         fwrite(&id_length, sizeof(int), 1, fp);
         fwrite((user_funcs[i].id), sizeof(char), id_length, fp);
+        fwrite((&user_funcs[i].address), sizeof(user_funcs[i].address), 1, fp);
+        fwrite((&user_funcs[i].localSize), sizeof(user_funcs[i].localSize), 1, fp);
     }
     //10 5 "lala" 6 "ofsafdf"
     fprintf(stderr, "total_named_lib_funcs : %u\n", total_named_lib_funcs);
@@ -669,19 +669,19 @@ void create_binary_file()
         fprintf(stderr, "%s\n", named_lib_funcs[i]);
         fwrite((named_lib_funcs[i]), sizeof(char), str_length, fp);
     }
-    fwrite(&curr_instr, sizeof(unsigned), 1, fp);
-
+    unsigned curr = curr_instr - 1;
+    fwrite(&curr, sizeof(curr_instr), 1, fp);
     for (i = 1; i < curr_instr; i++)
     {
-        fwrite(&instructions[i].opcode, sizeof(int), 1, fp);
+        fwrite(&instructions[i].opcode, sizeof(vmopcode), 1, fp);
 
-        fwrite(&instructions[i].result.type, sizeof(int), 1, fp);
+        fwrite(&instructions[i].result.type, sizeof(vmarg), 1, fp);
         fwrite(&instructions[i].result.val, sizeof(unsigned), 1, fp);
 
-        fwrite(&instructions[i].arg1.type, sizeof(int), 1, fp);
+        fwrite(&instructions[i].arg1.type, sizeof(vmarg), 1, fp);
         fwrite(&instructions[i].arg1.val, sizeof(unsigned), 1, fp);
 
-        fwrite(&instructions[i].arg2.type, sizeof(int), 1, fp);
+        fwrite(&instructions[i].arg2.type, sizeof(vmarg), 1, fp);
         fwrite(&instructions[i].arg2.val, sizeof(unsigned), 1, fp);
     }
 
