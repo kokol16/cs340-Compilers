@@ -1,33 +1,34 @@
 #include "../Symboltable_functions/symbolTable.h"
+
 typedef enum iopcode
 {
-    assign,
-    mul,
-    uminus,
-    add,
-    sub,
-    _div,
-    mod,
-    and,
-    or
-    ,
-    not,
-    if_eq,
-    if_noteq,
-    if_lesseq,
-    if_greatereq,
-    if_less,
-    if_greater,
-    call,
-    param,
-    ret,
-    getretval,
-    funcstart,
-    funcend,
-    tablecreate,
-    tablegetelem,
-    tablesetelem,
-    jump
+    assign=0,//0
+    mul,//1
+    uminus,//2
+    add,//3
+    sub,//4
+    _div,//5
+    mod,//6
+    and,//7
+    or,//8
+    not,//9
+    if_eq,//10
+    if_noteq,//11
+    if_lesseq,//12
+    if_greatereq,//13
+    if_less,//14
+    if_greater,//15
+    call,//16
+    param,//17
+    ret,//18
+    getretval,//19
+    funcstart,//20
+    funcend,//21
+    tablecreate,//22
+    tablegetelem,//23
+    tablesetelem,//24
+    jump,//25
+    nop//26
 } iopcode;
 
 typedef struct expr expr;
@@ -120,19 +121,19 @@ void print_quad_analytic_2nd_try(iopcode op, expr *arg1, expr *arg2, expr *resul
 
 typedef enum expr_t
 {
-    var_e,
-    tableitem_e,
-    programfunc_e,
-    libraryfunc_e,
-    arithexpr_e,
-    boolexpr_e,
-    assignexpr_e,
-    newtable_e,
-    constint_e,
-    constdouble_e,
-    constbool_e,
-    conststring_e,
-    nil_e
+    var_e,//0
+    tableitem_e,//1
+    programfunc_e,//2
+    libraryfunc_e,//3
+    arithexpr_e,//4
+    boolexpr_e,//5
+    assignexpr_e,//6
+    newtable_e,//7
+    constint_e,//8
+    constdouble_e,//9
+    constbool_e,//10
+    conststring_e,//11
+    nil_e//12
 } expr_t;
 
 typedef struct expr

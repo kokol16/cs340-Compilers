@@ -1,0 +1,6 @@
+#1	ASSIGN		 result: type: 1(global_a),  val: 0:a		arg1: type: 5(string_a),  val: 0:"lala"		
+#2	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:a	
+#3	ASSIGN		 result: type: 1(global_a),  val: 0:a		arg1: type: 5(string_a),  val: 1:"xoxo"		
+#4	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:a	
+#5	ASSIGN		 result: type: 1(global_a),  val: 0:a		arg1: type: 4(number_a),  val: 0:1.000000		
+#6	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:a	

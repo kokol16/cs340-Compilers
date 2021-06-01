@@ -5,6 +5,8 @@
         "lib.h": "c",
         "quads.h": "c",
         "type_traits": "c",
-        "xtr1common": "c"
+        "xtr1common": "c",
+        "xmemory": "c",
+        "instrtuctions.h": "c"
     }
 }

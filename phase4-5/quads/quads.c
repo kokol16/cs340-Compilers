@@ -213,7 +213,6 @@ void generate_eq_eq(FILE *quad_file, unsigned numb_of_eq)
 }
 void print_quads(FILE *quad_file)
 {
-    unsigned i = 1;
     /*fprintf(quad_file, "%-*s", width, "#QUAD");
     fprintf(quad_file, "%-*s", width, "opcode");
     fprintf(quad_file, "%-*s", width, "result");
@@ -223,6 +222,7 @@ void print_quads(FILE *quad_file)
     fprintf(quad_file, "%-*s\n", width, "line");
     generate_eq_eq(quad_file, EQUALS_PRINT);*/
 
+    unsigned i = 1;
     while (i < curr_quad)
     {
         //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;

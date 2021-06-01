@@ -1,6 +1,6 @@
 #include "symbolTable.h"
-#include "../general_functions/lib.h"
-#define DEBUG_OFFSET 0
+
+#define DEBUG_OFFSET 1
 unsigned int SIZE = 10;
 int yylineno;
 short is_local_id = 0;

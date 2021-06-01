@@ -445,6 +445,8 @@ ONELINECOMMENTT "//".*
 .           {
     print_Red();
     fprintf(stderr , "undefined  input %s in line : %d \n",yytext ,yylineno);
+    found_compile_error=1;
+
     reset_Red();
 }
 

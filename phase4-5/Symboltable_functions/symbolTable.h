@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include "../general_functions/lib.h"
 #define HASH_MULTIPLIER 65599
 #define ERROR_FUNC 2
 #define ERROR_VAR 3
@@ -31,6 +32,11 @@ typedef struct Variable
     unsigned int scope;
     unsigned int line;
 } Variable;
+typedef struct return_list
+{
+    unsigned address;
+    struct return_list *next;
+}return_list;
 typedef struct Function
 {
     const char *name;
@@ -40,6 +46,9 @@ typedef struct Function
     unsigned total_locals;
     unsigned int scope;
     unsigned int line;
+    return_list * returnList;
+    unsigned func_enter_jump;
+
 } Function;
 
 enum SymbolType
@@ -70,6 +79,7 @@ typedef struct SymbolTableEntry
     struct SymbolTableEntry *next;
     struct SymbolTableEntry *next_same_scope;
     struct SymbolTableEntry *next_arg;
+    unsigned taddress;
 
     enum SymbolType type;
 } SymbolTableEntry;

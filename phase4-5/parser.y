@@ -678,6 +678,7 @@ int yyerror( char * msg )
 {
     print_Red();
     fprintf(stderr ,"%s in line : %d \n", msg,yylineno);
+    found_compile_error=1;
     reset_Red();
 
 }
@@ -722,11 +723,14 @@ int main(int argc , char * argv[])
     symbolTable_print_scopes(symbolTable,100);
  
     FILE *quad_file = fopen("quads.txt", "w+");
+    FILE *instr_file = fopen("instructions.txt", "w+");
+
     //fprintf(stderr,"compile error %d\n",found_compile_error);
     if(! found_compile_error   )
     {
         print_quads(quad_file);
-
+        generate_instructions();
+        print_instructions(instr_file);
     }
     
     fclose(quad_file);

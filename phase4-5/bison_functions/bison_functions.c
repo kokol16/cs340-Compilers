@@ -1,5 +1,4 @@
 #include "bison_functions.h"
-
 #define lvalue_ptr (*lvalue)
 
 int are_same_type(expr *left, expr *right)
@@ -51,7 +50,7 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
         patchlist((*$3)->truelist, curr_quad);
         patchlist((*$3)->falselist, curr_quad + 2);
         //fprintf(stderr, "false list : %d\n", (*$3)->falselist);
-        emit(assign,new_expr_const_bool(1), NULL, (*$3) , curr_quad, 0, yylineno);
+        emit(assign, new_expr_const_bool(1), NULL, (*$3), curr_quad, 0, yylineno);
         emit(jump, NULL, NULL, NULL, curr_quad, curr_quad + 2, yylineno);
         emit(assign, new_expr_const_bool(0), NULL, (*$3), curr_quad, 0, yylineno);
     }
@@ -60,27 +59,26 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
 int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, expr *expr2)
 {
 
-
     switch (opcode)
     {
     case add:
-        _expr->doubleConst=expr1->doubleConst+expr2->doubleConst;
+        _expr->doubleConst = expr1->doubleConst + expr2->doubleConst;
         //_expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) + ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     case sub:
-        _expr->doubleConst=expr1->doubleConst-expr2->doubleConst;
+        _expr->doubleConst = expr1->doubleConst - expr2->doubleConst;
         //_expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) - ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     case mul:
-        _expr->doubleConst=expr1->doubleConst*expr2->doubleConst;
+        _expr->doubleConst = expr1->doubleConst * expr2->doubleConst;
         //_expr->doubleConst = (double)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) * ((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     case _div:
-        _expr->doubleConst=expr1->doubleConst/expr2->doubleConst;
+        _expr->doubleConst = expr1->doubleConst / expr2->doubleConst;
         //_expr->doubleConst = (double)((double)(expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst) / (double)((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     case mod:
-        _expr->doubleConst=(int)expr1->doubleConst % (int)expr2->doubleConst;
+        _expr->doubleConst = (int)expr1->doubleConst % (int)expr2->doubleConst;
         //_expr->doubleConst = ((int)((expr1->type == constdouble_e) ? expr1->doubleConst : expr1->intConst)) % (int)((expr2->type == constdouble_e) ? expr2->doubleConst : expr2->intConst);
         break;
     default:
@@ -241,7 +239,7 @@ expr *process_array_elist(expr *head, SymbolTable *symboltable)
     expr *t = new_expr(newtable_e);
     int i = 0;
     t->sym = new_temp(symboltable);
-    emit(tablecreate,NULL, NULL,  t, curr_quad, 0, yylineno);
+    emit(tablecreate, NULL, NULL, t, curr_quad, 0, yylineno);
     while (tmp != NULL)
     {
         emit(tablesetelem, new_expr_const_int(i++), tmp, t, curr_quad, 0, yylineno);
@@ -350,13 +348,11 @@ void process_local_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
         else
         {
             symbolTable_insert(symbolTable, bucket);
-         
         }
     }
     else
     {
         bucket = find_bucket_by_scope_and_name(symbolTable, id_name, scope);
-       
     }
     lvalue_ptr = lvalue_expr(bucket);
 }
@@ -376,7 +372,6 @@ void process_id(SymbolTable *symbolTable, char *id_name, expr **lvalue)
             bucket = create_bucket_var(1, var, GLOBAL);
 
         symbolTable_insert(symbolTable, bucket);
-      
     }
     lvalue_ptr = lvalue_expr(bucket);
 }
@@ -505,7 +500,7 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
     unsigned offset = pop_scope_offset_stack();
     //fprintf(stderr,"restoring %u\n",offset);
     restore_curr_scope_offset(offset);
-    emit(funcend,NULL , NULL, func_prefix, curr_quad, 0, yylineno);
+    emit(funcend, NULL, NULL, func_prefix, curr_quad, 0, yylineno);
     return func_prefix;
 }
 
@@ -520,7 +515,7 @@ expr *process_function_prefix(SymbolTable *symbolTable, char *func_name)
     if (bucket->value.funcVal != NULL)
         bucket->value.funcVal->iadress = curr_quad;
     _expr = lvalue_expr(bucket);
-    emit(funcstart,NULL, NULL,  _expr, curr_quad, 0, yylineno);
+    emit(funcstart, NULL, NULL, _expr, curr_quad, 0, yylineno);
     push_scope_offset_stack(curr_scope_offset());
     enter_scope_space();
     reset_formal_arg_offset();
@@ -591,7 +586,7 @@ void process_function_arguments(SymbolTable *symbolTable, char *arg_name)
     else
     {
         symbolTable_insert(symbolTable, bucket);
-       
+
         create_argument(symbolTable, arg_name, scope);
     }
 }
@@ -602,4 +597,47 @@ void process_double_colon_id(SymbolTable *symbolTable, char *name, expr **lvalue
         print_error(name, yylineno, "ERROR : global variable doesn't exist");
     }
     lvalue_ptr->sym = find_bucket_by_scope_and_name(symbolTable, name, 0);
+}
+
+void generate_instructions()
+{
+    unsigned i = 1;
+    instruction t;
+    emit_instr(t);
+
+    patch_incomplete_jumps();
+
+    while (i < curr_quad)
+    {
+        //fprintf(stderr, "opcode : %d\n",quads[i].op);
+        (*generators[quads[i].op])(quads + i);
+        i++;
+    }
+    //create binary file
+    //magic number , total_numbers numbers, total_strings strings, ... , instructions_size instructions
+    create_binary_file();
+    fprintf(stderr, "im out\n");
+}
+
+void create_binary_file()
+{
+    FILE *fp;
+    fp = fopen("target_code.abc", "wb");
+    unsigned magic_number = 340200501;
+    fwrite(&magic_number, sizeof(magic_number), 1, fp);
+    fprintf(stderr, "total numbers : %u\n", total_num_consts);
+    fwrite(&total_num_consts, sizeof(total_num_consts), 1, fp);
+    fwrite(num_consts, sizeof(double), total_num_consts, fp);
+    fprintf(stderr,"total_string_consts : %u\n",total_string_consts);
+    fwrite(&total_string_consts, sizeof(total_string_consts), 1, fp);
+    int i = 0;
+    for (i = 0; i < total_string_consts; i++)
+    {
+        int str_length = strlen(string_consts[i]) + 1;
+        fwrite(&str_length, sizeof(int), 1, fp);
+        fprintf(stderr,"%s\n", string_consts[i]);
+        fwrite((string_consts[i]), sizeof(char), str_length, fp);
+    }
+
+    fclose(fp);
 }

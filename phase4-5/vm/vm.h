@@ -54,3 +54,4 @@ avm_table *avm_table_new();
 void avm_table_destroy(avm_table *);
 avm_memcell *avm_table_get_elem(avm_memcell *key);
 void avm_table_set_elem(avm_memcell *key, avm_memcell *value);
+void read_binary_file();

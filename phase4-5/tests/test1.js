@@ -138,12 +138,12 @@ while (x > 0) {
 
 //3
 //if (1>2)
-  // x = 1;
+// x = 1;
 
 //4
 //while(1) { 
-  //  x = 1; 
- //}
+//  x = 1; 
+//}
 
 /*
  x=(
@@ -153,5 +153,34 @@ while (x > 0) {
  ) and not false or 2>=2;
  */
 
+/*
+while (true) {
+   function() {
+          if (x == 1) {
+               local y = 0;
+   
+           }
+       function () {
+           return 1;
+       }
+       return 4;
+   }
+   //break;
+   //while (1) continue;
 
-x=3+4.1+5.2%6 * 8.4 * 4 ;
+}*/
+
+//x = 10;
+//y = "hello";
+//function f(x,y) { return x+y; }
+//z = "world";
+//w = cos(3.1415);
+//print(x,y,z,w);
+
+
+a = "lala";
+a = "xoxo";
+a = 1;
+
+
+//a= b and g or not d and e or length;
