@@ -8,6 +8,10 @@
         "xtr1common": "c",
         "xmemory": "c",
         "instrtuctions.h": "c",
-        "vm_instructions_common.h": "c"
+        "vm_instructions_common.h": "c",
+        "exec_arith.h": "c",
+        "exec_funcs.h": "c",
+        "exec_other.h": "c",
+        "assert.h": "c"
     }
 }

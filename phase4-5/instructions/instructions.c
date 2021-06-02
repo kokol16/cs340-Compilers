@@ -111,6 +111,7 @@ void generate(vmopcode opcode, quad *quad)
     //fprintf(stderr, "generate\n");
     instruction t = {0};
     reset_instruction(&t);
+    t.srcLine=quad->line;
 
     t.opcode = opcode;
     if (quad->arg1 != NULL)
@@ -172,6 +173,7 @@ void generate_NOP(quad *quad)
     instruction t;
     reset_instruction(&t);
     t.opcode = nop_v;
+    t.srcLine=quad->line;
     emit_instr(t);
 }
 void generate_relational(vmopcode op, quad *quad)
@@ -179,6 +181,8 @@ void generate_relational(vmopcode op, quad *quad)
     //fprintf(stderr, "generate_relational\n");
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = op;
     make_operand(quad->arg1, &t.arg1);
     make_operand(quad->arg2, &t.arg2);
@@ -210,6 +214,8 @@ void generate_NOT(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = jeq_v;
     make_operand(quad->arg1, &t.arg1);
     make_booloperand(&t.arg2, 0);
@@ -247,6 +253,8 @@ void generate_OR(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = jeq_v;
     make_operand(quad->arg1, &t.arg1);
     make_booloperand(&t.arg2, 1);
@@ -273,6 +281,8 @@ void generate_AND(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = jeq_v;
     make_operand(quad->arg1, &t.arg1);
     make_booloperand(&t.arg2, 0);
@@ -300,6 +310,8 @@ void generate_PARAM(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = pusharg_v;
     make_operand(quad->arg1, &t.arg1);
     emit_instr(t);
@@ -309,6 +321,8 @@ void generate_CALL(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = call_v;
     make_operand(quad->arg1, &t.arg1);
     emit_instr(t);
@@ -318,6 +332,8 @@ void generate_GETRETVAL(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = assign_v;
     make_operand(quad->result, &t.result);
     make_retvaloperand(&t.arg1);
@@ -518,7 +534,7 @@ unsigned libfuncs_new_used(const char *s)
 
 unsigned userfuncs_new_func(SymbolTableEntry *sym)
 {
-   /* if (total_user_funcs == 0)
+    /* if (total_user_funcs == 0)
     {
         user_funcs = malloc(sizeof(userfunc) * EXPAND_SIZE);
     }
@@ -528,7 +544,7 @@ unsigned userfuncs_new_func(SymbolTableEntry *sym)
     memset(&_user_func, 0, sizeof(userfunc));
     _user_func.id = strdup(sym->value.funcVal->name);
     user_funcs[total_user_funcs++] = _user_func;*/
-    return total_user_funcs-1;
+    return total_user_funcs - 1;
 }
 
 void make_retvaloperand(vmarg *arg)
@@ -583,6 +599,8 @@ void generate_funcstart(quad *quad)
     instruction t;
     memset(&t, 0, sizeof(t));
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.result.type = 0;
     t.opcode = jump_v;
     //make_operand(quad->result, &t.result);
@@ -607,6 +625,8 @@ void generate_return(quad *quad)
 
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = assign_v;
     make_retvaloperand(&t.result);
     make_operand(quad->arg1, &t.arg1);
@@ -675,6 +695,8 @@ void generate_funcend(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
+    t.srcLine=quad->line;
+
     t.opcode = funcexit_v;
     make_operand(quad->result, &t.result);
     emit_instr(t);
@@ -702,7 +724,7 @@ unsigned user_funcs_add(const char *id, unsigned tadress, unsigned total_locals)
     total_user_funcs++;
     //fprintf(stderr, "total locals  : %u\n", user_funcs[total_user_funcs].localSize);
 
-    return total_user_funcs-1;
+    return total_user_funcs - 1;
 }
 
 void patch_incomplete_jumps()
@@ -780,7 +802,7 @@ void print_vmarg_text(vmarg *arg1, FILE *instr_file)
 
     fprintf(instr_file, "\t");
 }
-void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file)
+void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file, unsigned line)
 {
     char *opcode_str;
 
@@ -814,6 +836,7 @@ void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsig
 
         print_vmarg_text(arg2, instr_file);
     }
+    fprintf(instr_file, "line : %u\n", line);
 
     fprintf(instr_file, "\n");
 }
@@ -865,7 +888,7 @@ void print_instructions(FILE *instr_file)
         //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
         //fprintf(stderr, "opcode:%s\n", vm_opcode_to_string(instructions[i].opcode));
         //print_instructions_analytics(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, instr_file);
-        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, instr_file);
+        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, instr_file,instructions[i].srcLine);
 
         i++;
     }

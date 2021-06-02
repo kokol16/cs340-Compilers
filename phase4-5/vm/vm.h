@@ -1,9 +1,33 @@
+#pragma once
 #include <string.h>
-#include"../vm_instructions_common.h"
+#include "exec_arith/exec_arith.h"
+#include "exec_funcs/exec_funcs.h"
+#include "exec_jumps/exec_jumps.h"
+#include "exec_tables/exec_tables.h"
+#include "exec_other/exec_other.h"
+#define AVM_STACKENV_SIZE 4
+#define AVM_MAX_INSTRUCTIONS 24
+#define AVM_ENDING_PC codeSize
 #define AVM_STACK_SIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_SIZE 211
-
+extern unsigned char execution_finished ;
+extern unsigned pc ;
+extern unsigned currLine ;
+extern unsigned codeSize;
+extern instruction *code;
+extern unsigned totalActuals;
+extern double *consts_number;
+extern unsigned total_numbers;
+extern char **consts_string;
+extern unsigned total_strings;
+extern unsigned total_user_funcs;
+extern struct userfunc *user_funcs;
+extern char **lib_funcs;
+extern unsigned total_lib_funcs;
+extern struct avm_memcell ax, bx, cx;
+extern struct avm_memcell retval;
+extern unsigned top, topsp;
 typedef enum avm_memcell_t
 {
     number_m = 0,
@@ -57,3 +81,6 @@ void avm_table_destroy(avm_table *);
 avm_memcell *avm_table_get_elem(avm_memcell *key);
 void avm_table_set_elem(avm_memcell *key, avm_memcell *value);
 void read_binary_file();
+avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg);
+void avm_memcell_clear(avm_memcell *m);
+void avm_table_inc_ref_counter(avm_table *t);

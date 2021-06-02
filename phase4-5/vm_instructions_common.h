@@ -1,3 +1,4 @@
+#pragma once
 #include <stdio.h>
 typedef enum vmopcode
 {
@@ -65,4 +66,4 @@ typedef struct userfunc
     char *id;
 } userfunc;
 void print_instructions_analytics(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file);
- void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file);
+ void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file, unsigned line);

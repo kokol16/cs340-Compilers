@@ -1,3 +1,4 @@
+#include "exec_other.h"
 unsigned char execution_finished ;
 unsigned pc;
 unsigned currLine ;
@@ -19,3 +20,23 @@ unsigned top, topsp;
 
 
 
+
+ void execute_nop(instruction * instr){}
+
+
+ void execute_and(instruction * instr){}
+
+
+ void execute_or(instruction * instr){}
+
+
+ void execute_not(instruction * instr){}
+
+
+ void execute_return(instruction * instr){}
+
+
+ void execute_get_ret_val(instruction * instr){}
+
+
+ void execute_jump(instruction * instr){}

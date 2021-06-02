@@ -3,6 +3,113 @@
 #include <assert.h>
 #include <stdio.h>
 #define MAGIC_NUMBER 340200501
+
+unsigned char execution_finished = 0;
+unsigned pc = 0;
+unsigned currLine = 0;
+unsigned codeSize = 0;
+instruction *code = NULL;
+
+unsigned totalActuals = 0;
+double *consts_number;
+unsigned total_numbers;
+char **consts_string;
+unsigned total_strings;
+unsigned total_user_funcs;
+struct userfunc *user_funcs;
+char **lib_funcs;
+unsigned total_lib_funcs;
+struct avm_memcell ax, bx, cx;
+struct avm_memcell retval;
+unsigned top, topsp;
+
+unsigned curr_instr;
+instruction *instructions;
+
+typedef void (*execute_func_t)(instruction *);
+execute_func_t executeFuncs[] = {
+    execute_assign,       //0
+    execute_mul,          //1
+    execute_uminus,       //2
+    execute_add,          //3
+    execute_sub,          //4
+    execute_div,          //5
+    execute_mod,          //6
+    execute_and,          //7
+    execute_or,           //8
+    execute_not,          //9
+    execute_jeq,          //10
+    execute_jne,          //11
+    execute_jle,          //12
+    execute_jgt,          //13
+    execute_jlt,          //14
+    execute_jgt,          //15
+    execute_call,         //16
+    execute_pusharg,      //17
+    execute_return,       //18
+    execute_get_ret_val,  //19
+    execute_funcenter,    //20
+    execute_funcexit,     //21
+    execute_newtable,     //22
+    execute_tablegetelem, //23
+    execute_tablesetelem, //24
+    execute_jump,         //25
+    execute_nop,          //26
+
+};
+
+avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
+{
+    switch (arg->type)
+    {
+    case global_a:
+        return &stack[AVM_STACK_SIZE - 1 - arg->val];
+    case local_a:
+        return &stack[topsp - arg->val];
+    case formal_a:
+        return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
+    case retval_a:
+        return &retval;
+    case number_a:
+    {
+        reg->type = number_m;
+        reg->data.numVal = consts_number[arg->val];
+        return reg;
+    }
+    case string_a:
+    {
+        reg->type = string_m;
+        reg->data.strVal = strdup(consts_string[arg->val]);
+        return reg;
+    }
+    case bool_a:
+    {
+        reg->type = bool_m;
+        reg->data.boolVal = arg->val;
+        return reg;
+    }
+    case nil_a:
+    {
+        reg->type = nil_m;
+        return reg;
+    }
+    case userfunc_a:
+    {
+        reg->type = userfunc_m;
+        reg->data.funVal = arg->val;
+        return reg;
+    }
+    case libfunc_a:
+    {
+        reg->type = libfunc_m;
+        reg->data.libfuncVal = lib_funcs[arg->val];
+        return reg;
+    }
+    default:
+        assert(0);
+    }
+}
+
 void avm_ini_stack(void)
 {
     unsigned i = 0;
@@ -46,8 +153,41 @@ avm_table *avm_table_new()
     avm_table_buckets_init(t->user_func_indexed);
     return t;
 }
+void memclear_string(avm_memcell *m)
+{
+    assert(m->data.strVal);
+    free(m->data.strVal);
+}
+
+void memclear_table(avm_memcell *m)
+{
+    assert(m->data.tableVal);
+    avm_table_dec_ref_counter(m->data.tableVal);
+}
+typedef void (*memclear_func_t)(avm_memcell *);
+
+memclear_func_t memclearFuncs[] = {
+    0, //number
+    memclear_string,
+    0, //bool
+    memclear_table,
+    0, //userfunc
+    0, //libfunc
+    0, //nil
+    0  //undef
+
+};
 void avm_memcell_clear(avm_memcell *m)
 {
+    if (m->type != undef_m)
+    {
+        memclear_func_t f = memclearFuncs[m->type];
+        if (f)
+        {
+            (*f)(m);
+        }
+        m->type = undef_m;
+    }
 }
 void avm_table_buckets_destroy(avm_table_bucket **p)
 {
@@ -81,17 +221,7 @@ int main()
     fprintf(stderr, "===========VM============\n");
     read_binary_file();
 }
-double *consts_number;
-unsigned total_numbers;
-char **consts_string;
-unsigned total_strings;
-unsigned total_user_funcs;
-struct userfunc *user_funcs;
-char **lib_funcs;
-unsigned total_lib_funcs;
 
-unsigned curr_instr;
-instruction *instructions;
 void read_binary_file()
 {
     unsigned magic_number;
@@ -187,7 +317,7 @@ void read_binary_file()
 
         fread(&instructions[i].arg2.type, sizeof(vmarg), 1, fp);
         fread(&instructions[i].arg2.val, sizeof(unsigned), 1, fp);
-        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i + 1, fp2);
+        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i + 1, fp2, instructions[i].srcLine);
     }
 
     for (i = 0; i < total_lib_funcs; i++)
@@ -203,6 +333,7 @@ void read_binary_file()
     {
         fprintf(stderr, "%s\n", consts_string[i]);
     }
+    code = instructions;
 
     fclose(fp);
     fclose(fp2);
@@ -331,7 +462,7 @@ void print_vmarg_text(vmarg *arg1, FILE *instr_file)
 
     fprintf(instr_file, "\t");
 }
-void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file)
+void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsigned curr_no, FILE *instr_file, unsigned line)
 {
     char *opcode_str;
 
@@ -365,5 +496,34 @@ void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsig
 
         print_vmarg_text(arg2, instr_file);
     }
+    fprintf(instr_file, "line : %u\n", line);
+
     fprintf(instr_file, "\n");
+}
+
+void execute_cycle()
+{
+    if (execution_finished)
+        return;
+    else if (pc == AVM_ENDING_PC)
+    {
+        execution_finished = 1;
+        return;
+    }
+    else
+    {
+        assert(pc < AVM_ENDING_PC);
+        instruction *instr = code + pc;
+        assert(instr->opcode >= 0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
+        if (instr->srcLine)
+        {
+            currLine = instr->srcLine;
+        }
+        unsigned oldPC = pc;
+        (*executeFuncs[instr->opcode])(instr);
+        if (pc == oldPC)
+        {
+            ++pc;
+        }
+    }
 }
