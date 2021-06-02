@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#define MAGIC_NUMBER 340200501
 void avm_ini_stack(void)
 {
     unsigned i = 0;
@@ -100,6 +101,8 @@ void read_binary_file()
 
     fread(&magic_number, sizeof(magic_number), 1, fp);
     fprintf(stderr, "magic number %u\n", magic_number);
+    if (MAGIC_NUMBER != magic_number)
+        return;
     fread(&total_numbers, sizeof(total_numbers), 1, fp);
     fprintf(stderr, "total number %u\n", total_numbers);
 
@@ -136,12 +139,11 @@ void read_binary_file()
         fread(&size, sizeof(size), 1, fp);
 
         user_funcs[i].id = malloc(sizeof(char) * size);
-        fread(user_funcs[i].id, sizeof(char), size, fp);
+        char *str;
+        fread(str, sizeof(char), size, fp);
+        user_funcs[i].id = strdup(str);
         fread(&user_funcs[i].address, sizeof(user_funcs[i].address), 1, fp);
         fread(&user_funcs[i].localSize, sizeof(user_funcs[i].localSize), 1, fp);
-        fprintf(stderr, "i=: %d\n", i);
-
-        fprintf(stderr, "id: %s\n", user_funcs[0].id);
 
         /*fprintf(stderr, "=========\n");
         fprintf(stderr, "id: %s\n", user_funcs[i].id);
@@ -204,7 +206,6 @@ void read_binary_file()
 
     fclose(fp);
     fclose(fp2);
-
 }
 
 char *vm_opcode_to_string(vmopcode op)
@@ -313,7 +314,7 @@ void print_vmarg_text(vmarg *arg1, FILE *instr_file)
         }
         else if (arg1->type == userfunc_a)
         {
-            fprintf(stderr, "offset  %u\n", arg1->val);
+            // fprintf(stderr, "offset  %u\n", arg1->val);
 
             //if (arg1->val < total_user_funcs)
             fprintf(instr_file, ":\"%s\"\t", user_funcs[arg1->val].id);

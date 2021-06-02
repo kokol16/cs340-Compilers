@@ -1,12 +1,12 @@
 #1	JUMP		 result: type: 0(label_a),  val: 10	
-#2	FUNCENTER		 result: type: 8(userfunc_a),  val: 0:""		
+#2	FUNCENTER		 result: type: 8(userfunc_a),  val: 0:"f"		
 #3	ASSIGN		 result: type: 3(local_a),  val: 0		arg1: type: 5(string_a),  val: 0:"lala"		
 #4	ASSIGN		 result: type: 3(local_a),  val: 1		arg1: type: 3(local_a),  val: 0	
 #5	ASSIGN		 result: type: 3(local_a),  val: 0		arg1: type: 5(string_a),  val: 1:"xoxo"		
 #6	ASSIGN		 result: type: 3(local_a),  val: 1		arg1: type: 3(local_a),  val: 0	
 #7	ASSIGN		 result: type: 3(local_a),  val: 0		arg1: type: 4(number_a),  val: 0:1.000000		
 #8	ASSIGN		 result: type: 3(local_a),  val: 1		arg1: type: 3(local_a),  val: 0	
-#9	FUNCEXIT		 result: type: 8(userfunc_a),  val: 0:""		
+#9	FUNCEXIT		 result: type: 8(userfunc_a),  val: 0:"f"		
 #10	JUMP		 result: type: 0(label_a),  val: 13	
 #11	FUNCENTER		 result: type: 8(userfunc_a),  val: 1:"$func1"		
 #12	FUNCEXIT		 result: type: 8(userfunc_a),  val: 1:"$func1"		
