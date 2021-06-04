@@ -21,12 +21,12 @@ char *vmarg_str[] = {
 
 generator_func_t generators[] = {
     generate_ASSIGN,       //0
-    generate_MUL,          //1
-    generate_UMINUS,       //2
     generate_ADD,          //3
     generate_SUB,          //4
+    generate_MUL,          //1
     generate_DIV,          //5
     generate_MOD,          //6
+    generate_UMINUS,       //2
     generate_AND,          //7
     generate_OR,           //8
     generate_NOT,          //9

@@ -7,13 +7,13 @@
 #include "exec_other/exec_other.h"
 #define AVM_STACKENV_SIZE 4
 #define AVM_MAX_INSTRUCTIONS 24
-#define AVM_ENDING_PC codeSize
+#define AVM_ENDING_PC curr_instr
 #define AVM_STACK_SIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
 #define AVM_TABLE_SIZE 211
-extern unsigned char execution_finished ;
-extern unsigned pc ;
-extern unsigned currLine ;
+extern unsigned char execution_finished;
+extern unsigned pc;
+extern unsigned currLine;
 extern unsigned codeSize;
 extern instruction *code;
 extern unsigned totalActuals;
@@ -28,6 +28,8 @@ extern unsigned total_lib_funcs;
 extern struct avm_memcell ax, bx, cx;
 extern struct avm_memcell retval;
 extern unsigned top, topsp;
+extern unsigned curr_instr;
+
 typedef enum avm_memcell_t
 {
     number_m = 0,
@@ -90,14 +92,14 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv);
 void avm_table_dec_ref_counter(avm_table *t);
 void avm_table_inc_ref_counter(avm_table *t);
 avm_table *avm_table_new();
-int avm_table_insert_str_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
-int avm_table_insert_lib_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_set_str_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_set_lib_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
 
-int avm_table_insert_user_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_set_user_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
 
-int avm_table_insert_number_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_set_number_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
 
-int avm_table_insert_bool_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_set_bool_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
 
 avm_memcell *avm_table_get_number_indexed(avm_table *table, avm_memcell *left);
 
@@ -110,6 +112,23 @@ avm_memcell *avm_table_get_user_func_indexed(avm_table *table, avm_memcell *left
 avm_memcell *avm_table_get_lib_func_indexed(avm_table *table, avm_memcell *left);
 int avm_table_get(avm_table *table, avm_memcell *left);
 
-int avm_table_insert(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_set(avm_table *table, avm_memcell *left, avm_memcell *right);
 
-void avm_error(char *message , char * arg1 , char * arg2);
+void avm_error(char *message, char *arg1, char *arg2);
+
+//to string
+typedef char *(*tostring_func_t)(avm_memcell *);
+
+char *number_tostring(avm_memcell *mem);
+char *string_tostring(avm_memcell *mem);
+char *bool_tostring(avm_memcell *mem);
+char *table_tostring(avm_memcell *mem);
+char *userfunc_tostring(avm_memcell *mem);
+char *libfunc_tostring(avm_memcell *mem);
+char *nil_tostring(avm_memcell *mem);
+char *undef_tostring(avm_memcell *mem);
+
+tostring_func_t tostringFuncs[8];
+
+//execute
+void execute_cycle();

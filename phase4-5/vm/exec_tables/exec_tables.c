@@ -60,6 +60,7 @@ avm_memcell *avm_tablegetelement(avm_table *table, avm_memcell *index)
 }
 void execute_tablegetelem(instruction *instr)
 {
+    fprintf(stderr, "execute_tablegetelem\n");
     avm_memcell *lv = avm_translate_operand(&instr->result, NULL);
     avm_memcell *t = avm_translate_operand(&instr->arg1, NULL);
     avm_memcell *i = avm_translate_operand(&instr->arg2, &ax);
@@ -87,7 +88,7 @@ void execute_tablegetelem(instruction *instr)
 }
 avm_memcell *avm_tablesetelement(avm_table *table, avm_memcell *index, avm_memcell *content)
 {
-    avm_table_insert(table, index, content);
+    avm_table_set(table, index, content);
 }
 void execute_tablesetelem(instruction *instr)
 {

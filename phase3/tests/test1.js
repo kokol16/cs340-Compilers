@@ -138,12 +138,12 @@ while (x > 0) {
 
 //3
 //if (1>2)
-  // x = 1;
+// x = 1;
 
 //4
 //while(1) { 
-  //  x = 1; 
- //}
+//  x = 1; 
+//}
 
 /*
  x=(
@@ -153,18 +153,13 @@ while (x > 0) {
  ) and not false or 2>=2;
  */
 
-
- while(1)
-{
-    break;
-    continue;
-
-    while(1)
-    {
-        break;
-        continue;
-
-    }
-    break;
-    continue;
-}
+ /*
+ x = 10.12;
+ y = "hello";
+ z = (function(){return x; });
+ function g(a,b){return z(a,b); }
+ print(x,y,z);
+ t = [];
+ t.x = y;*/
+ //x= a or c>d and not b;
+ t.x.y=1821;

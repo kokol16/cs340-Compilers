@@ -88,6 +88,7 @@ void avm_table_buckets_init(avm_table_bucket **p)
     }
 }
 
+
 avm_table *avm_table_new()
 {
     avm_table *t = malloc(sizeof(avm_table));
@@ -134,19 +135,19 @@ avm_table_bucket *avm_table_create_bucket(avm_memcell *left, avm_memcell *right)
     return bucket;
 }
 
-int avm_table_insert_str_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
+int avm_table_set_str_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
 {
     if (table == NULL)
         return 0;
     int index = hash_str(left->data.strVal);
 
     avm_table_bucket *tmp = table->str_indexed[index];
-    avm_table_bucket *bucket = avm_table_create_bucket(left, right);
+    //avm_table_bucket *bucket = avm_table_create_bucket(left, right);
 
     if (tmp == NULL)
     {
-        table->str_indexed[index] = bucket;
-        return 1;
+        //table->str_indexed[index] = bucket;
+        return 0;
     }
     avm_table_bucket *prev;
     while (tmp->next != NULL)
@@ -179,22 +180,22 @@ int avm_table_insert_str_indexed(avm_table *table, avm_memcell *left, avm_memcel
         prev = tmp;
         tmp = tmp->next;
     }
-    tmp->next = bucket;
+    //tmp->next = bucket;
     return 1;
 }
-int avm_table_insert_lib_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
+int avm_table_set_lib_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
 {
     if (table == NULL)
         return 0;
     int index = hash_str(left->data.libfuncVal);
 
     avm_table_bucket *tmp = table->library_func_indexed[index];
-    avm_table_bucket *bucket = avm_table_create_bucket(left, right);
+    //avm_table_bucket *bucket = avm_table_create_bucket(left, right);
 
     if (tmp == NULL)
     {
-        table->library_func_indexed[index] = bucket;
-        return 1;
+        //table->library_func_indexed[index] = bucket;
+        return 0;
     }
     avm_table_bucket *prev;
     while (tmp->next != NULL)
@@ -226,23 +227,23 @@ int avm_table_insert_lib_func_indexed(avm_table *table, avm_memcell *left, avm_m
         prev = tmp;
         tmp = tmp->next;
     }
-    tmp->next = bucket;
+    //tmp->next = bucket;
     return 1;
 }
 
-int avm_table_insert_user_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
+int avm_table_set_user_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
 {
     if (table == NULL)
         return 0;
     int index = hash_str(user_funcs[left->data.funVal].id);
 
     avm_table_bucket *tmp = table->user_func_indexed[index];
-    avm_table_bucket *bucket = avm_table_create_bucket(left, right);
+    //avm_table_bucket *bucket = avm_table_create_bucket(left, right);
 
     if (tmp == NULL)
     {
-        table->user_func_indexed[index] = bucket;
-        return 1;
+    //    table->user_func_indexed[index] = bucket;
+        return 0;
     }
     avm_table_bucket *prev;
     while (tmp->next != NULL)
@@ -274,23 +275,23 @@ int avm_table_insert_user_func_indexed(avm_table *table, avm_memcell *left, avm_
         prev = tmp;
         tmp = tmp->next;
     }
-    tmp->next = bucket;
+    //tmp->next = bucket;
     return 1;
 }
 
-int avm_table_insert_number_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
+int avm_table_set_number_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
 {
     if (table == NULL)
         return 0;
     int index = hash_double(left->data.numVal);
 
     avm_table_bucket *tmp = table->num_indexed[index];
-    avm_table_bucket *bucket = avm_table_create_bucket(left, right);
+    //avm_table_bucket *bucket = avm_table_create_bucket(left, right);
 
     if (tmp == NULL)
     {
-        table->num_indexed[index] = bucket;
-        return 1;
+        //table->num_indexed[index] = bucket;
+        return 0;
     }
     avm_table_bucket *prev;
     while (tmp->next != NULL)
@@ -321,23 +322,23 @@ int avm_table_insert_number_indexed(avm_table *table, avm_memcell *left, avm_mem
         prev = tmp;
         tmp = tmp->next;
     }
-    tmp->next = bucket;
+    //tmp->next = bucket;
     return 1;
 }
 
-int avm_table_insert_bool_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
+int avm_table_set_bool_indexed(avm_table *table, avm_memcell *left, avm_memcell *right)
 {
     if (table == NULL)
         return 0;
     int index = left->data.boolVal;
 
     avm_table_bucket *tmp = table->bool_indexed[index];
-    avm_table_bucket *bucket = avm_table_create_bucket(left, right);
+    //avm_table_bucket *bucket = avm_table_create_bucket(left, right);
 
     if (tmp == NULL)
     {
-        table->bool_indexed[index] = bucket;
-        return 1;
+        //table->bool_indexed[index] = bucket;
+        return 0;
     }
     avm_table_bucket *prev;
     while (tmp->next != NULL)
@@ -369,7 +370,7 @@ int avm_table_insert_bool_indexed(avm_table *table, avm_memcell *left, avm_memce
         prev = tmp;
         tmp = tmp->next;
     }
-    tmp->next = bucket;
+    //tmp->next = bucket;
     return 1;
 }
 
@@ -502,33 +503,33 @@ int avm_table_get(avm_table *table, avm_memcell *left)
     }
 }
 
-int avm_table_insert(avm_table *table, avm_memcell *left, avm_memcell *right)
+int avm_table_set(avm_table *table, avm_memcell *left, avm_memcell *right)
 {
     switch (left->type)
     {
     case number_m:
-        avm_table_insert_number_indexed(table, left, right);
+        avm_table_set_number_indexed(table, left, right);
         table->total++;
 
         break;
     case string_m:
-        avm_table_insert_str_indexed(table, left, right);
+        avm_table_set_str_indexed(table, left, right);
         table->total++;
 
         break;
 
     case bool_m:
-        avm_table_insert_bool_indexed(table, left, right);
+        avm_table_set_bool_indexed(table, left, right);
         table->total++;
 
         break;
     case userfunc_m:
-        avm_table_insert_user_func_indexed(table, left, right);
+        avm_table_set_user_func_indexed(table, left, right);
         table->total++;
 
         break;
     case libfunc_m:
-        avm_table_insert_lib_func_indexed(table, left, right);
+        avm_table_set_lib_func_indexed(table, left, right);
         table->total++;
 
         break;

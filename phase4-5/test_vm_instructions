@@ -1,4 +1,10 @@
-#1	TABLE_SET_ELEM		 result: type: 1(global_a),  val: 0		arg1: type: 5(string_a),  val: 0:"i"			arg2: type: 4(number_a),  val: 0:0.000000		line : 198
+#1	ASSIGN		 result: type: 1(global_a),  val: 0		arg1: type: 4(number_a),  val: 0:5.000000		line : 199
 
-#2	TABLE_GET_ELEM		 result: type: 1(global_a),  val: 1		arg1: type: 1(global_a),  val: 0		arg2: type: 5(string_a),  val: 1:"i"		line : 198
+#2	ASSIGN		 result: type: 1(global_a),  val: 1		arg1: type: 1(global_a),  val: 0	line : 199
+
+#3	PUSHARG		arg1: type: 1(global_a),  val: 0	line : 200
+
+#4	CALLFUNC		arg1: type: 9(libfunc_a),  val: 0:print		line : 200
+
+#5	ASSIGN		 result: type: 1(global_a),  val: 1		arg1: type: 10 val: 0	line : 200
 

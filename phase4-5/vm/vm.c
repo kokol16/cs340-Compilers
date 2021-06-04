@@ -4,11 +4,9 @@
 #include <stdio.h>
 #include "../general_functions/lib.h"
 #define MAGIC_NUMBER 340200501
-
 unsigned char execution_finished = 0;
 unsigned pc = 0;
 unsigned currLine = 0;
-unsigned codeSize = 0;
 instruction *code = NULL;
 
 unsigned totalActuals = 0;
@@ -25,24 +23,25 @@ struct avm_memcell retval;
 unsigned top, topsp;
 
 unsigned curr_instr;
+unsigned codeSize = 0;
 instruction *instructions;
 
 typedef void (*execute_func_t)(instruction *);
 execute_func_t executeFuncs[] = {
     execute_assign,       //0
-    execute_mul,          //1
-    execute_uminus,       //2
     execute_add,          //3
     execute_sub,          //4
+    execute_mul,          //1
     execute_div,          //5
     execute_mod,          //6
+    execute_uminus,       //2
     execute_and,          //7
     execute_or,           //8
     execute_not,          //9
     execute_jeq,          //10
     execute_jne,          //11
     execute_jle,          //12
-    execute_jgt,          //13
+    execute_jge,          //13
     execute_jlt,          //14
     execute_jgt,          //15
     execute_call,         //16
@@ -107,7 +106,8 @@ avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg)
         return reg;
     }
     default:
-        assert(0);
+        return NULL;
+        //assert(0);
     }
 }
 
@@ -121,10 +121,23 @@ void avm_ini_stack(void)
     }
 }
 
+void avm_initialize()
+{
+    avm_ini_stack();
+
+    avm_registerlibfunc("print", libfunc_print);
+
+    avm_registerlibfunc("typeof", libfunc_typeof);
+}
 int main()
 {
     fprintf(stderr, "===========VM============\n");
     read_binary_file();
+    avm_initialize();
+    while (!execution_finished)
+    {
+        execute_cycle();
+    }
 }
 
 void read_binary_file()
@@ -409,14 +422,20 @@ void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsig
 void execute_cycle()
 {
     if (execution_finished)
+    {
+        fprintf(stderr, "execution finished pc  : %d\n", pc);
+
         return;
+    }
     else if (pc == AVM_ENDING_PC)
     {
+
         execution_finished = 1;
         return;
     }
     else
     {
+
         assert(pc < AVM_ENDING_PC);
         instruction *instr = code + pc;
         assert(instr->opcode >= 0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
@@ -425,6 +444,8 @@ void execute_cycle()
             currLine = instr->srcLine;
         }
         unsigned oldPC = pc;
+        char *vmop = vm_opcode_to_string(instr->opcode);
+        fprintf(stderr, "op : %s(%d)\n", vmop, instr->opcode);
         (*executeFuncs[instr->opcode])(instr);
         if (pc == oldPC)
         {

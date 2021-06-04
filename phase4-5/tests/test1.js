@@ -195,7 +195,8 @@ function c()
 
 print();
 x=print();*/
-array.i=0;
-
+//array.i=0;
+x=5;
+print(x);
 
 //a= b and g or not d and e or length;

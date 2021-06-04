@@ -3,32 +3,36 @@
 typedef enum vmopcode
 {
     assign_v,
-    mul_v,
-    not_v,
-    jle_v,
-    jgt_v,
-    funcenter_v,
-    tablegetelem_v,
     add_v,
-    div_v,
-    and_v,
-    jeq_v,
-    jge_v,
-    call_v,
-    funcexit_v,
-    tablesetelem_v,
     sub_v,
+    mul_v,
+    div_v,
     mod_v,
+    uminus_v,
+    and_v,
     or_v,
+    not_v,
+    jeq_v,
     jne_v,
+    jle_v,
+    jge_v,
     jlt_v,
+    jgt_v,
+    call_v,
     pusharg_v,
     return_v,
+    get_ret_val_v,
+    funcenter_v,
+    funcexit_v,
     newtable_v,
-    nop_v,
+    tablegetelem_v,
+    tablesetelem_v,
     jump_v,
+    nop_v,
 
 } vmopcode;
+
+  
 
 typedef enum vmarg_t
 {

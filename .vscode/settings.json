@@ -12,6 +12,7 @@
         "exec_arith.h": "c",
         "exec_funcs.h": "c",
         "exec_other.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "xutility": "c"
     }
 }

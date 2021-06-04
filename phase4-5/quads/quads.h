@@ -3,12 +3,12 @@
 typedef enum iopcode
 {
     assign=0,//0
-    mul,//1
-    uminus,//2
     add,//3
     sub,//4
+    mul,//1
     _div,//5
     mod,//6
+    uminus,//2
     and,//7
     or,//8
     not,//9
