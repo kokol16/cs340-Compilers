@@ -40,11 +40,12 @@ typedef enum avm_memcell_t
     undef_m = 7
 
 } avm_memcell_t;
+
 typedef struct avm_table avm_table;
 typedef struct avm_memcell
 {
     avm_memcell_t type;
-    union datta
+    union data
     {
         double numVal;
         char *strVal;
@@ -58,8 +59,8 @@ typedef struct avm_memcell
 
 typedef struct avm_table_bucket
 {
-    struct avm_memcell key;
-    struct avm_memcell value;
+    struct avm_memcell *key;
+    struct avm_memcell *value;
     struct avm_table_bucket *next;
 } avm_table_bucket;
 
@@ -83,4 +84,32 @@ void avm_table_set_elem(avm_memcell *key, avm_memcell *value);
 void read_binary_file();
 avm_memcell *avm_translate_operand(vmarg *arg, avm_memcell *reg);
 void avm_memcell_clear(avm_memcell *m);
+void avm_assign(avm_memcell *lv, avm_memcell *rv);
+
+//tables
+void avm_table_dec_ref_counter(avm_table *t);
 void avm_table_inc_ref_counter(avm_table *t);
+avm_table *avm_table_new();
+int avm_table_insert_str_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+int avm_table_insert_lib_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+
+int avm_table_insert_user_func_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+
+int avm_table_insert_number_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+
+int avm_table_insert_bool_indexed(avm_table *table, avm_memcell *left, avm_memcell *right);
+
+avm_memcell *avm_table_get_number_indexed(avm_table *table, avm_memcell *left);
+
+avm_memcell *avm_table_get_string_indexed(avm_table *table, avm_memcell *left);
+
+avm_memcell *avm_table_get_bool_indexed(avm_table *table, avm_memcell *left);
+
+avm_memcell *avm_table_get_user_func_indexed(avm_table *table, avm_memcell *left);
+
+avm_memcell *avm_table_get_lib_func_indexed(avm_table *table, avm_memcell *left);
+int avm_table_get(avm_table *table, avm_memcell *left);
+
+int avm_table_insert(avm_table *table, avm_memcell *left, avm_memcell *right);
+
+void avm_error(char *message , char * arg1 , char * arg2);

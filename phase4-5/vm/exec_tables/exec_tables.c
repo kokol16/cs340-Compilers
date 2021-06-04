@@ -56,7 +56,7 @@ void execute_newtable(instruction *instr)
 }
 avm_memcell *avm_tablegetelement(avm_table *table, avm_memcell *index)
 {
-
+    avm_table_get(table, index);
 }
 void execute_tablegetelem(instruction *instr)
 {
@@ -85,9 +85,9 @@ void execute_tablegetelem(instruction *instr)
         }
     }
 }
-avm_memcell *avm_tablesetelement(avm_table *table, avm_memcell *index, avm_memcell * content)
+avm_memcell *avm_tablesetelement(avm_table *table, avm_memcell *index, avm_memcell *content)
 {
-
+    avm_table_insert(table, index, content);
 }
 void execute_tablesetelem(instruction *instr)
 {

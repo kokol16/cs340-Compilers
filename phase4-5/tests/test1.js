@@ -176,7 +176,7 @@ while (true) {
 //z = "world";
 //w = cos(3.1415);
 //print(x,y,z,w);
-
+/*
 function f(){
     a = "lala";
     a = "xoxo";
@@ -194,6 +194,8 @@ function c()
 }
 
 print();
-x=print();
+x=print();*/
+array.i=0;
+
 
 //a= b and g or not d and e or length;

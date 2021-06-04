@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include "../general_functions/lib.h"
 #define MAGIC_NUMBER 340200501
 
 unsigned char execution_finished = 0;
@@ -118,102 +119,6 @@ void avm_ini_stack(void)
         AVM_WIPEOUT(stack[i]);
         stack[i].type = undef_m;
     }
-}
-
-void avm_table_inc_ref_counter(avm_table *t)
-{
-    ++t->refCounter;
-}
-void avm_table_dec_ref_counter(avm_table *t)
-{
-    assert(t->refCounter > 0);
-    if (!--t->refCounter)
-    {
-        avm_table_destroy(t);
-    }
-}
-void avm_table_buckets_init(avm_table_bucket **p)
-{
-    unsigned i = 0;
-    for (i = 0; i < AVM_TABLE_SIZE; ++i)
-    {
-        p[i] = (avm_table_bucket *)0;
-    }
-}
-
-avm_table *avm_table_new()
-{
-    avm_table *t = malloc(sizeof(avm_table));
-    AVM_WIPEOUT(t);
-    t->refCounter = t->total = 0;
-    avm_table_buckets_init(t->num_indexed);
-    avm_table_buckets_init(t->bool_indexed);
-    avm_table_buckets_init(t->str_indexed);
-    avm_table_buckets_init(t->library_func_indexed);
-    avm_table_buckets_init(t->user_func_indexed);
-    return t;
-}
-void memclear_string(avm_memcell *m)
-{
-    assert(m->data.strVal);
-    free(m->data.strVal);
-}
-
-void memclear_table(avm_memcell *m)
-{
-    assert(m->data.tableVal);
-    avm_table_dec_ref_counter(m->data.tableVal);
-}
-typedef void (*memclear_func_t)(avm_memcell *);
-
-memclear_func_t memclearFuncs[] = {
-    0, //number
-    memclear_string,
-    0, //bool
-    memclear_table,
-    0, //userfunc
-    0, //libfunc
-    0, //nil
-    0  //undef
-
-};
-void avm_memcell_clear(avm_memcell *m)
-{
-    if (m->type != undef_m)
-    {
-        memclear_func_t f = memclearFuncs[m->type];
-        if (f)
-        {
-            (*f)(m);
-        }
-        m->type = undef_m;
-    }
-}
-void avm_table_buckets_destroy(avm_table_bucket **p)
-{
-    unsigned i = 0;
-    for (i = 0; i < AVM_TABLE_SIZE; ++i, ++p)
-    {
-        for (avm_table_bucket *b = *p; b;)
-        {
-            avm_table_bucket *del = b;
-            b = b->next;
-            avm_memcell_clear(&del->key);
-            avm_memcell_clear(&del->value);
-            free(del);
-        }
-        p[i] = (avm_table_bucket *)0;
-    }
-}
-void avm_table_destroy(avm_table *t)
-{
-    avm_table_buckets_destroy(t->str_indexed);
-    avm_table_buckets_destroy(t->bool_indexed);
-    avm_table_buckets_destroy(t->num_indexed);
-    avm_table_buckets_destroy(t->library_func_indexed);
-    avm_table_buckets_destroy(t->user_func_indexed);
-
-    free(t);
 }
 
 int main()
@@ -526,4 +431,41 @@ void execute_cycle()
             ++pc;
         }
     }
+}
+
+void avm_error(char *message, char *arg1, char *arg2)
+{
+    print_Red();
+    if (arg2 != NULL)
+    {
+        fprintf(stderr, message, arg1, arg2);
+    }
+    else if (arg1 != NULL)
+    {
+        fprintf(stderr, message, arg1);
+    }
+    else
+    {
+        fprintf(stderr, message);
+    }
+    reset_Red();
+    execution_finished = 1;
+}
+
+void avm_warning(char *message, char *arg1, char *arg2)
+{
+    print_Yellow();
+    if (arg2 != NULL)
+    {
+        fprintf(stderr, message, arg1, arg2);
+    }
+    else if (arg1 != NULL)
+    {
+        fprintf(stderr, message, arg1);
+    }
+    else
+    {
+        fprintf(stderr, message);
+    }
+    reset_Yellow();
 }
