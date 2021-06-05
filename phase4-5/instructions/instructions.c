@@ -73,13 +73,16 @@ void add_incomplete_jump(unsigned _intr_no, unsigned iaddress)
     ij = malloc(sizeof(incomplete_jump));
     ij->iaddress = iaddress;
     ij->instr_no = _intr_no;
+    ij->next = NULL;
     tmp = ij_head;
     ij_total++;
     if (ij_head == NULL)
     {
         ij_head = ij;
+
         return;
     }
+
     while (tmp->next != NULL)
     {
         tmp = tmp->next;
@@ -111,7 +114,7 @@ void generate(vmopcode opcode, quad *quad)
     //fprintf(stderr, "generate\n");
     instruction t = {0};
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = opcode;
     if (quad->arg1 != NULL)
@@ -173,16 +176,15 @@ void generate_NOP(quad *quad)
     instruction t;
     reset_instruction(&t);
     t.opcode = nop_v;
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
     emit_instr(t);
 }
 void generate_relational(vmopcode op, quad *quad)
 {
-    //fprintf(stderr, "generate_relational\n");
+    fprintf(stderr, "generate_relational\n");
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
-
+    t.srcLine = quad->line;
     t.opcode = op;
     make_operand(quad->arg1, &t.arg1);
     make_operand(quad->arg2, &t.arg2);
@@ -214,7 +216,7 @@ void generate_NOT(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = jeq_v;
     make_operand(quad->arg1, &t.arg1);
@@ -253,7 +255,7 @@ void generate_OR(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = jeq_v;
     make_operand(quad->arg1, &t.arg1);
@@ -281,7 +283,7 @@ void generate_AND(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = jeq_v;
     make_operand(quad->arg1, &t.arg1);
@@ -310,7 +312,7 @@ void generate_PARAM(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = pusharg_v;
     make_operand(quad->arg1, &t.arg1);
@@ -321,7 +323,7 @@ void generate_CALL(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = call_v;
     make_operand(quad->arg1, &t.arg1);
@@ -332,7 +334,7 @@ void generate_GETRETVAL(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = assign_v;
     make_operand(quad->result, &t.result);
@@ -599,7 +601,7 @@ void generate_funcstart(quad *quad)
     instruction t;
     memset(&t, 0, sizeof(t));
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.result.type = 0;
     t.opcode = jump_v;
@@ -625,7 +627,7 @@ void generate_return(quad *quad)
 
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = assign_v;
     make_retvaloperand(&t.result);
@@ -695,7 +697,7 @@ void generate_funcend(quad *quad)
     quad->taddress = nextinstructionlabel();
     instruction t;
     reset_instruction(&t);
-    t.srcLine=quad->line;
+    t.srcLine = quad->line;
 
     t.opcode = funcexit_v;
     make_operand(quad->result, &t.result);
@@ -888,7 +890,7 @@ void print_instructions(FILE *instr_file)
         //if(quads[i].op==jump && quads[i].label==0) quads[i].label=1;
         //fprintf(stderr, "opcode:%s\n", vm_opcode_to_string(instructions[i].opcode));
         //print_instructions_analytics(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, instr_file);
-        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, instr_file,instructions[i].srcLine);
+        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, instr_file, instructions[i].srcLine);
 
         i++;
     }

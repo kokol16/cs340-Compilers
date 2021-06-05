@@ -5,7 +5,7 @@
 #include "../general_functions/lib.h"
 #define MAGIC_NUMBER 340200501
 unsigned char execution_finished = 0;
-unsigned pc = 0;
+unsigned pc = 1;
 unsigned currLine = 0;
 instruction *code = NULL;
 
@@ -20,7 +20,7 @@ char **lib_funcs;
 unsigned total_lib_funcs;
 struct avm_memcell ax, bx, cx;
 struct avm_memcell retval;
-unsigned top, topsp;
+unsigned top = AVM_STACK_SIZE - 1, topsp = AVM_STACK_SIZE - 1;
 
 unsigned curr_instr;
 unsigned codeSize = 0;
@@ -121,6 +121,20 @@ void avm_ini_stack(void)
     }
 }
 
+void push_global_to_stack(vmarg *vmarg)
+{
+    static int i = 0;
+    if (AVM_STACK_SIZE - top - 1 > vmarg->val)
+        return;
+
+    fprintf(stderr, "push_global_to_stack offset %u\n", vmarg->val);
+    avm_memcell *arg = avm_translate_operand(vmarg, &ax);
+    i++;
+    assert(arg);
+    avm_assign_v2(&stack[top], arg);
+    avm_dec_top();
+    topsp = top;
+}
 void avm_initialize()
 {
     avm_ini_stack();
@@ -134,6 +148,7 @@ int main()
     fprintf(stderr, "===========VM============\n");
     read_binary_file();
     avm_initialize();
+    fprintf(stderr,"instruictions total: %u\n", curr_instr);
     while (!execution_finished)
     {
         execute_cycle();
@@ -223,7 +238,7 @@ void read_binary_file()
     instructions = malloc(sizeof(instruction) * curr_instr);
     FILE *fp2;
     fp2 = fopen("test_vm_instructions", "w+");
-    for (i = 0; i < curr_instr; i++)
+    for (i = 1; i < curr_instr; i++)
     {
         fread(&instructions[i].opcode, sizeof(vmopcode), 1, fp);
 
@@ -235,7 +250,19 @@ void read_binary_file()
 
         fread(&instructions[i].arg2.type, sizeof(vmarg), 1, fp);
         fread(&instructions[i].arg2.val, sizeof(unsigned), 1, fp);
-        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i + 1, fp2, instructions[i].srcLine);
+        print_text_file(instructions[i].opcode, &instructions[i].arg1, &instructions[i].arg2, &instructions[i].result, i, fp2, instructions[i].srcLine);
+        if (instructions[i].result.type == global_a)
+        {
+            push_global_to_stack(&instructions[i].result);
+        }
+        if (instructions[i].arg1.type == global_a)
+        {
+            push_global_to_stack(&instructions[i].arg1);
+        }
+        if (instructions[i].arg2.type == global_a)
+        {
+            push_global_to_stack(&instructions[i].arg2);
+        }
     }
 
     for (i = 0; i < total_lib_funcs; i++)
@@ -252,7 +279,7 @@ void read_binary_file()
         fprintf(stderr, "%s\n", consts_string[i]);
     }
     code = instructions;
-
+    fprintf(stderr, "==========END OF BINARY FILE===========\n");
     fclose(fp);
     fclose(fp2);
 }
@@ -444,7 +471,9 @@ void execute_cycle()
             currLine = instr->srcLine;
         }
         unsigned oldPC = pc;
+
         char *vmop = vm_opcode_to_string(instr->opcode);
+
         fprintf(stderr, "op : %s(%d)\n", vmop, instr->opcode);
         (*executeFuncs[instr->opcode])(instr);
         if (pc == oldPC)

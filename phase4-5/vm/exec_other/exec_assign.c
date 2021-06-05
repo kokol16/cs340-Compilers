@@ -1,13 +1,13 @@
 
 #include "exec_other.h"
 #include <assert.h>
-unsigned char execution_finished ;
+unsigned char execution_finished;
 unsigned pc;
-unsigned currLine ;
-unsigned codeSize ;
-instruction *code ;
+unsigned currLine;
+unsigned codeSize;
+instruction *code;
 
-unsigned totalActuals ;
+unsigned totalActuals;
 double *consts_number;
 unsigned total_numbers;
 char **consts_string;
@@ -20,11 +20,9 @@ struct avm_memcell ax, bx, cx;
 struct avm_memcell retval;
 unsigned top, topsp;
 
-
-
-
 void avm_assign(avm_memcell *lv, avm_memcell *rv)
 {
+
     if (lv == rv)
         return;
 
@@ -34,10 +32,12 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
     }
     if (rv->type == undef_m)
     {
+        avm_warning("assigning from undef content!\n", NULL, NULL);
     } //warning
 
     avm_memcell_clear(lv);
     memcpy(lv, rv, sizeof(avm_memcell));
+
     if (lv->type == string_m)
     {
         lv->data.strVal = strdup(rv->data.strVal);
@@ -50,7 +50,7 @@ void avm_assign(avm_memcell *lv, avm_memcell *rv)
 
 void execute_assign(instruction *instr)
 {
-    fprintf(stderr,"execute assign\n");
+    fprintf(stderr, "execute assign\n");
 
     avm_memcell *lv = avm_translate_operand(&instr->result, (avm_memcell *)0);
     avm_memcell *rv = avm_translate_operand(&instr->arg1, &ax);

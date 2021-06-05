@@ -1,21 +1,5 @@
-unsigned char execution_finished ;
-unsigned pc;
-unsigned currLine ;
-unsigned codeSize ;
-instruction *code ;
-
-unsigned totalActuals ;
-double *consts_number;
-unsigned total_numbers;
-char **consts_string;
-unsigned total_strings;
-unsigned total_user_funcs;
-struct userfunc *user_funcs;
-char **lib_funcs;
-unsigned total_lib_funcs;
-struct avm_memcell ax, bx, cx;
-struct avm_memcell retval;
-unsigned top, topsp;
+check equalitys with differnt types
+check >= klp
 
 
 

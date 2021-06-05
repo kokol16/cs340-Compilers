@@ -13,6 +13,15 @@
         "exec_funcs.h": "c",
         "exec_other.h": "c",
         "assert.h": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "xstring": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "limits": "c",
+        "new": "c",
+        "tuple": "c",
+        "utility": "c",
+        "stdlib.h": "c",
+        "vm.h": "c"
     }
 }

@@ -1,10 +1,4 @@
-#1	ASSIGN		 result: type: 1(global_a),  val: 0:x		arg1: type: 4(number_a),  val: 0:5.000000		line : 199
+#1	IF_EQUALS		 result: type: 0(label_a),  val: 0		arg1: type: 6(bool_a),  val: 1:1ÌIâ—^Hâ‚HÉ‰PTLç ﬂ		arg2: type: 6(bool_a),  val: 1:true		line : 212
 
-#2	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 1(global_a),  val: 0:x	line : 199
-
-#3	PUSHARG		arg1: type: 1(global_a),  val: 0:x	line : 200
-
-#4	CALLFUNC		arg1: type: 9(libfunc_a),  val: 0:print	line : 200
-
-#5	ASSIGN		 result: type: 1(global_a),  val: 1:_t0		arg1: type: 10 val: 0:print	line : 200
+#2	JUMP		 result: type: 0(label_a),  val: 0	line : 212
 

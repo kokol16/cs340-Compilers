@@ -6,7 +6,7 @@
 #include "exec_tables/exec_tables.h"
 #include "exec_other/exec_other.h"
 #define AVM_STACKENV_SIZE 4
-#define AVM_MAX_INSTRUCTIONS 24
+#define AVM_MAX_INSTRUCTIONS 26
 #define AVM_ENDING_PC curr_instr
 #define AVM_STACK_SIZE 4096
 #define AVM_WIPEOUT(m) memset(&(m), 0, sizeof(m))
@@ -115,6 +115,7 @@ int avm_table_get(avm_table *table, avm_memcell *left);
 int avm_table_set(avm_table *table, avm_memcell *left, avm_memcell *right);
 
 void avm_error(char *message, char *arg1, char *arg2);
+void avm_warning(char *message, char *arg1, char *arg2);
 
 //to string
 typedef char *(*tostring_func_t)(avm_memcell *);
@@ -130,5 +131,7 @@ char *undef_tostring(avm_memcell *mem);
 
 tostring_func_t tostringFuncs[8];
 
+
 //execute
 void execute_cycle();
+void avm_dec_top();

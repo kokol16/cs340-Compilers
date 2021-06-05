@@ -28,6 +28,8 @@ typedef unsigned char (*check_equality)(avm_memcell *m1, avm_memcell *m2);
 
 unsigned char numbereq_check(avm_memcell *m1, avm_memcell *m2)
 {
+    fprintf(stderr, "numbereq_check %f == %f\n", m1->data.numVal, m2->data.numVal);
+
     return m1->data.numVal == m2->data.numVal;
 }
 unsigned char stringeq_check(avm_memcell *m1, avm_memcell *m2)
@@ -37,10 +39,12 @@ unsigned char stringeq_check(avm_memcell *m1, avm_memcell *m2)
 
 unsigned char booleq_check(avm_memcell *m1, avm_memcell *m2)
 {
-    return 1;
+
+    return m1->data.boolVal == m2->data.boolVal;
 }
 unsigned char tableeq_check(avm_memcell *m1, avm_memcell *m2)
 {
+
     return 1;
 }
 unsigned char user_funceq_check(avm_memcell *m1, avm_memcell *m2)
@@ -81,19 +85,22 @@ unsigned char jlt_impl(double x, double y)
 }
 
 cmp_func comparisonFuncs[] = {
-    jge_impl,
-    jgt_impl,
     jle_impl,
+    jge_impl,
     jlt_impl,
+    jgt_impl,
 
 };
 
 void execute_cmp(instruction *instr)
 {
-    avm_memcell *lv = avm_translate_operand(&instr->result, (avm_memcell *)0);
+    unsigned char result = 0;
+    //avm_memcell *lv = avm_translate_operand(&instr->result, (avm_memcell *)0);
     avm_memcell *rv1 = avm_translate_operand(&instr->arg1, &ax);
     avm_memcell *rv2 = avm_translate_operand(&instr->arg2, &bx);
-    assert(lv && (&stack[AVM_STACK_SIZE - 1] >= lv && lv > &stack[top] || lv == &retval));
+    //assert(lv );
+    //assert( (&stack[AVM_STACK_SIZE - 1] >= lv && lv > &stack[top] || lv == &retval));
+
     assert(rv1 && rv2);
     if (rv1->type != number_m || rv2->type != number_m)
     {
@@ -102,10 +109,16 @@ void execute_cmp(instruction *instr)
     }
     else
     {
-        cmp_func op = comparisonFuncs[instr->opcode - jge_v];
-        avm_memcell_clear(lv);
-        lv->type = bool_m;
-        lv->data.boolVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+        fprintf(stderr, "aferesi %d\n", instr->opcode - jle_v);
+        result = comparisonFuncs[instr->opcode - jle_v](rv1->data.numVal, rv2->data.numVal);
+
+        //avm_memcell_clear(lv);
+        //lv->type = bool_m;
+        //lv->data.boolVal = (*op)(rv1->data.numVal, rv2->data.numVal);
+    }
+    if (!execution_finished && result == 1)
+    {
+        pc = instr->result.val;
     }
 }
 
@@ -178,12 +191,13 @@ void execute_jne(instruction *instr)
     unsigned char result = 0;
     if (rv1->type == undef_m || rv2->type == undef_m)
     {
+        avm_error("undef involed to equality\n", NULL, NULL);
         //avm_error
         execution_finished = 1;
     }
     else if (rv1->type == nil_m || rv2->type == nil_m)
     {
-        result = (rv1->type != nil_m) && (rv2->type != nil_m);
+        result = (rv1->type != nil_m) || (rv2->type != nil_m);
     }
     else if (rv1->type == bool_m || rv2->type == bool_m)
     {
@@ -191,14 +205,17 @@ void execute_jne(instruction *instr)
     }
     else if (rv1->type != rv2->type)
     {
+        avm_error("%s == %s is illegal\n", typeStrings[rv1->type], typeStrings[rv1->type]);
+
         //avm_error
     }
     else
     {
+        result = !(equalityFuncs[rv1->type](rv1, rv2));
         //dispatching
     }
 
-    if (!execution_finished && result)
+    if (!execution_finished && result == 1)
     {
         pc = instr->result.val;
     }
@@ -206,12 +223,13 @@ void execute_jne(instruction *instr)
 void execute_jeq(instruction *instr)
 {
     assert(instr->result.type == label_a);
+
     avm_memcell *rv1 = avm_translate_operand(&instr->arg1, &ax);
     avm_memcell *rv2 = avm_translate_operand(&instr->arg2, &bx);
     unsigned char result = 0;
     if (rv1->type == undef_m || rv2->type == undef_m)
     {
-        //avm_error
+        avm_error("undefined type in jeq\n", NULL, NULL);
         execution_finished = 1;
     }
     else if (rv1->type == nil_m || rv2->type == nil_m)
@@ -224,15 +242,19 @@ void execute_jeq(instruction *instr)
     }
     else if (rv1->type != rv2->type)
     {
-        //avm_error
+        avm_error("different types \n", NULL, NULL);
+        execution_finished = 1;
     }
     else
     {
         result = equalityFuncs[rv1->type](rv1, rv2);
+        //fprintf(stderr, "result is %d\n", result);
     }
 
-    if (!execution_finished && result)
+    if (!execution_finished && result == 1)
     {
+
         pc = instr->result.val;
+        fprintf(stderr, "pc after if equality %u\n", pc);
     }
 }

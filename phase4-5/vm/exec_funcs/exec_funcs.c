@@ -26,7 +26,7 @@ char **lib_funcs;
 unsigned total_lib_funcs;
 struct avm_memcell ax, bx, cx;
 struct avm_memcell retval;
-unsigned top = AVM_STACK_SIZE-1, topsp = AVM_STACK_SIZE-1;
+unsigned top, topsp;
 
 void avm_assign_v2(avm_memcell *lv, avm_memcell *rv)
 {
@@ -39,6 +39,7 @@ void avm_assign_v2(avm_memcell *lv, avm_memcell *rv)
     }
     if (rv->type == undef_m)
     {
+        avm_warning("assign from undef content\n", NULL, NULL);
     } //warning
 
     avm_memcell_clear(lv);
@@ -96,6 +97,7 @@ library_func_t avm_get_library_func(char *id)
 }
 void avm_call_lib_func(char *id)
 {
+    fprintf(stderr, "call lib func\n");
     library_func_t f = avm_get_library_func(id);
     if (!f)
     {
@@ -117,15 +119,16 @@ void avm_call_lib_func(char *id)
 void execute_call(instruction *instr)
 {
     fprintf(stderr, "execute call\n");
-    
-    avm_memcell *func = avm_translate_operand(&instr->result, &ax);
+
+    avm_memcell *func = avm_translate_operand(&instr->arg1, &ax);
     assert(func);
     avm_callsaveenviroment();
     switch (func->type)
     {
     case userfunc_m:
     {
-        pc = func->data.funVal;
+        pc = user_funcs[func->data.funVal].address;
+
         assert(pc < AVM_ENDING_PC);
         assert(code[pc].opcode == funcenter_v);
         break;
@@ -136,6 +139,7 @@ void execute_call(instruction *instr)
         avm_call_lib_func(func->data.libfuncVal);
     default:
     {
+
         //avm error
         execution_finished = 1;
     }
@@ -177,11 +181,11 @@ void execute_funcenter(instruction *instr)
 {
     avm_memcell *func = avm_translate_operand(&instr->result, &ax);
     assert(func);
-    assert(pc == func->data.funVal);
+    assert(pc == user_funcs[func->data.funVal].address);
 
     /* callee actions here */
     totalActuals = 0;
-    userfunc *func_info = avm_get_func_info(pc);
+    userfunc *func_info = &user_funcs[func->data.funVal]; //
     topsp = top;
     top = top - func_info->localSize;
 }
@@ -290,13 +294,16 @@ char *avm_tostring(avm_memcell *mem)
 
 void libfunc_print()
 {
+    fprintf(stderr, "lala1\n");
+
     unsigned n = avm_totalactuals();
-    fprintf(stderr, "im going to print %u", n);
+    fprintf(stderr, "im going to print %u\n", n);
     for (unsigned i = 0; i < n; i++)
     {
         char *s = avm_tostring(avm_getactual(i));
         puts(s);
-        free(s);
+        //free(s);
+        //fprintf(stderr, "lala2\n");
     }
 }
 struct map_lib_funcs *root_lib_funcs = NULL;

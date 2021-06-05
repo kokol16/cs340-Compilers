@@ -196,7 +196,32 @@ function c()
 print();
 x=print();*/
 //array.i=0;
-x=5;
-print(x);
+
+/*
+function x() {
+    local y = 9;
+    if(y==9)
+    {
+        z=65;
+        print(z);
+    }
+}
+x();*/
+
+
+if(true)
+{
+}
+
+
+
+
+
+/*
+function ()
+{
+    x=5;
+}*/
+
 
 //a= b and g or not d and e or length;

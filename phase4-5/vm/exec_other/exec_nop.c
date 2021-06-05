@@ -1,11 +1,11 @@
 #include "exec_other.h"
-unsigned char execution_finished ;
+unsigned char execution_finished;
 unsigned pc;
-unsigned currLine ;
-unsigned codeSize ;
-instruction *code ;
+unsigned currLine;
+unsigned codeSize;
+instruction *code;
 
-unsigned totalActuals ;
+unsigned totalActuals;
 double *consts_number;
 unsigned total_numbers;
 char **consts_string;
@@ -18,25 +18,20 @@ struct avm_memcell ax, bx, cx;
 struct avm_memcell retval;
 unsigned top, topsp;
 
+void execute_nop(instruction *instr) {}
 
+void execute_and(instruction *instr) {}
 
+void execute_or(instruction *instr) {}
 
- void execute_nop(instruction * instr){}
+void execute_not(instruction *instr) {}
 
+void execute_return(instruction *instr) {}
 
- void execute_and(instruction * instr){}
+void execute_get_ret_val(instruction *instr) {}
 
-
- void execute_or(instruction * instr){}
-
-
- void execute_not(instruction * instr){}
-
-
- void execute_return(instruction * instr){}
-
-
- void execute_get_ret_val(instruction * instr){}
-
-
- void execute_jump(instruction * instr){}
+void execute_jump(instruction *instr)
+{
+    pc = instr->result.val ;
+    fprintf(stderr, "jump to %u\n", pc);
+}

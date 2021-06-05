@@ -493,8 +493,8 @@ indexedelem: LEFT_BRACE expr  COLON expr RIGHT_BRACE {print_to_stream("Index Ele
                                                                                         
                                                                                         };
 
-block: LEFT_BRACE {scope++;}  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=NULL;}       
-       |LEFT_BRACE {scope++;}  statements  RIGHT_BRACE {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=$3;} ;  
+block: LEFT_BRACE {scope++; }  RIGHT_BRACE  {print_to_stream("Block"); symbolTable_hide(symbolTable, scope); scope--; $$=NULL;}       
+       |LEFT_BRACE {scope++;  }  statements  RIGHT_BRACE {print_to_stream("Block");  symbolTable_hide(symbolTable, scope); scope--; $$=$3;} ;  
        
 block_func: LEFT_BRACE {iam_in_function++;enum func_loops entry = func; push_func_loop(   entry  );}  
                         RIGHT_BRACE  {print_to_stream("Function Block");  symbolTable_hide(symbolTable, scope);
