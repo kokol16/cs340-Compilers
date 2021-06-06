@@ -822,32 +822,32 @@ int push(function_stack *root, SymbolTableEntry *func)
     stack_entry->func = func;
     stack_entry->next = NULL;
 
-    if (root == NULL)
+    if (functions_stack == NULL)
     {
-        root = stack_entry;
+        functions_stack = stack_entry;
         return 1;
     }
 
-    stack_entry->next = root;
-    root = stack_entry;
+    stack_entry->next = functions_stack;
+    functions_stack = stack_entry;
     return 1;
 }
 
 int pop(function_stack *root)
 {
-    if (root == NULL)
+    if (functions_stack == NULL)
     {
         return 0;
     }
-    root = (root)->next;
+    functions_stack = (functions_stack)->next;
     return 1;
 }
 
 SymbolTableEntry *top(function_stack *root)
 {
-    if (root != NULL)
+    if (functions_stack != NULL)
     {
-        return root->func;
+        return functions_stack->func;
     }
     else
     {

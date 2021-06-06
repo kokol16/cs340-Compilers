@@ -58,7 +58,7 @@ void create_emits_after_bool_op(expr **$3, SymbolTable *symbolTable)
 
 int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, expr *expr2)
 {
-
+    /*
     switch (opcode)
     {
     case add:
@@ -85,6 +85,7 @@ int do_the_arith_operations_double(iopcode opcode, expr *_expr, expr *expr1, exp
         return 0;
     }
     return 1;
+    */
 }
 int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *expr2)
 {
@@ -113,11 +114,11 @@ int do_the_arith_operations_int(iopcode opcode, expr *_expr, expr *expr1, expr *
 
 expr *process_arithm_operation(iopcode opcode, expr *expr1, expr *expr2, SymbolTable *symboltable)
 {
-    expr *_expr;
+    expr *_expr = malloc(sizeof(expr));
     check_arith(expr1, opcode_to_string(opcode));
     check_arith(expr2, opcode_to_string(opcode));
-    _expr = new_expr(constdouble_e);
-    do_the_arith_operations_double(opcode, _expr, expr1, expr2);
+    //_expr = new_expr(constdouble_e);
+    //do_the_arith_operations_double(opcode, _expr, expr1, expr2);
 
     /*if (expr1->type == constdouble_e && expr2->type == constdouble_e || expr1->type == constdouble_e && expr2->type == constint_e || expr2->type == constdouble_e && expr1->type == constint_e)
         _expr = new_expr(constdouble_e);
@@ -457,7 +458,7 @@ short check_access(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
     }
     const char *id_name;
     id_name = ((*lvalue)->value.varVal != NULL) ? (*lvalue)->value.varVal->name : (*lvalue)->value.funcVal->name;
-    if ((*lvalue)->value.varVal != NULL && (*lvalue)->value.varVal->scope == scope || (*lvalue)->value.varVal != NULL && (*lvalue)->value.varVal->scope == scope)
+    if ((*lvalue)->value.varVal != NULL && (*lvalue)->value.varVal->scope == scope)
     {
         //all good
     }
@@ -471,13 +472,13 @@ short check_access(SymbolTable *symbolTable, SymbolTableEntry **lvalue)
     else
     {
         SymbolTableEntry *func_entry = top(functions_stack);
+
         if (is_function(*lvalue) || (*lvalue)->value.varVal->scope == 0 ||
             func_entry != NULL && (*lvalue)->value.varVal->scope > func_entry->value.funcVal->scope)
         {
         }
         else
         {
-
             print_error(id_name, yylineno, "ERROR : no access to variable");
             *lvalue = NULL;
             return 0;
@@ -502,6 +503,7 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
     }
     unsigned offset = pop_scope_offset_stack();
     //fprintf(stderr,"restoring %u\n",offset);
+    push(functions_stack, func_prefix->sym);
     restore_curr_scope_offset(offset);
     emit(funcend, NULL, NULL, func_prefix, curr_quad, 0, yylineno);
     return func_prefix;

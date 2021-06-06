@@ -198,21 +198,47 @@ x=print();*/
 //array.i=0;
 
 /*
-function x() {
-    local y = 9;
-    if(y==9)
-    {
-        z=65;
-        print(z);
+function xaxa(a)
+{
+    print(a);
+}*/
+if (x) {
+    function f() {
+        print("haha");
+        return;
     }
 }
-x();*/
+else {
+    x = 21;
+}
+/*
+
+function x(a) {
+    if (a == 7) {
+        return 0;
+    }
+    else {
+        function y() {
+            print(
+                "das"
+            );
+
+        }
+        //x(a-1);
+    }
 
 
+}
+a = 5;
+x(a);
+*/
+
+
+/*
 if(true)
 {
 }
-
+*/
 
 
 

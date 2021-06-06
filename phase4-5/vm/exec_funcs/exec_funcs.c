@@ -102,6 +102,7 @@ void avm_call_lib_func(char *id)
     if (!f)
     {
         //avm error
+        avm_error("didn't find library function\n", NULL, NULL);
         execution_finished = 1;
     }
     else
@@ -119,15 +120,18 @@ void avm_call_lib_func(char *id)
 void execute_call(instruction *instr)
 {
     fprintf(stderr, "execute call\n");
-
     avm_memcell *func = avm_translate_operand(&instr->arg1, &ax);
     assert(func);
+    fprintf(stderr, "type: %s\n", typeStrings[func->type]);
     avm_callsaveenviroment();
     switch (func->type)
     {
     case userfunc_m:
     {
+        fprintf(stderr, "func val index : %u\n", instr->arg1.val);
+
         pc = user_funcs[func->data.funVal].address;
+        fprintf(stderr, "pc will go to function: %u %s\n", user_funcs[func->data.funVal].address, user_funcs[func->data.funVal].id);
 
         assert(pc < AVM_ENDING_PC);
         assert(code[pc].opcode == funcenter_v);
@@ -135,11 +139,13 @@ void execute_call(instruction *instr)
     }
     case string_m:
         avm_call_lib_func(func->data.strVal);
+        break;
     case libfunc_m:
         avm_call_lib_func(func->data.libfuncVal);
+        break;
     default:
     {
-
+        avm_error("execute call error\n", NULL, NULL);
         //avm error
         execution_finished = 1;
     }
@@ -168,9 +174,11 @@ void execute_pusharg(instruction *instr)
 }
 void execute_funcexit(instruction *instr)
 {
+    fprintf(stderr, "execute_funcexit\n");
     unsigned oldTop = top;
     top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
     pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
+    fprintf(stderr, "pc:%u\n", pc);
     topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
     while (++oldTop <= top)
     {
@@ -186,6 +194,7 @@ void execute_funcenter(instruction *instr)
     /* callee actions here */
     totalActuals = 0;
     userfunc *func_info = &user_funcs[func->data.funVal]; //
+    //fprintf(stderr, "enter func %s\n", func_info->id);
     topsp = top;
     top = top - func_info->localSize;
 }

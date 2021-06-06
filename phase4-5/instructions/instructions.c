@@ -192,8 +192,9 @@ void generate_relational(vmopcode op, quad *quad)
     if (quad->label < curr_quad)
     {
         fprintf(stderr, "tadress for result %u\n", quads[quad->label].taddress);
-        //quads[quad->label].taddress;
-        t.result.val = quad->label;
+
+        t.result.val = quads[quad->label].taddress;
+        t.result.val = quad->label + 1;
     }
     else
     {
@@ -402,6 +403,7 @@ void make_operand(expr *e, vmarg *arg)
         arg->val = 0;
         return;
     }
+
     if (e->sym && e->sym->value.varVal)
         fprintf(stderr, "%s ",
                 e->sym->value.varVal->name);
@@ -419,11 +421,12 @@ void make_operand(expr *e, vmarg *arg)
         //fprintf(stderr, "vars,etc...\n");
 
         assert(e->sym);
-        arg->name = e->sym->value.varVal->name;
+        arg->name = strdup(e->sym->value.varVal->name);
         arg->val = e->sym->offset;
         switch (e->sym->space)
         {
         case programvar:
+
             arg->type = global_a;
             break;
         case functionlocal:
@@ -441,6 +444,7 @@ void make_operand(expr *e, vmarg *arg)
     case constbool_e:
     {
         //fprintf(stderr, "const bool\n");
+        memset(arg, 0, sizeof(vmarg));
 
         arg->val = e->boolConst;
         arg->type = bool_a;
@@ -448,41 +452,61 @@ void make_operand(expr *e, vmarg *arg)
     }
     case conststring_e:
     {
-        //fprintf(stderr, "const str\n");
+        memset(arg, 0, sizeof(vmarg));
 
+        //fprintf(stderr, "const str\n");
         arg->val = consts_new_string(e->strConst);
         arg->type = string_a;
         break;
     }
     case constdouble_e:
     {
+        memset(arg, 0, sizeof(vmarg));
+
         //fprintf(stderr, "const dobule\n");
         arg->val = consts_new_number(e->doubleConst);
         arg->type = number_a;
         break;
     }
     case nil_e:
+        memset(arg, 0, sizeof(vmarg));
+
         arg->type = nil_a;
         break;
     case programfunc_e:
     {
+
         arg->type = userfunc_a;
         arg->name = strdup(e->sym->value.funcVal->name);
+        arg->val = 0;
         fprintf(stderr, "program func\n");
-        arg->val = userfuncs_new_func(e->sym);
+        int i = 0;
+        for (i = 0; i < total_user_funcs; i++)
+        {
+            if (strcmp(arg->name, user_funcs[i].id) == 0)
+            {
+                arg->val = i;
+            }
+        }
+        //arg->val = ;
+        fprintf(stderr, "prog func arg->val %u\n", arg->val);
+
         //fprintf(stderr, "arg->val: %d\n", arg->val);
         break;
         //another way exists
     }
     case libraryfunc_e:
     {
+
         arg->type = libfunc_a;
-        arg->name = e->sym->value.funcVal->name;
+        arg->name = strdup(e->sym->value.funcVal->name);
         arg->val = libfuncs_new_used(e->sym->value.funcVal->name);
         break;
     }
 
     default:
+        memset(arg, 0, sizeof(vmarg));
+
         arg->type = -1;
         break;
         //assert(0);
@@ -681,7 +705,7 @@ void backpatch_return_list(return_list *head, unsigned address)
     }
     while (tmp != NULL)
     {
-        fprintf(stderr, "%d--\n", address);
+        //fprintf(stderr, "index : %u lable : %d--\n",tmp->address ,  address);
 
         instructions[tmp->address].result.val = address;
         tmp->address = address;
@@ -751,20 +775,27 @@ void patch_incomplete_jumps()
 void print_vmarg_text(vmarg *arg1, FILE *instr_file)
 {
     fprintf(instr_file, "type: %u", arg1->type);
+    if (arg1 == NULL)
+        return;
 
-    if (arg1->type < 10 && arg1->type >= 0)
+    if (arg1->type <= 10 && arg1->type >= 0)
         fprintf(instr_file, "(%s), ", vmarg_str[arg1->type]);
 
     fprintf(instr_file, " val: %u", arg1->val);
+
     if (arg1->type != 0)
     {
 
         if (arg1->name != NULL)
         {
+            //fprintf(stderr, "lalalalla11 type: %d\n", arg1->type);
+            //fprintf(stderr, "lalalalla12 %s: \n", arg1->name);
+
             fprintf(instr_file, ":%s", arg1->name);
         }
         else
         {
+
             if (arg1->type == bool_a)
             {
                 if (arg1->val == 1)
@@ -772,7 +803,6 @@ void print_vmarg_text(vmarg *arg1, FILE *instr_file)
                     fprintf(instr_file, ":%s\t", "true");
                 }
                 else if (arg1->val == 0)
-
                 {
 
                     fprintf(instr_file, ":%s\t", "false");
@@ -815,10 +845,11 @@ void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsig
     }
 
     fprintf(instr_file, "#%u\t", curr_no);
+
     opcode_str = vm_opcode_to_string(op);
     fprintf(instr_file, "%s\t", opcode_str);
 
-    if (result->type != -1)
+    if (result && result->type != -1)
     {
 
         fprintf(instr_file, "\t result: ");
@@ -826,13 +857,13 @@ void print_text_file(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *result, unsig
         print_vmarg_text(result, instr_file);
     }
 
-    if (arg1->type != -1)
+    if (arg1 && arg1->type != -1)
     {
         fprintf(instr_file, "\targ1: ");
         print_vmarg_text(arg1, instr_file);
     }
 
-    if (arg2->type != -1)
+    if (arg2 && arg2->type != -1)
     {
         fprintf(instr_file, "\targ2: ");
 
@@ -860,6 +891,7 @@ void print_instructions_analytics(vmopcode op, vmarg *arg1, vmarg *arg2, vmarg *
     fprintf(instr_file, "<opcode , ");
     fprintf(instr_file, "%s>\t", opcode_str);
     fprintf(instr_file, "<result , ");
+
     if (!print_by_type_vmarg(result, instr_file))
     {
 

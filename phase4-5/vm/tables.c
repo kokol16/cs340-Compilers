@@ -88,7 +88,6 @@ void avm_table_buckets_init(avm_table_bucket **p)
     }
 }
 
-
 avm_table *avm_table_new()
 {
     avm_table *t = malloc(sizeof(avm_table));
@@ -153,7 +152,7 @@ int avm_table_set_str_indexed(avm_table *table, avm_memcell *left, avm_memcell *
     while (tmp->next != NULL)
     {
 
-        if (tmp->key == left)
+        if (strcmp(tmp->key->data.strVal, left->data.strVal) == 0)
         {
             if (right->type == nil_m)
             {
@@ -200,7 +199,7 @@ int avm_table_set_lib_func_indexed(avm_table *table, avm_memcell *left, avm_memc
     avm_table_bucket *prev;
     while (tmp->next != NULL)
     {
-        if (tmp->key == left)
+        if (strcmp(tmp->key->data.libfuncVal, left->data.libfuncVal) == 0)
         {
             if (right->type == nil_m)
             {
@@ -242,13 +241,13 @@ int avm_table_set_user_func_indexed(avm_table *table, avm_memcell *left, avm_mem
 
     if (tmp == NULL)
     {
-    //    table->user_func_indexed[index] = bucket;
+        //    table->user_func_indexed[index] = bucket;
         return 0;
     }
     avm_table_bucket *prev;
     while (tmp->next != NULL)
     {
-        if (tmp->key == left)
+        if (tmp->key->data.funVal == left->data.funVal)
         {
             if (right->type == nil_m)
             {
@@ -296,7 +295,7 @@ int avm_table_set_number_indexed(avm_table *table, avm_memcell *left, avm_memcel
     avm_table_bucket *prev;
     while (tmp->next != NULL)
     {
-        if (tmp->key == left)
+        if (tmp->key->data.numVal == left->data.numVal)
         {
             if (right->type == nil_m)
             {
@@ -343,7 +342,7 @@ int avm_table_set_bool_indexed(avm_table *table, avm_memcell *left, avm_memcell 
     avm_table_bucket *prev;
     while (tmp->next != NULL)
     {
-        if (tmp->key == left)
+        if (tmp->key->data.boolVal == left->data.boolVal)
         {
             if (right->type == nil_m)
             {
@@ -383,7 +382,7 @@ avm_memcell *avm_table_get_number_indexed(avm_table *table, avm_memcell *left)
     avm_table_bucket *tmp = table->num_indexed[index];
     while (tmp != NULL)
     {
-        if (tmp->key == left)
+        if (tmp->key->data.numVal == left->data.numVal)
         {
             return tmp->value;
         }
@@ -401,7 +400,7 @@ avm_memcell *avm_table_get_string_indexed(avm_table *table, avm_memcell *left)
     avm_table_bucket *tmp = table->str_indexed[index];
     while (tmp != NULL)
     {
-        if (tmp->key == left)
+        if (strcmp(tmp->key->data.strVal, left->data.strVal) == 0)
         {
             return tmp->value;
         }
@@ -419,7 +418,7 @@ avm_memcell *avm_table_get_bool_indexed(avm_table *table, avm_memcell *left)
     avm_table_bucket *tmp = table->bool_indexed[index];
     while (tmp != NULL)
     {
-        if (tmp->key == left)
+        if (tmp->key->data.boolVal == left->data.boolVal)
         {
             return tmp->value;
         }
@@ -437,7 +436,7 @@ avm_memcell *avm_table_get_user_func_indexed(avm_table *table, avm_memcell *left
     avm_table_bucket *tmp = table->user_func_indexed[index];
     while (tmp != NULL)
     {
-        if (tmp->key == left)
+        if (tmp->key->data.funVal == left->data.funVal)
         {
             return tmp->value;
         }
@@ -455,7 +454,7 @@ avm_memcell *avm_table_get_lib_func_indexed(avm_table *table, avm_memcell *left)
     avm_table_bucket *tmp = table->library_func_indexed[index];
     while (tmp != NULL)
     {
-        if (tmp->key == left)
+        if (strcmp(tmp->key->data.libfuncVal, left->data.libfuncVal) == 0)
         {
             return tmp->value;
         }

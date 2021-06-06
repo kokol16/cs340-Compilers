@@ -131,7 +131,7 @@ void push_global_to_stack(vmarg *vmarg)
     avm_memcell *arg = avm_translate_operand(vmarg, &ax);
     i++;
     assert(arg);
-    avm_assign_v2(&stack[top], arg);
+    avm_assign(&stack[top], arg);
     avm_dec_top();
     topsp = top;
 }
@@ -214,7 +214,7 @@ void read_binary_file()
         fprintf(stderr, "adress: %u\n", user_funcs[i].address);
         fprintf(stderr, "=========\n");*/
     }
-    fprintf(stderr, "%s\n", user_funcs[0].id);
+    //fprintf(stderr, "%s\n", user_funcs[0].id);
 
     for (i = 0; i < total_user_funcs; i++)
     {
