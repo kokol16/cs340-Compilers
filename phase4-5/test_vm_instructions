@@ -1,0 +1,24 @@
+#1	IF_EQUALS		 result: type: 0(label_a),  val: 4		arg1: type: 1(global_a),  val: 0		arg2: type: 6(bool_a),  val: 1:true		line : 205
+
+#2	JUMP		 result: type: 0(label_a),  val: 11	line : 205
+
+#3	JUMP		 result: type: 0(label_a),  val: 11	line : 206
+
+#4	FUNCENTER		 result: type: 8(userfunc_a),  val: 0:"f"		line : 206
+
+#5	PUSHARG		arg1: type: 5(string_a),  val: 0:"haha"		line : 207
+
+#6	CALLFUNC		arg1: type: 9(libfunc_a),  val: 0:print		line : 207
+
+#7	ASSIGN		 result: type: 3(local_a),  val: 0		arg1: type: 10 val: 0	line : 207
+
+#8	ASSIGN		 result: type: 10 val: 0	line : 208
+
+#9	JUMP		 result: type: 0(label_a),  val: 10	line : 208
+
+#10	FUNCEXIT		 result: type: 8(userfunc_a),  val: 0:"f"		line : 209
+
+#11	JUMP		 result: type: 0(label_a),  val: 11	line : 211
+
+#12	ASSIGN		 result: type: 1(global_a),  val: 0		arg1: type: 4(number_a),  val: 0:21.000000		line : 212
+

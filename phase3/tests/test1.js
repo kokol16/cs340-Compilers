@@ -73,7 +73,7 @@ for(i=0; true; i++) {
 //x=not (a>b) and not (b<c) or c;
 
 //not i==j;
-a["ads"];
+/*a["ads"];
 5+6==4+2;
 xaxa1;
 function ( x1 ,x2 ,x3)
@@ -90,7 +90,7 @@ function ( x1 ,x2 ,x3)
 
 }
 xaxa2;
-xaxa3;
+xaxa3;*/
 
 /*x=(
     -(function(x){
@@ -138,9 +138,28 @@ while (x > 0) {
 
 //3
 //if (1>2)
-  // x = 1;
+// x = 1;
 
 //4
 //while(1) { 
-  //  x = 1; 
- //}
+//  x = 1; 
+//}
+
+/*
+ x=(
+     -(function(x){
+         return[{"x":x}];
+     }) (2).x+2
+ ) and not false or 2>=2;
+ */
+
+ /*
+ x = 10.12;
+ y = "hello";
+ z = (function(){return x; });
+ function g(a,b){return z(a,b); }
+ print(x,y,z);
+ t = [];
+ t.x = y;*/
+ //x= a or c>d and not b;
+ t.x.y=1821;

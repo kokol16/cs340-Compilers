@@ -3,6 +3,25 @@
         "symboltable.h": "c",
         "bison_functions.h": "c",
         "lib.h": "c",
-        "quads.h": "c"
+        "quads.h": "c",
+        "type_traits": "c",
+        "xtr1common": "c",
+        "xmemory": "c",
+        "instrtuctions.h": "c",
+        "vm_instructions_common.h": "c",
+        "exec_arith.h": "c",
+        "exec_funcs.h": "c",
+        "exec_other.h": "c",
+        "assert.h": "c",
+        "xutility": "c",
+        "xstring": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "limits": "c",
+        "new": "c",
+        "tuple": "c",
+        "utility": "c",
+        "stdlib.h": "c",
+        "vm.h": "c"
     }
 }

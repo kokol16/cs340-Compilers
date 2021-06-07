@@ -497,7 +497,7 @@ expr *process_funcdef(expr *func_prefix, unsigned total_locals)
     unsigned offset = pop_scope_offset_stack();
     //fprintf(stderr,"restoring %u\n",offset);
     restore_curr_scope_offset(offset);
-    emit(funcend, func_prefix, NULL, NULL, curr_quad, 0, yylineno);
+    emit(funcend,NULL , NULL, func_prefix, curr_quad, 0, yylineno);
     return func_prefix;
 }
 
