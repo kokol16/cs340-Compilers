@@ -5,7 +5,7 @@
 * Olimpia  Popa      csd4239@csd.uoc.gr
 
 
-
+# How To Run
 * To run the compiler, execute make run 
 * run the executable with ./al <arg1> <arg2> (optional)
 
