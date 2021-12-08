@@ -6,8 +6,11 @@
 
 
 # How To Run
-* To run the compiler, execute make run 
-* run the executable with ./al <arg1> <arg2> (optional)
+* make run
+* ./al <your_source_code> 
+* make avm
+* ./vm_exec
+
 
 
 
